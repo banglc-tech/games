@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Góc game camera · chơi bằng cơ thể thật</title>
+<title>Góc game · 56 game chơi bằng cơ thể và chạm</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -86,7 +86,7 @@ footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
   <footer>Thêm game mới: thêm một dòng vào mảng <code>GAMES</code> trong file này. <code>cat</code> là nhóm hiển thị, <code>body</code> là bộ phận dùng (tay / toan-than / chan), <code>players</code> là số người tối đa, <code>tags</code> gồm <code>treem</code>, <code>vandong</code>. Game chưa có <code>url</code> sẽ hiện "Sắp có".</footer>
 </main>
 <script>
-const B='https://banglc-tech.github.io/';
+const B='https://banglc-tech.github.io/';const V=B+'vui/';
 const GAMES=[
   {cat:'Thể thao',ico:'⚽',name:'Đá phạt đền',desc:'Vung chân thật để sút 20 quả. Thủ môn 4 mức, khán đài reo hò.',url:B+'da-phat/',body:'chan',players:1,tags:['vandong']},
   {cat:'Thể thao',ico:'🧤',name:'Thủ môn bắt bóng',desc:'Bóng sút về phía bạn, vòng vàng báo điểm tới, đưa tay vào cản.',url:B+'thu-mon/',body:'tay',players:1,tags:['treem']},
@@ -110,6 +110,26 @@ const GAMES=[
   {cat:'Phản xạ',ico:'👻',name:'Trốn ma',desc:'Ma quay đi thì chạy tại chỗ, ma quay lại thì đứng im. Tiến tới 100.',url:B+'tron-ma/',body:'toan-than',players:1,tags:['treem','vandong']},
   {cat:'Phản xạ',ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật tay lên khi phao chìm. Cá to giật nhiều lần.',url:B+'games/cau-ca/',body:'tay',players:1,tags:['treem']},
   {cat:'Phản xạ',ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, tay lướt tới đâu sạch tới đó. 2 người đua.',url:B+'lau-kinh/',body:'tay',players:2,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🐤',name:'Chim bay',desc:'Chạm để vỗ cánh, lách qua ống.',url:V+'chim-bay/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🔢',name:'2048',desc:'Vuốt để gộp số tới 2048.',url:V+'2048/',body:'ngon-tay',players:1,tags:[]},
+  {cat:'Vui nhanh',ico:'🏓',name:'Pong',desc:'Bóng bàn 2 thanh, máy hoặc 2 người, 7 điểm.',url:V+'pong/',body:'ngon-tay',players:2,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🐸',name:'Ếch qua đường',desc:'Băng qua xe và sông bằng khúc gỗ về 5 nhà.',url:V+'ech-qua-duong/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'⛏️',name:'Đào vàng',desc:'Thả móc đúng lúc kéo vàng, đá, kim cương. Đạt chỉ tiêu mỗi màn.',url:V+'dao-vang/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'👾',name:'Mê cung ăn chấm',desc:'Ăn hết chấm, né 4 ma, viên năng lượng để ăn ma.',url:V+'me-cung/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🃏',name:'Lật thẻ ghi nhớ',desc:'Tìm các cặp thẻ giống nhau với ít lượt nhất.',url:V+'lat-the/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'💣',name:'Dò mìn',desc:'9×9 tới 16×16, giữ lâu để cắm cờ.',url:V+'do-min/',body:'ngon-tay',players:1,tags:[]},
+  {cat:'Vui nhanh',ico:'⭕',name:'Cờ caro',desc:'Xếp 5 thẳng hàng, máy biết chặn hoặc 2 người.',url:V+'caro/',body:'ngon-tay',players:2,tags:[]},
+  {cat:'Vui nhanh',ico:'🎨',name:'Lặp lại màu',desc:'Nhớ dãy màu sáng rồi bấm lại, dài dần.',url:V+'lap-lai-mau/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🐹',name:'Đập chuột',desc:'Đập chuột chui lên trong 45 giây, tránh bom.',url:V+'dap-chuot/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🏗️',name:'Tháp xếp',desc:'Thả khối đúng lúc để chồng cao, khớp thì không bị cắt.',url:V+'thap-xep/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🦖',name:'Khủng long chạy',desc:'Nhảy qua xương rồng, cúi né chim, nhanh dần.',url:V+'chay-khong-ngung/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'☄️',name:'Tránh thiên thạch',desc:'Kéo ngang né đá rơi, nhặt khiên.',url:V+'tranh-thien-thach/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🎹',name:'Nhịp phím',desc:'Chạm ô đen đúng cột, mỗi ô một nốt nhạc.',url:V+'nhip-phim/',body:'ngon-tay',players:1,tags:[]},
+  {cat:'Vui nhanh',ico:'🧺',name:'Hứng trái cây',desc:'Đưa rổ hứng trái cây rơi, tránh bom.',url:V+'bat-trai-cay/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🦘',name:'Nhảy lò xo',desc:'Nhảy lên mãi qua bệ di chuyển, bệ vỡ, lò xo.',url:V+'nhay-lo-xo/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Vui nhanh',ico:'🚣',name:'Đua thuyền',desc:'Chạm trái phải luân phiên thật nhanh, máy hoặc 2 người.',url:V+'dua-thuyen/',body:'ngon-tay',players:2,tags:['treem']},
+  {cat:'Vui nhanh',ico:'💡',name:'Lật ô sáng',desc:'Tắt hết ô vàng, chạm đảo 5 ô. 12 màn.',url:V+'lat-o/',body:'ngon-tay',players:1,tags:[]},
+  {cat:'Vui nhanh',ico:'🎯',name:'Tìm ô khác màu',desc:'Tìm ô hơi khác màu thật nhanh trong 30 giây.',url:V+'tim-khac/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Không cần camera',ico:'⛏️',name:'Thế giới khối',desc:'Sandbox 3D: đảo tạo ngẫu nhiên, đào và đặt 8 loại khối, bay, ngày đêm, lưu thế giới vào máy.',url:'https://banglc-tech.github.io/the-gioi-khoi/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Không cần camera',ico:'💣',name:'Đặt bom',desc:'Kiểu Bomberman: phá gạch, diệt quái, nhặt đồ, tìm cửa ra. 8 màn, chơi bằng nút bấm hoặc bàn phím.',url:'https://banglc-tech.github.io/dat-bom/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Không cần camera',ico:'🐍',name:'Rắn săn mồi',desc:'Ăn mồi để dài ra, đừng cắn đuôi. Mồi thưởng 50 điểm, 3 tốc độ, xuyên tường hoặc không.',url:'https://banglc-tech.github.io/8bit/ran/',body:'ngon-tay',players:1,tags:['treem']},
@@ -120,7 +140,7 @@ const GAMES=[
   {cat:'Nhịp điệu & thư giãn',ico:'🥁',name:'Trống không khí',desc:'4 mặt trống quanh người, vỗ tay xuống đúng lúc nốt chạm.',url:B+'trong/',body:'tay',players:1,tags:['treem']},
   {cat:'Nhịp điệu & thư giãn',ico:'🧘',name:'Yoga giữ dáng',desc:'5 tư thế, giữ yên 10 giây mỗi tư thế, chấm độ rung.',url:B+'games/yoga/',body:'toan-than',players:1,tags:[]},
 ];
-const CATS=['Thể thao','Chạy & nhảy','Phản xạ','Nhịp điệu & thư giãn','Không cần camera'];
+const CATS=['Thể thao','Chạy & nhảy','Phản xạ','Nhịp điệu & thư giãn','Vui nhanh','Không cần camera'];
 const BODY={tay:'✋ tay','toan-than':'🧍 toàn thân',chan:'🦶 chân','ngon-tay':'📱 chạm / phím'};
 let filter='all',q='';
 function match(g){const s=(g.name+' '+g.desc+' '+g.cat).toLowerCase();if(q&&!s.includes(q))return false;
