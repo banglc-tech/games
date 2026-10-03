@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thế giới khối</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B0D12;--paper:#F3F1EC;--acc:#7CC243;--panel:rgba(11,13,18,.7);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--panel:rgba(11,13,18,.75)}}
+:root[data-theme="dark"]{--panel:rgba(11,13,18,.75)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:#7fb7ff;color:var(--paper);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none}
+#stage{position:relative;width:100%;height:100%}
+canvas#c{display:block;width:100%;height:100%}
+#cross{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none}
+#cross::before,#cross::after{content:"";position:absolute;background:rgba(255,255,255,.85);mix-blend-mode:difference}
+#cross::before{left:8px;top:0;width:2px;height:18px}#cross::after{top:8px;left:0;width:18px;height:2px}
+#hot{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:4px;background:var(--panel);padding:5px;border-radius:10px}
+#hot button{width:46px;height:46px;border:2px solid transparent;border-radius:8px;background:#222;padding:0;cursor:pointer}
+#hot button.on{border-color:#fff}
+@media (max-width:430px){#hot button{width:38px;height:38px}#hot{gap:3px;padding:4px}}
+#hot canvas{width:100%;height:100%;display:block;border-radius:6px;image-rendering:pixelated}
+#hud{position:absolute;top:8px;left:8px;background:var(--panel);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700}
+#tools{position:absolute;right:8px;top:8px;display:flex;gap:6px}#tools button{width:40px;height:40px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
+#touch{position:absolute;inset:0;pointer-events:none}
+.stick{position:absolute;left:24px;bottom:84px;width:120px;height:120px;border-radius:50%;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.3)}
+.stick i{position:absolute;left:38px;top:38px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.6)}
+.abtns{position:absolute;right:16px;bottom:84px;display:grid;grid-template-columns:64px 64px;gap:10px}
+.abtns button{width:64px;height:64px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font:inherit;font-weight:900;font-size:12px;pointer-events:auto}
+.abtns button:active{background:var(--acc);color:var(--ink)}
+@media (hover:hover) and (min-width:900px){#touch{display:none}}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,13,18,.9);padding:22px;z-index:10}.ov[hidden]{display:none}
+.card{max-width:460px;width:100%;text-align:center}
+.card h1{font-size:clamp(34px,9vw,56px);line-height:.95;font-weight:900;margin:0;letter-spacing:-.03em}.card h1 span{display:block;font-size:.38em;font-weight:700;color:var(--acc);margin-top:10px}
+.card ol{text-align:left;font-size:13.5px;line-height:1.5;padding-left:18px;margin:14px 0}
+.btn{display:block;width:100%;padding:15px;margin-top:12px;border-radius:10px;border:none;font:inherit;font-weight:700;font-size:16px;cursor:pointer}.btn.primary{background:var(--acc);color:var(--ink)}.btn.ghost{background:transparent;color:var(--paper);border:2px solid rgba(243,241,236,.35);margin-top:8px}
+a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
+#msg{position:absolute;left:50%;top:14%;transform:translateX(-50%);background:var(--panel);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}#msg.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="cross"></div>
+  <div id="hud">☀️ <span id="time">Sáng</span> · 📦 <span id="cnt">0</span> khối đã đặt</div>
+  <div id="tools"><button id="bSave" title="Lưu thế giới">💾</button><button id="bHelp">?</button></div>
+  <div id="hot"></div>
+  <div id="msg"></div>
+  <div id="touch"><div class="stick" id="stick"><i id="knob"></i></div><div class="abtns"><button id="bJump">NHẢY</button><button id="bFly">BAY</button><button id="bBreak">ĐẬP</button><button id="bPlace">ĐẶT</button></div></div>
+  <div class="ov" id="ovStart"><div class="card">
+    <h1>Thế giới khối<span>Đào, xây, khám phá đảo của bạn</span></h1>
+    <ol id="guide">
+      <li><b>Điện thoại:</b> cần điều khiển bên trái để đi, kéo ngón tay bên phải màn hình để nhìn. Nút NHẢY, BAY (bật/tắt, đang bay thì NHẢY = lên, cúi = xuống), ĐẬP khối đang nhắm, ĐẶT khối đang chọn.</li>
+      <li><b>Máy tính:</b> chạm vào màn hình để khoá chuột, WASD đi, chuột nhìn, phím cách nhảy (nhấn đúp để bay), chuột trái đập, chuột phải đặt, phím 1–8 hoặc lăn chuột chọn khối, Esc thả chuột.</li>
+      <li>Thanh dưới cùng là các loại khối: cỏ, đất, đá, gỗ, lá, cát, gạch, đèn. Đèn phát sáng ban đêm.</li>
+      <li>Có ngày và đêm. Nút 💾 lưu thế giới vào máy, lần sau mở lại vẫn còn.</li>
+    </ol>
+    <button class="btn primary" id="bStart">Vào thế giới</button>
+    <button class="btn ghost" id="bNew">Tạo thế giới mới (xoá bản đã lưu)</button>
+    <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
+  </div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const SX=64,SZ=64,SY=24,CH=16;
+const TYPES=[{n:'Cỏ',top:'#6fbf3a',side:'#8a6a3c',sidetop:'#6fbf3a',bot:'#8a6a3c'},{n:'Đất',top:'#8a6a3c'},{n:'Đá',top:'#8a8f98'},{n:'Gỗ',top:'#b08a52',side:'#6b4a2b'},{n:'Lá',top:'#2e8b3a',alpha:true},{n:'Cát',top:'#e6d38a'},{n:'Gạch',top:'#b5533c'},{n:'Đèn',top:'#ffe77a',light:true}];
+const AIR=0;let world=new Uint8Array(SX*SY*SZ);const idx=(x,y,z)=>(y*SZ+z)*SX+x;
+const get=(x,y,z)=>(x<0||z<0||y<0||x>=SX||z>=SZ||y>=SY)?AIR:world[idx(x,y,z)];
+// ---- noise ----
+function hash(x,z,s){let h=(x*374761393+z*668265263+s*1274126177)|0;h=(h^(h>>13))*1274126177;return ((h^(h>>16))>>>0)/4294967296}
+function noise(x,z,s){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi;const u=xf*xf*(3-2*xf),v=zf*zf*(3-2*zf);const a=hash(xi,zi,s),b=hash(xi+1,zi,s),c=hash(xi,zi+1,s),d=hash(xi+1,zi+1,s);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
+function gen(seed){world.fill(0);for(let x=0;x<SX;x++)for(let z=0;z<SZ;z++){const dx=x-SX/2,dz=z-SZ/2;const isl=1-Math.hypot(dx,dz)/(SX*0.52);let h=4+noise(x/9,z/9,seed)*5+noise(x/3,z/3,seed+7)*2+isl*5;h=Math.max(2,Math.min(SY-6,h|0));
+    for(let y=0;y<h;y++)world[idx(x,y,z)]=y<h-3?3:2;if(h<=4){world[idx(x,h-1,z)]=6;for(let y=h;y<4;y++)world[idx(x,y,z)]=0}else world[idx(x,h-1,z)]=1;
+    if(h>5&&hash(x,z,seed+3)<0.02&&x>3&&z>3&&x<SX-4&&z<SZ-4){const th=4+(hash(x,z,seed+4)*3|0);for(let y=0;y<th;y++)world[idx(x,h+y,z)]=4;for(let ox=-2;ox<=2;ox++)for(let oz=-2;oz<=2;oz++)for(let oy=-2;oy<=1;oy++){if(Math.abs(ox)+Math.abs(oz)+Math.abs(oy)>4)continue;const yy=h+th-1+oy;if(get(x+ox,yy,z+oz)===0)world[idx(x+ox,yy,z+oz)]=5}}}
+  // ponds: y<4 is "water level" shown as blue flat later
+}
+// ---- textures ----
+function tex(){const c=document.createElement('canvas');c.width=16*TYPES.length*3;c.height=16;const g=c.getContext('2d');
+  TYPES.forEach((t,i)=>{[['top',t.top],['side',t.side||t.top],['bot',t.bot||t.side||t.top]].forEach(([k,col],j)=>{const ox=(i*3+j)*16;g.fillStyle=col;g.fillRect(ox,0,16,16);
+    for(let p=0;p<40;p++){g.fillStyle=`rgba(${Math.random()<0.5?0:255},${Math.random()<0.5?0:255},${Math.random()<0.5?0:255},${0.08+Math.random()*0.08})`;g.fillRect(ox+Math.random()*16|0,Math.random()*16|0,1+Math.random()*2|0,1+Math.random()*2|0)}
+    if(i===0&&j===1){g.fillStyle=t.sidetop;g.fillRect(ox,0,16,4);for(let p=0;p<6;p++)g.fillRect(ox+Math.random()*16|0,4,1,1+Math.random()*2|0)}
+    if(i===3&&j===0){g.strokeStyle='#7a5a32';g.lineWidth=1;for(let r=2;r<8;r+=2){g.beginPath();g.arc(ox+8,8,r,0,7);g.stroke()}}
+    if(i===6){g.fillStyle='#d9c3b0';for(let r=0;r<4;r++){g.fillRect(ox,r*4+3,16,1);for(let k=0;k<2;k++)g.fillRect(ox+((r%2)*8+k*8)%16,r*4,1,4)}}
+    if(i===7){g.fillStyle='#8b6b2a';g.fillRect(ox,0,16,2);g.fillRect(ox,14,16,2);g.fillRect(ox,0,2,16);g.fillRect(ox+14,0,2,16)}
+    if(i===2){g.fillStyle='rgba(0,0,0,.25)';g.fillRect(ox+2,5,6,1);g.fillRect(ox+9,10,5,1);g.fillRect(ox+6,12,1,3)}})});
+  const T=new THREE.CanvasTexture(c);T.magFilter=THREE.NearestFilter;T.minFilter=THREE.NearestFilter;return T}
+// ---- meshing ----
+let scene,camera,renderer,chunks={},mat,matLight;
+const FACES=[{d:[1,0,0],c:[[1,0,0],[1,1,0],[1,1,1],[1,0,1]],n:[1,0,0],sh:.8},{d:[-1,0,0],c:[[0,0,1],[0,1,1],[0,1,0],[0,0,0]],n:[-1,0,0],sh:.8},{d:[0,1,0],c:[[0,1,1],[1,1,1],[1,1,0],[0,1,0]],n:[0,1,0],sh:1},{d:[0,-1,0],c:[[0,0,0],[1,0,0],[1,0,1],[0,0,1]],n:[0,-1,0],sh:.5},{d:[0,0,1],c:[[1,0,1],[1,1,1],[0,1,1],[0,0,1]],n:[0,0,1],sh:.7},{d:[0,0,-1],c:[[0,0,0],[0,1,0],[1,1,0],[1,0,0]],n:[0,0,-1],sh:.7}];
+function buildChunk(cx,cz){const key=cx+','+cz;if(chunks[key]){scene.remove(chunks[key]);chunks[key].geometry.dispose()}
+  const pos=[],uv=[],col=[],ind=[];let vi=0;const NT=TYPES.length*3;
+  for(let x=cx*CH;x<cx*CH+CH;x++)for(let z=cz*CH;z<cz*CH+CH;z++)for(let y=0;y<SY;y++){const b=get(x,y,z);if(!b)continue;const t=TYPES[b-1];
+    FACES.forEach((f,fi)=>{const nb=get(x+f.d[0],y+f.d[1],z+f.d[2]);if(nb&&!(TYPES[nb-1].alpha&&nb!==b))return;const ti=(b-1)*3+(fi===2?0:fi===3?2:1);const u0=ti/NT,u1=(ti+1)/NT;
+      f.c.forEach((c,k)=>{pos.push(x+c[0],y+c[1],z+c[2]);const uvs=[[u0,0],[u0,1],[u1,1],[u1,0]][k];uv.push(uvs[0],uvs[1]);const sh=f.sh*(t.light?1.3:1);col.push(sh,sh,sh)});ind.push(vi,vi+1,vi+2,vi,vi+2,vi+3);vi+=4})}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setIndex(ind);g.computeVertexNormals();
+  const m=new THREE.Mesh(g,mat);scene.add(m);chunks[key]=m}
+function rebuildAt(x,z){buildChunk(x/CH|0,z/CH|0);if(x%CH===0)buildChunk((x-1)/CH|0,z/CH|0);if(x%CH===CH-1)buildChunk((x+1)/CH|0,z/CH|0);if(z%CH===0)buildChunk(x/CH|0,(z-1)/CH|0);if(z%CH===CH-1)buildChunk(x/CH|0,(z+1)/CH|0)}
+function buildAll(){for(const k in chunks){scene.remove(chunks[k])}chunks={};for(let cx=0;cx<SX/CH;cx++)for(let cz=0;cz<SZ/CH;cz++)buildChunk(cx,cz)}
+// ---- player ----
+const P={x:SX/2+.5,y:16,z:SZ/2+.5,vy:0,yaw:0,pitch:0,fly:false,ground:false,sel:0};let placed=0,lastSpace=0,dayT=0.25;
+const solid=(x,y,z)=>{const b=get(Math.floor(x),Math.floor(y),Math.floor(z));return b&&!TYPES[b-1].alpha||b===5}
+function collide(nx,ny,nz){const r=0.3;for(const dx of [-r,r])for(const dz of [-r,r])for(const dy of [0.1,0.9,1.7])if(solid(nx+dx,ny+dy,nz+dz))return true;return false}
+function move(dt,fw,st,up){const sp=P.fly?9:4.5;const sin=Math.sin(P.yaw),cos=Math.cos(P.yaw);let dx=(-sin*fw+cos*st)*sp*dt,dz=(-cos*fw-sin*st)*sp*dt;
+  if(!collide(P.x+dx,P.y,P.z))P.x+=dx;else if(!collide(P.x+dx,P.y+1,P.z)&&P.ground&&!P.fly){P.y+=1;P.x+=dx}
+  if(!collide(P.x,P.y,P.z+dz))P.z+=dz;else if(!collide(P.x,P.y+1,P.z+dz)&&P.ground&&!P.fly){P.y+=1;P.z+=dz}
+  if(P.fly){P.vy=up*6}else{P.vy-=22*dt;if(up>0&&P.ground)P.vy=8}
+  let dy=P.vy*dt;P.ground=false;if(!collide(P.x,P.y+dy,P.z))P.y+=dy;else{if(dy<0)P.ground=true;P.vy=0}
+  if(P.y<-10){P.y=SY;P.x=SX/2;P.z=SZ/2}}
+function ray(){const dir=new THREE.Vector3(-Math.sin(P.yaw)*Math.cos(P.pitch),Math.sin(P.pitch),-Math.cos(P.yaw)*Math.cos(P.pitch));let x=P.x,y=P.y+1.6,z=P.z,px,py,pz;
+  for(let i=0;i<60;i++){const bx=Math.floor(x),by=Math.floor(y),bz=Math.floor(z);if(get(bx,by,bz)){return{x:bx,y:by,z:bz,px,py,pz}}px=bx;py=by;pz=bz;x+=dir.x*0.1;y+=dir.y*0.1;z+=dir.z*0.1}return null}
+function doBreak(){const h=ray();if(!h)return;world[idx(h.x,h.y,h.z)]=0;rebuildAt(h.x,h.z);snd(200,.08)}
+function doPlace(){const h=ray();if(!h||h.px===undefined)return;if(h.px<0||h.pz<0||h.px>=SX||h.pz>=SZ||h.py<0||h.py>=SY)return;const b=P.sel+1;
+  if(Math.floor(P.x)===h.px&&Math.floor(P.z)===h.pz&&(h.py===Math.floor(P.y)||h.py===Math.floor(P.y+1)))return;
+  world[idx(h.px,h.py,h.pz)]=b;rebuildAt(h.px,h.pz);placed++;$('cnt').textContent=placed;snd(500,.06)}
+// ---- audio ----
+let ac=null;function snd(f,d){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+// ---- hotbar ----
+function hotbar(){const h=$('hot');h.innerHTML='';TYPES.forEach((t,i)=>{const b=document.createElement('button');b.className=i===P.sel?'on':'';b.title=t.n;const c=document.createElement('canvas');c.width=16;c.height=16;const g=c.getContext('2d');g.fillStyle=t.top;g.fillRect(0,0,16,16);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,10,16,6);if(t.side){g.fillStyle=t.side;g.fillRect(0,6,16,10)}b.appendChild(c);b.onclick=()=>{P.sel=i;hotbar();msg(t.n)};h.appendChild(b)})}
+function msg(t){const m=$('msg');m.textContent=t;m.classList.add('show');clearTimeout(msg.t);msg.t=setTimeout(()=>m.classList.remove('show'),1200)}
+// ---- input ----
+const keys={};let locked=false,look={x:0,y:0},stickV={x:0,y:0},jumpHeld=false;
+window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'){const n=performance.now();if(n-lastSpace<300){P.fly=!P.fly;msg(P.fly?'Bay: bật':'Bay: tắt')}lastSpace=n}if(e.key>='1'&&e.key<='8'){P.sel=+e.key-1;hotbar()}e.preventDefault()});
+window.addEventListener('keyup',e=>{keys[e.code]=false});
+const cv=$('c');
+cv.addEventListener('click',e=>{if(!locked&&matchMedia('(hover:hover)').matches&&cv.requestPointerLock){cv.requestPointerLock();return}});
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===cv});
+cv.addEventListener('mousemove',e=>{if(!locked)return;P.yaw-=e.movementX*0.0025;P.pitch=Math.max(-1.5,Math.min(1.5,P.pitch-e.movementY*0.0025))});
+cv.addEventListener('mousedown',e=>{if(!locked)return;if(e.button===0)doBreak();if(e.button===2)doPlace()});cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('wheel',e=>{P.sel=(P.sel+(e.deltaY>0?1:TYPES.length-1))%TYPES.length;hotbar()});
+// touch: left stick, right look
+let lookId=null,lookLast=null,stickId=null;const stick=$('stick'),knob=$('knob');
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;cv.setPointerCapture(e.pointerId);if(e.clientX<innerWidth/2&&stickId===null){stickId=e.pointerId;stickAt(e)}else if(lookId===null){lookId=e.pointerId;lookLast={x:e.clientX,y:e.clientY}}});
+cv.addEventListener('pointermove',e=>{if(e.pointerId===lookId){P.yaw-=(e.clientX-lookLast.x)*0.006;P.pitch=Math.max(-1.5,Math.min(1.5,P.pitch-(e.clientY-lookLast.y)*0.006));lookLast={x:e.clientX,y:e.clientY}}if(e.pointerId===stickId)stickAt(e)});
+const endP=e=>{if(e.pointerId===lookId)lookId=null;if(e.pointerId===stickId){stickId=null;stickV={x:0,y:0};knob.style.transform=''}};cv.addEventListener('pointerup',endP);cv.addEventListener('pointercancel',endP);
+function stickAt(e){const r=stick.getBoundingClientRect();let dx=(e.clientX-(r.left+r.width/2))/(r.width/2),dy=(e.clientY-(r.top+r.height/2))/(r.height/2);const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}stickV={x:dx,y:-dy};knob.style.transform=`translate(${dx*38}px,${dy*38}px)`}
+$('bJump').addEventListener('pointerdown',e=>{e.preventDefault();jumpHeld=true});$('bJump').addEventListener('pointerup',()=>jumpHeld=false);$('bJump').addEventListener('pointercancel',()=>jumpHeld=false);
+$('bFly').onclick=()=>{P.fly=!P.fly;msg(P.fly?'Bay: bật (NHẢY lên, cúi = nhìn xuống + NHẢY)':'Bay: tắt')};
+$('bBreak').addEventListener('pointerdown',e=>{e.preventDefault();doBreak()});$('bPlace').addEventListener('pointerdown',e=>{e.preventDefault();doPlace()});
+// ---- save ----
+function save(){try{let out=[],run=0,cur=world[0];for(let i=0;i<world.length;i++){if(world[i]===cur&&run<255)run++;else{out.push(cur,run);cur=world[i];run=1}}out.push(cur,run);localStorage.setItem('tgk-world',btoa(String.fromCharCode(...new Uint8Array(out))));localStorage.setItem('tgk-p',JSON.stringify({x:P.x,y:P.y,z:P.z,yaw:P.yaw,placed}));msg('Đã lưu thế giới')}catch(e){msg('Không lưu được')}}
+function load(){try{const s=localStorage.getItem('tgk-world');if(!s)return false;const a=atob(s);let i=0;for(let k=0;k<a.length;k+=2){const v=a.charCodeAt(k),n=a.charCodeAt(k+1);for(let j=0;j<n;j++)world[i++]=v}const p=JSON.parse(localStorage.getItem('tgk-p')||'{}');if(p.x!==undefined){P.x=p.x;P.y=p.y;P.z=p.z;P.yaw=p.yaw||0;placed=p.placed||0}return true}catch(e){return false}}
+$('bSave').onclick=save;setInterval(()=>{if(started)save()},60000);
+$('bHelp').onclick=()=>{$('ovStart').hidden=false;if(document.exitPointerLock)document.exitPointerLock()};
+// ---- main ----
+let started=false,last=performance.now(),water,sun,amb,hemi;
+function init(){renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));scene=new THREE.Scene();scene.fog=new THREE.Fog(0x9fcfff,30,70);
+  camera=new THREE.PerspectiveCamera(75,1,0.1,120);mat=new THREE.MeshLambertMaterial({map:tex(),vertexColors:true,alphaTest:0.5});
+  hemi=new THREE.HemisphereLight(0xffffff,0x6a7a4a,0.9);scene.add(hemi);sun=new THREE.DirectionalLight(0xffffff,0.6);scene.add(sun);
+  water=new THREE.Mesh(new THREE.PlaneGeometry(SX,SZ),new THREE.MeshLambertMaterial({color:0x2f7fd8,transparent:true,opacity:0.65}));water.rotation.x=-Math.PI/2;water.position.set(SX/2,3.9,SZ/2);scene.add(water);
+  resize();window.addEventListener('resize',resize);hotbar()}
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(started){let fw=0,st=0,up=0;if(keys.KeyW||keys.ArrowUp)fw=1;if(keys.KeyS||keys.ArrowDown)fw=-1;if(keys.KeyA||keys.ArrowLeft)st=-1;if(keys.KeyD||keys.ArrowRight)st=1;if(keys.Space||jumpHeld)up=1;if(keys.ShiftLeft)up=-1;
+    if(stickV.x||stickV.y){fw=stickV.y;st=stickV.x}if(P.fly&&jumpHeld&&P.pitch<-0.9)up=-1;
+    move(dt,fw,st,up);
+    dayT=(dayT+dt/240)%1;const sunA=dayT*Math.PI*2;const day=Math.max(0,Math.sin(sunA));sun.position.set(Math.cos(sunA)*50,Math.sin(sunA)*50,20);sun.intensity=0.2+day*0.6;hemi.intensity=0.25+day*0.7;
+    const sky=new THREE.Color().setHSL(0.58,0.7,0.12+day*0.55);renderer.setClearColor(sky);scene.fog.color=sky;$('time').textContent=day>0.5?'Sáng':day>0.1?'Hoàng hôn':'Đêm';$('hud').firstChild.textContent=day>0.5?'☀️ ':day>0.1?'🌇 ':'🌙 '}
+  camera.position.set(P.x,P.y+1.6,P.z);camera.rotation.set(0,0,0,'YXZ');camera.rotation.y=P.yaw;camera.rotation.x=P.pitch;
+  renderer.render(scene,camera);requestAnimationFrame(frame)}
+init();
+const seed0=(Math.random()*1e6)|0;
+$('bStart').onclick=()=>{if(!started){if(!load()){gen(seed0)}buildAll();started=true}$('ovStart').hidden=true;$('bStart').textContent='Tiếp tục';$('bNew').textContent='Tạo thế giới mới (xoá bản đã lưu)'};
+$('bNew').onclick=()=>{try{localStorage.removeItem('tgk-world');localStorage.removeItem('tgk-p')}catch(e){}gen((Math.random()*1e6)|0);P.x=SX/2+.5;P.z=SZ/2+.5;P.y=18;placed=0;$('cnt').textContent=0;buildAll();started=true;$('ovStart').hidden=true;msg('Thế giới mới')};
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Đấu Boxing – Camera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A0F; --paper:#F3F1EC; --blue:#1E6BFF; --red:#E3312D; --gold:#F5C542; --panel:rgba(10,10,15,.78);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --panel:rgba(10,10,15,.82) } }
+:root[data-theme="dark"]{ --panel:rgba(10,10,15,.82) }
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:var(--ink);color:var(--paper);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none}
+#stage{position:relative;width:100%;height:100%}
+canvas#c{display:block;width:100%;height:100%}
+video{display:none}
+
+#hud{position:absolute;top:8px;left:8px;right:8px;display:flex;align-items:center;gap:8px;pointer-events:none}
+.hp{flex:1;background:var(--panel);border-radius:8px;padding:6px 8px}
+.hp small{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:4px}
+.hp .bar{height:12px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.hp .bar i{display:block;height:100%;width:100%;transition:width .15s}
+.hp.a .bar i{background:var(--blue)} .hp.b .bar i{background:var(--red)}
+.hp.b small{flex-direction:row-reverse}
+#clock{background:var(--ink);border:2px solid var(--gold);border-radius:10px;padding:4px 10px;text-align:center;min-width:64px}
+#clock b{display:block;font-size:22px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1}
+#clock small{font-size:10px;font-weight:700;opacity:.8}
+#tools{position:absolute;right:8px;top:64px;display:flex;flex-direction:column;gap:8px}
+#tools button{width:42px;height:42px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:18px;cursor:pointer}
+#status{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:var(--panel);padding:10px 18px;border-radius:999px;font-weight:700;font-size:15px;white-space:nowrap;pointer-events:none;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#big{position:absolute;left:0;right:0;top:40%;text-align:center;font-weight:900;font-size:clamp(40px,12vw,96px);letter-spacing:-.03em;pointer-events:none;opacity:0;transform:scale(.6) rotate(-6deg);transition:transform .15s,opacity .15s;text-shadow:0 5px 0 rgba(0,0,0,.55)}
+#big.show{opacity:1;transform:scale(1) rotate(-6deg)}
+
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,15,.9);padding:22px;overflow:auto}
+.ov[hidden]{display:none}
+.card{max-width:460px;width:100%;text-align:center}
+.card h1{font-size:clamp(38px,11vw,64px);line-height:.92;font-weight:900;margin:0;letter-spacing:-.04em;font-style:italic}
+.card h1 span{display:block;font-size:.36em;font-weight:700;color:var(--gold);letter-spacing:0;margin-top:10px;font-style:normal}
+.card ul{text-align:left;font-size:13.5px;line-height:1.5;padding-left:18px;margin:12px 0;opacity:.9}
+.lbl{margin:12px 0 6px;font-weight:700;font-size:14px;text-align:left}
+.row{display:flex;gap:6px}
+.opt{flex:1;padding:10px 4px;border-radius:8px;border:2px solid rgba(243,241,236,.3);background:transparent;color:var(--paper);font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.opt.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn{display:block;width:100%;padding:15px;margin-top:12px;border-radius:10px;border:none;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.btn.primary{background:var(--red);color:#fff}
+.btn.ghost{background:transparent;color:var(--paper);border:2px solid rgba(243,241,236,.35);margin-top:8px}
+.btn:focus-visible,.opt:focus-visible,#tools button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#err{color:var(--gold);font-size:13px;min-height:1em;margin-top:10px}
+#endBox h1{font-size:clamp(34px,9vw,54px)}
+#endText{font-size:15px;line-height:1.5;opacity:.9}
+@media (min-width:1000px){.card{max-width:540px}.card ul{font-size:16px}.btn{font-size:19px}#status{font-size:20px}#clock b{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}.hp .bar{height:16px}.hp small{font-size:13px}}
+@media (prefers-reduced-motion: reduce){#big{transition:none}}
+.card.help{text-align:left}.card.help ol{font-size:14px;line-height:1.55;padding-left:20px;margin:10px 0}.card.help ol li{margin:6px 0}.card.help .tips{background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.5;margin-top:12px}.card.help .tips ul{padding-left:18px;margin:6px 0 0}#bHelp{font-weight:900;font-size:20px!important}</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <video id="v" playsinline muted autoplay></video>
+
+  <div id="hud">
+    <div class="hp a"><small><span id="nA">Bạn</span><span id="hA">100</span></small><div class="bar"><i id="bA"></i></div></div>
+    <div id="clock"><small id="rnd">Hiệp 1</small><b id="tm">60</b></div>
+    <div class="hp b"><small><span id="nB">Máy</span><span id="hB">100</span></small><div class="bar"><i id="bB"></i></div></div>
+  </div>
+  <div id="tools">
+    <button id="bFlip" aria-label="Đổi camera" title="Đổi camera">⟲</button>
+    <button id="bMute" aria-label="Âm thanh" title="Âm thanh">🔊</button>
+    <button id="bFull" aria-label="Toàn màn hình" title="Toàn màn hình">⛶</button>
+    <button id="bHelp" aria-label="Hướng dẫn" title="Hướng dẫn">?</button>
+  </div>
+  <div id="status">Đang chuẩn bị…</div>
+  <div id="big"></div>
+
+  <div class="ov" id="ovStart">
+    <div class="card">
+      <h1>Đấu Boxing<span>Đấm, móc, né bằng cơ thể thật</span></h1>
+      <ul>
+        <li><b>Đấm thẳng:</b> duỗi tay nhanh về phía camera, duỗi hết tay. Đứng cách camera 1,5–2 m, thấy từ đầu tới hông.</li>
+        <li><b>Đấm móc:</b> vung tay ngang qua người.</li>
+        <li><b>Né:</b> nghiêng đầu sang trái/phải hoặc cúi xuống khi đối thủ vung tay (có mũi tên báo trước).</li>
+        <li><b>Thủ:</b> giơ hai nắm tay che mặt, giảm 70% sát thương.</li>
+      </ul>
+      <div class="lbl">Đối thủ</div>
+      <div class="row" id="rowMode"><button class="opt on" data-v="bot">Võ sĩ máy</button><button class="opt" data-v="pvp">2 người</button></div>
+      <div id="botLvl"><div class="lbl">Độ giỏi võ sĩ máy</div>
+      <div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button><button class="opt" data-v="3">Huyền thoại</button></div></div>
+      <div class="lbl">Thể thức</div>
+      <div class="row" id="rowFmt"><button class="opt on" data-v="1">1 hiệp 60s</button><button class="opt" data-v="3">3 hiệp 60s</button></div>
+      <button class="btn primary" id="bCam">Bật camera và đấu</button>
+      <button class="btn ghost" id="bTouch">Chơi bằng chạm màn hình</button>
+      <p id="err"></p>
+    </div>
+  </div>
+
+  <div class="ov" id="ovHelp" hidden><div class="card help"><h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1><ol><li>Võ sĩ đối diện bạn trên màn hình. Hai chấm xanh là hai tay bạn, chấm sáng to khi tay vung nhanh.</li><li>Đấm thẳng: duỗi tay nhanh hết cỡ về phía camera. Đấm móc: vung tay ngang qua người.</li><li>Khi võ sĩ máy sắp đánh, chữ đỏ báo trước: ◀ NÉ TRÁI, NÉ PHẢI ▶ hoặc NÉ hoặc CÚI. Nghiêng đầu sang đúng bên hoặc cúi xuống.</li><li>Giơ hai nắm tay che mặt là thủ, giảm 70% sát thương. Né xong đấm ngay là đòn phản, mạnh gấp rưỡi.</li><li>Thắng bằng KO hoặc hơn máu khi hết hiệp. Góc trái màn hình báo game đang nhận bạn ở tư thế nào.</li></ol>
+<div class="tips"><b>Để camera nhận tốt</b><ul><li>Đứng cách camera 1,5–2 m, đủ sáng, không ngược sáng.</li><li>Camera thấy từ đầu tới hông, hai tay duỗi thẳng vẫn trong hình.</li><li>Nền phía sau càng gọn càng dễ nhận.</li></ul></div>
+<button class="btn primary" id="bHelpClose">Đã hiểu, chơi thôi</button></div></div>
+  <div class="ov" id="ovEnd" hidden>
+    <div class="card" id="endBox">
+      <h1 id="endTitle">Bạn thắng!</h1>
+      <p id="endText"></p>
+      <button class="btn primary" id="bAgain">Đấu lại</button>
+      <button class="btn ghost" id="bMenu">Về màn hình đầu</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+const $=id=>document.getElementById(id);
+$('bHelp').onclick=()=>{$('ovHelp').hidden=!$('ovHelp').hidden};$('bHelpClose').onclick=()=>{$('ovHelp').hidden=true;try{localStorage.setItem('bx-help','1')}catch(e){}};
+function firstHelp(){let seen=false;try{seen=localStorage.getItem('bx-help')==='1'}catch(e){}if(!seen)$('ovHelp').hidden=false}
+const cv=$('c'),ctx=cv.getContext('2d'),video=$('v');
+let W=0,H=0,DPR=1;
+function layout(){DPR=Math.min(window.devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
+window.addEventListener('resize',layout);
+
+// ---------- settings ----------
+const BOT=[
+ {name:'Dễ',hp:80,tele:1.0,gap:[2.2,3.6],dmg:0.6,stun:0.5,guardP:0.1},
+ {name:'Vừa',hp:100,tele:0.75,gap:[1.5,2.6],dmg:1,stun:0.4,guardP:0.25},
+ {name:'Khó',hp:120,tele:0.55,gap:[1.0,1.8],dmg:1.3,stun:0.3,guardP:0.4},
+ {name:'Huyền thoại',hp:150,tele:0.4,gap:[0.7,1.3],dmg:1.6,stun:0.22,guardP:0.55},
+];
+let opt={mode:'bot',lvl:1,rounds:1};
+try{const o=JSON.parse(localStorage.getItem('bx-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
+function bindRow(id,key,parse){const row=$(id);row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));
+  b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem('bx-opt',JSON.stringify(opt))}catch(e){};$('botLvl').style.display=opt.mode==='bot'?'':'none'}})}
+bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);bindRow('rowFmt','rounds',v=>+v);$('botLvl').style.display=opt.mode==='bot'?'':'none';
+
+// ---------- audio ----------
+let ac=null,master=null,muted=false;try{muted=localStorage.getItem('bx-mute')==='1'}catch(e){}
+function out(){if(!master){master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination)}return master}
+function initAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){}}
+function tone(f,d,type='sine',v=.15,slide){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;if(slide)o.frequency.exponentialRampToValueAtTime(slide,ac.currentTime+d);g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g).connect(out());o.start();o.stop(ac.currentTime+d)}
+function nz(d,f,q,v){if(!ac)return;const b=ac.createBuffer(1,ac.sampleRate*d,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);const s=ac.createBufferSource(),fl=ac.createBiquadFilter(),g=ac.createGain();s.buffer=b;fl.type='bandpass';fl.frequency.value=f;fl.Q.value=q;g.gain.value=v;s.connect(fl).connect(g).connect(out());s.start()}
+const sfx={hit(h){nz(.12,h?260:160,0.8,.9);tone(h?110:80,.18,'triangle',.5,40)},whiff(){nz(.15,1500,0.7,.3)},block(){nz(.08,700,1.5,.4);tone(300,.08,'square',.1)},
+  bell(){for(let i=0;i<2;i++)setTimeout(()=>{tone(1800,1.2,'sine',.25,1750);tone(2700,.8,'sine',.12)},i*450)},
+  tele(){tone(500,.1,'square',.06,400)},ooh(){for(let i=0;i<6;i++)setTimeout(()=>tone(260+Math.random()*120,.8,'triangle',.05,160),i*40)},
+  cheer(){nz(2.2,1100,0.6,.8);for(let i=0;i<8;i++)setTimeout(()=>tone(380+Math.random()*300,.8,'sawtooth',.03,300),i*70)},count(n){tone(880,.15,'square',.12)}};
+function updMute(){$('bMute').textContent=muted?'🔇':'🔊';if(master)master.gain.value=muted?0:1}
+$('bMute').onclick=()=>{muted=!muted;try{localStorage.setItem('bx-mute',muted?'1':'0')}catch(e){}updMute()};updMute();
+$('bFull').onclick=()=>{const d=document.documentElement;if(!document.fullscreenElement){(d.requestFullscreen||d.webkitRequestFullscreen||function(){}).call(d)}else{(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document)}};
+
+// ---------- camera + pose ----------
+let noPerson=false,noPersonT=0;
+let stream=null,facing='user',crop={sx:0,sy:0,sw:1,sh:1},pose=null,poseReady=false,input='none';
+async function startCam(){try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:960},height:{ideal:720}},audio:false});video.srcObject=stream;await video.play();return true}catch(e){window.__camErr=(e&&e.name||'')+' '+(e&&e.message||'');return false}}
+function computeCrop(){const vw=video.videoWidth,vh=video.videoHeight;if(!vw)return false;const s=Math.max(W/vw,H/vh);const sw=W/s,sh=H/s;crop={sx:(vw-sw)/2,sy:(vh-sh)/2,sw,sh};return true}
+const mirrored=()=>facing==='user';
+function toScreen(lm){const vw=video.videoWidth,vh=video.videoHeight;let x=(lm.x*vw-crop.sx)/crop.sw*W,y=(lm.y*vh-crop.sy)/crop.sh*H;if(mirrored())x=W-x;return{x,y}}
+async function loadPose(){try{const mod=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
+  const vision=await mod.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+  pose=await mod.PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',delegate:'GPU'},runningMode:'VIDEO',numPoses:opt.mode==='pvp'?2:1});
+  poseReady=true;return true}catch(e){console.warn(e);return false}}
+$('bFlip').onclick=async()=>{if(input!=='pose')return;facing=facing==='user'?'environment':'user';await startCam()};
+
+// ---------- fighters ----------
+const ATK={jab:{dmg:6,hdmg:9,speed:0.14},hookL:{dmg:9,hdmg:12,speed:0.2},hookR:{dmg:9,hdmg:12,speed:0.2}};
+function mkFighter(name,ctrl,side,color,hp){return{name,ctrl,side,color,hp,maxHp:hp,
+  lean:0,duck:false,guard:false,baseX:null,baseY:null,sw:60,seen:false,
+  hands:{L:{ext:0,pts:[],cd:0},R:{ext:0,pts:[],cd:0}},
+  anim:{state:'idle',t:0,atk:null,face:0,hitT:0},stun:0,nextAtk:1.5,tele:0,
+  glove:{t:0,hand:'R',kind:'jab'},shake:0,flash:0,hits:0,landed:0}}
+let F=[],phase='menu',round=1,timeLeft=60,koCount=0,koT=0,winner=null;
+
+function targetOf(f){return F[f===F[0]?1:0]}
+function viewerHalf(f){ // screen region where f's avatar is drawn (the opponent's view)
+  if(opt.mode==='bot')return{x0:0,x1:W};return f===F[0]?{x0:W/2,x1:W}:{x0:0,x1:W/2}}
+function victimHalf(f){ // region of the viewer controlling f (for hit flashes)
+  if(opt.mode==='bot')return{x0:0,x1:W};return f===F[0]?{x0:0,x1:W/2}:{x0:W/2,x1:W}}
+
+function flash(txt,col){const b=$('big');b.textContent=txt;b.style.color=col;b.classList.add('show');clearTimeout(flash.t);flash.t=setTimeout(()=>b.classList.remove('show'),700)}
+function setStatus(s){$('status').textContent=s}
+
+function launch(att,kind,hand){ // attacker starts an attack
+  if(phase!=='fight'||att.stun>0||att.anim.state!=='idle')return;
+  if(att.ctrl!=='bot'){if((att.pcd||0)>0)return;att.pcd=0.38}
+  att.anim.state='tele';att.anim.t=0;att.anim.atk=kind;att.anim.hand=hand;
+  att.tele=att.ctrl==='bot'?BOT[opt.lvl].tele:0.12;
+  if(att.ctrl==='bot')sfx.tele();
+  if(att.ctrl!=='bot'){att.glove.t=1;att.glove.hand=hand;att.glove.kind=kind}
+}
+function resolve(att){
+  const def=targetOf(att),kind=att.anim.atk,a=ATK[kind];
+  if(def.anim.state==='hit'){att.anim.state='recover';att.anim.t=0;return} // already reeling, can't be hit again yet
+  let dodged=false;
+  if(kind==='jab')dodged=Math.abs(def.lean)>0.38||def.duck;
+  else if(kind==='hookL')dodged=def.duck||def.lean>0.38;   // hook coming at defender's left → lean right
+  else dodged=def.duck||def.lean<-0.38;
+  const high=!def.duck;
+  if(dodged){sfx.whiff();att.anim.state='recover';att.anim.t=0;pops.push({x:mid(victimHalf(def)),y:H*0.5,txt:'NÉ!',c:'#F3F1EC',life:1});
+    if(def.ctrl!=='bot')def.counter=0.8;return}
+  let dmg=(high?a.hdmg:a.dmg)*(att.ctrl==='bot'?BOT[opt.lvl].dmg:1);
+  if(def.counter>0)dmg*=1.5;
+  if(def.guard){dmg*=0.3;sfx.block();pops.push({x:mid(victimHalf(def)),y:H*0.5,txt:'THỦ',c:'#F5C542',life:1})}
+  else{sfx.hit(high);def.flash=1;def.shake=1;def.anim.state='hit';def.anim.t=0;def.anim.hitT=1;def.anim.hitDir=kind==='hookL'?1:kind==='hookR'?-1:(Math.random()<.5?1:-1);def.stun=att.ctrl==='bot'?0.25:BOT[opt.lvl].stun;
+    pops.push({x:mid(victimHalf(def)),y:H*0.45,txt:(kind==='jab'?'ĐẤM':'MÓC')+(def.counter>0?' PHẢN!':'!'),c:att.color,life:1});
+    if(def.ctrl==='bot'&&Math.random()<0.4)sfx.ooh();}
+  def.hp=Math.max(0,def.hp-Math.round(dmg));att.landed++;if(def.ctrl==='bot'&&!def.guard)def.pressure=(def.pressure||0)+1;
+  att.anim.state='recover';att.anim.t=0;
+  if(def.hp<=0)ko(att,def);
+}
+function mid(h){return (h.x0+h.x1)/2}
+let pops=[];
+
+// ---------- pose → fighter input ----------
+function feedPose(f,lm,wl,now,dt){
+  const S=i=>toScreen(lm[i]);
+  const nose=S(0),ls=S(11),rs=S(12),le=S(13),re=S(14),lw=S(15),rw=S(16);
+  const sw=Math.max(30,Math.hypot(ls.x-rs.x,ls.y-rs.y));f.sw=sw;f.seen=true;
+  if(f.baseX===null){f.baseX=nose.x;f.baseY=nose.y}
+  const lean=(nose.x-f.baseX)/sw,duck=(nose.y-f.baseY)/sw;
+  f.lean=lean;f.duck=duck>0.45;
+  // slow re-centering when not dodging
+  if(Math.abs(lean)<0.3&&!f.duck){f.baseX+=(nose.x-f.baseX)*Math.min(1,dt*0.6);f.baseY+=(nose.y-f.baseY)*Math.min(1,dt*0.6)}
+  // guard: both wrists near face and above shoulder line
+  const shY=(ls.y+rs.y)/2;
+  f.guard=Math.hypot(lw.x-nose.x,lw.y-nose.y)<sw*0.9&&Math.hypot(rw.x-nose.x,rw.y-nose.y)<sw*0.9&&lw.y<shY+sw*0.1&&rw.y<shY+sw*0.1;
+  // punches: use 3D world landmarks (metres) when available, else 2D fallback
+  f.dbg={nose,ls,rs,lw,rw,le,re};
+  for(const [tag,wi,si,w2,s2,vis] of [['L',15,11,lw,ls,lm[15].visibility],['R',16,12,rw,rs,lm[16].visibility]]){
+    const h=f.hands[tag];h.cd=Math.max(0,h.cd-dt);
+    if(vis!==undefined&&vis<0.3){h.pts=[];continue}
+    let pt;
+    if(wl&&wl[wi]){const w=wl[wi],sh=wl[si];pt={x:w.x-sh.x,y:w.y-sh.y,z:w.z-sh.z,t:now,m:true}}      // wrist relative to its shoulder, metres
+    else{pt={x:(w2.x-s2.x)/sw*0.4,y:(w2.y-s2.y)/sw*0.4,z:0,t:now,m:false}}
+    h.pts.push(pt);while(h.pts.length>6)h.pts.shift();
+    if(h.pts.length<3||h.cd>0||f.guard)continue;
+    const p0=h.pts[0],p1=h.pts[h.pts.length-1],dtp=Math.max(0.03,(p1.t-p0.t)/1000);
+    const vx=(p1.x-p0.x)/dtp,vy=(p1.y-p0.y)/dtp,vz=(p1.z-p0.z)/dtp;          // m/s
+    const spd=Math.hypot(vx,vy,vz);
+    h.meter=spd;
+    const reach=Math.hypot(p1.x,p1.y,p1.z);                                   // arm extension in metres
+    if(spd>1.6&&reach>0.33){
+      let kind='jab';
+      if(Math.abs(vx)>Math.abs(vz)*1.1&&Math.abs(vx)>Math.abs(vy)){kind=vx<0?'hookL':'hookR'} // world x+ = image right = person's left; mirrored on screen
+      if(!p1.m&&Math.abs(vx)>1.2)kind=vx>0?'hookR':'hookL';
+      h.cd=0.4;h.pts=[];launch(f,kind,tag);
+    }
+  }
+}
+
+// ---------- touch fallback ----------
+let tp=null,holdT=null;
+cv.addEventListener('pointerdown',e=>{if(input!=='touch'||phase!=='fight')return;const f=opt.mode==='pvp'?(e.clientX<W/2?F[0]:F[1]):F[0];
+  tp={x:e.clientX,y:e.clientY,t:performance.now(),f};cv.setPointerCapture(e.pointerId);holdT=setTimeout(()=>{if(tp){tp.f.guard=true;tp.hold=true}},260)});
+cv.addEventListener('pointerup',e=>{if(!tp)return;clearTimeout(holdT);const f=tp.f,dx=e.clientX-tp.x,dy=e.clientY-tp.y;f.guard=false;
+  if(tp.hold){}else if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){f.lean=dx>0?1:-1;setTimeout(()=>{f.lean=0},550)}
+  else if(dy>60){f.duck=true;setTimeout(()=>{f.duck=false},550)}
+  else{const half=victimHalf(f);const rel=(e.clientX-half.x0)/(half.x1-half.x0);const kind=performance.now()-tp.t<120?'jab':'jab';launch(f,rel<0.33?'hookR':rel>0.66?'hookL':'jab',rel<0.5?'L':'R')}
+  tp=null});
+
+// ---------- bot brain ----------
+function botThink(b,dt){
+  if(phase!=='fight')return;const L=BOT[opt.lvl],you=targetOf(b);
+  b.nextAtk-=dt;b.guardT=Math.max(0,(b.guardT||0)-dt);b.pressure=Math.max(0,(b.pressure||0)-dt*0.8);
+  if(b.pressure>=1.6&&b.guardT<=0){b.guardT=0.7+L.guardP;b.pressure=0}       // under a flurry: cover up
+  if(you.anim.state==='tele'&&Math.random()<L.guardP*dt*12)b.guardT=Math.max(b.guardT,0.35); // reads your punch and blocks
+  b.guard=b.guardT>0;
+  if(b.stun>0||b.anim.state!=='idle')return;
+  if(b.nextAtk<=0){const r=Math.random();launch(b,r<0.5?'jab':r<0.75?'hookL':'hookR',r<0.5?(Math.random()<.5?'L':'R'):r<0.75?'L':'R');b.nextAtk=L.gap[0]+Math.random()*(L.gap[1]-L.gap[0])}
+}
+
+// ---------- drawing ----------
+function drawRing(){
+  ctx.save();ctx.lineWidth=Math.max(4,H*0.008);
+  for(let i=0;i<3;i++){const y=H*0.56+i*H*0.1;ctx.strokeStyle=i===1?'#F3F1EC':'#1E6BFF';ctx.globalAlpha=.75;ctx.beginPath();ctx.moveTo(0,y+Math.sin(i)*2);ctx.quadraticCurveTo(W/2,y-H*0.02,W,y);ctx.stroke()}
+  ctx.restore();
+}
+function drawBoxer(f,now){
+  const half=viewerHalf(f),cx=mid(half),span=half.x1-half.x0,s=Math.min(span,H)*0.0024; // scale
+  const a=f.anim,bob=Math.sin(now/350)*6*s,sway=Math.sin(now/900)*14*s;
+  const col=f.color,skin=f===F[0]?'#E7B894':'#C98E62';
+  let ox=0,oy=0,headTilt=0,gl={L:{x:-120,y:60,r:52},R:{x:120,y:60,r:52}},bodyScale=1;
+  const t=a.t;
+  if(a.state==='tele'){const k=Math.min(1,t/f.tele);const h=a.hand;gl[h].x+= (h==='L'?-70:70)*k;gl[h].y-=40*k;gl[h].r+=10*k;oy=-10*k}
+  else if(a.state==='strike'){const k=Math.min(1,t/ATK[a.atk].speed);const h=a.hand;const k2=Math.sin(k*Math.PI);
+    if(a.atk==='jab'){gl[h].x*=1-0.8*k2;gl[h].y=60-200*k2;gl[h].r=52+120*k2}else{gl[h].x=(h==='L'?-240:240)*(1-k2)+(h==='L'?200:-200)*k2;gl[h].y=60-110*k2;gl[h].r=52+100*k2}bodyScale=1+0.12*k2}
+  else if(a.state==='hit'){const k=1-Math.min(1,t/0.35);ox=(f.anim.hitDir||1)*40*k;headTilt=(f.anim.hitDir||1)*0.5*k;oy=10*k}
+  else if(a.state==='recover'){const k=1-Math.min(1,t/0.4);oy=8*k}
+  if(f.guard&&(a.state==='idle'||a.state==='hit'||a.state==='recover')){gl.L.x=-45;gl.L.y=-60;gl.R.x=45;gl.R.y=-60}
+  if(f.hp<=0){oy=120;headTilt=0.9}
+  ctx.save();ctx.translate(cx+sway+ox,H*0.42+bob+oy);ctx.scale(s*bodyScale,s*bodyScale);
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(0,200,170,30,0,0,7);ctx.fill();
+  // torso
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(-120,-20);ctx.quadraticCurveTo(-150,120,-90,210);ctx.lineTo(90,210);ctx.quadraticCurveTo(150,120,120,-20);ctx.closePath();ctx.fill();
+  ctx.fillStyle=skin;ctx.beginPath();ctx.moveTo(-100,-20);ctx.quadraticCurveTo(-110,80,-70,120);ctx.lineTo(70,120);ctx.quadraticCurveTo(110,80,100,-20);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(-35,50,22,36,0,0,7);ctx.ellipse(35,50,22,36,0,0,7);ctx.fill();
+  // head
+  ctx.save();ctx.translate(0,-90);ctx.rotate(headTilt);
+  ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(0,0,62,72,0,0,7);ctx.fill();
+  ctx.fillStyle='#1b1b1b';ctx.beginPath();ctx.ellipse(0,-45,66,32,0,Math.PI,0);ctx.fill();   // hair/cap
+  ctx.fillStyle=col;ctx.fillRect(-66,-50,132,12);                                             // headband
+  // eyes
+  const dead=f.hp<=0;ctx.strokeStyle='#1b1b1b';ctx.lineWidth=6;ctx.lineCap='round';
+  if(dead){for(const ex of[-24,24]){ctx.beginPath();ctx.moveTo(ex-10,-10);ctx.lineTo(ex+10,10);ctx.moveTo(ex+10,-10);ctx.lineTo(ex-10,10);ctx.stroke()}}
+  else{ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-24,-4,14,10,0,0,7);ctx.ellipse(24,-4,14,10,0,0,7);ctx.fill();ctx.fillStyle='#1b1b1b';ctx.beginPath();ctx.arc(-22,-3,5,0,7);ctx.arc(26,-3,5,0,7);ctx.fill();
+    ctx.beginPath();ctx.moveTo(-40,-22);ctx.lineTo(-10,-14);ctx.moveTo(40,-22);ctx.lineTo(10,-14);ctx.stroke()}
+  ctx.fillStyle='#8b2d2d';ctx.beginPath();ctx.ellipse(0,32,a.state==='hit'?14:22,a.state==='hit'?16:8,0,0,7);ctx.fill();
+  if(a.hitT>0){ctx.fillStyle='#F5C542';for(let i=0;i<5;i++){const an=now/200+i*1.26;ctx.beginPath();ctx.arc(Math.cos(an)*95,-30+Math.sin(an)*30,8*a.hitT,0,7);ctx.fill()}}
+  ctx.restore();
+  // gloves
+  for(const h of ['L','R']){const g=gl[h];ctx.fillStyle=col;ctx.beginPath();ctx.arc(g.x,g.y,g.r,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.25)';ctx.beginPath();ctx.arc(g.x-g.r*.3,g.y-g.r*.3,g.r*.4,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(g.x,g.y,g.r*.75,0.3,2.2);ctx.stroke()}
+  ctx.restore();
+  // telegraph arrow for the defender
+  if(a.state==='tele'){const def=targetOf(f),vh=victimHalf(def),mx=mid(vh);const k=0.5+0.5*Math.sin(now/80);
+    ctx.save();ctx.globalAlpha=0.6+0.4*k;ctx.fillStyle='#E3312D';ctx.font='900 '+Math.min(44,(vh.x1-vh.x0)*0.085)+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';
+    const txt=a.atk==='jab'?'NÉ hoặc CÚI':a.atk==='hookL'?'NÉ PHẢI ▶':'◀ NÉ TRÁI';ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=6;ctx.strokeText(txt,mx,H*0.78);ctx.fillText(txt,mx,H*0.78);ctx.restore()}
+}
+function drawFirstPersonGlove(f,now){ // glove of a human player punching
+  if(f.glove.t<=0)return;const vh=victimHalf(f),span=vh.x1-vh.x0,k=Math.sin(Math.min(1,1-f.glove.t)*Math.PI);
+  const x=vh.x0+span*(f.glove.hand==='L'?0.3:0.7)+(f.glove.kind==='hookL'?span*0.3*k:f.glove.kind==='hookR'?-span*0.3*k:0);
+  const y=H*(0.95-0.45*k),r=Math.min(span,H)*(0.14-0.06*k);
+  ctx.save();ctx.fillStyle=f.color;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.4,0,7);ctx.fill();ctx.restore();
+}
+function drawStance(f){ // small indicator of the detected pose state for the human
+  if(f.ctrl==='bot')return;
+  if(f.dbg&&f.seen){const d=f.dbg;ctx.save();ctx.strokeStyle='rgba(243,241,236,.45)';ctx.lineWidth=3;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(d.ls.x,d.ls.y);ctx.lineTo(d.rs.x,d.rs.y);ctx.moveTo(d.ls.x,d.ls.y);ctx.lineTo(d.le.x,d.le.y);ctx.lineTo(d.lw.x,d.lw.y);ctx.moveTo(d.rs.x,d.rs.y);ctx.lineTo(d.re.x,d.re.y);ctx.lineTo(d.rw.x,d.rw.y);ctx.stroke();
+    for(const [pt,tag] of [[d.lw,'L'],[d.rw,'R']]){const m=Math.min(1,(f.hands[tag].meter||0)/1.6);ctx.fillStyle=f.color;ctx.shadowColor=f.color;ctx.shadowBlur=10+m*25;ctx.beginPath();ctx.arc(pt.x,pt.y,10+m*10,0,7);ctx.fill()}
+    ctx.shadowBlur=0;ctx.fillStyle='rgba(243,241,236,.8)';ctx.beginPath();ctx.arc(d.nose.x,d.nose.y,6,0,7);ctx.fill();ctx.restore()}
+  if(!f.seen)return;const vh=victimHalf(f),x=vh.x0+14,y=H*0.5;
+  ctx.save();ctx.font='700 13px "Be Vietnam Pro",sans-serif';ctx.textAlign='left';ctx.fillStyle='rgba(243,241,236,.85)';
+  const st=f.guard?'🛡 THỦ':f.duck?'⬇ CÚI':f.lean>0.38?'▶ NÉ PHẢI':f.lean<-0.38?'◀ NÉ TRÁI':'● sẵn sàng';ctx.fillText(st,x,y);ctx.restore();
+}
+
+// ---------- loop ----------
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHelp').hidden){requestAnimationFrame(frame);return}ctx.clearRect(0,0,W,H);
+  if(input==='pose'&&video.readyState>=2&&computeCrop()){ctx.save();if(mirrored()){ctx.translate(W,0);ctx.scale(-1,1)}ctx.drawImage(video,crop.sx,crop.sy,crop.sw,crop.sh,0,0,W,H);ctx.restore();ctx.fillStyle='rgba(10,10,15,.25)';ctx.fillRect(0,0,W,H)}
+  else{const g=ctx.createRadialGradient(W/2,H*0.4,20,W/2,H*0.4,Math.max(W,H));g.addColorStop(0,'#232338');g.addColorStop(1,'#0A0A0F');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  drawRing();
+  if(opt.mode==='pvp'){ctx.strokeStyle='rgba(243,241,236,.35)';ctx.setLineDash([10,10]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([])}
+
+  // pose
+  if(input==='pose'&&poseReady&&video.readyState>=2&&(phase==='fight'||phase==='ready')){
+    try{const res=pose.detectForVideo(video,now);const ppl=(res.landmarks||[]).map((lm,i)=>({lm,wl:(res.worldLandmarks||[])[i],nx:toScreen(lm[0]).x})).sort((a,b)=>a.nx-b.nx);
+      noPerson=ppl.length===0;
+      F.forEach(f=>{if(f.ctrl==='pose')f.seen=false});
+      ppl.forEach(p=>{const f=opt.mode==='pvp'?(p.nx<W/2?F[0]:F[1]):F[0];if(f.ctrl==='pose')feedPose(f,p.lm,p.wl,now,dt)});
+    }catch(e){}
+  }
+  for(const f of F){
+    if(f.ctrl==='bot')botThink(f,dt);
+    f.stun=Math.max(0,f.stun-dt);f.pcd=Math.max(0,(f.pcd||0)-dt);f.counter=Math.max(0,(f.counter||0)-dt);f.glove.t=Math.max(0,f.glove.t-dt*4);f.flash=Math.max(0,f.flash-dt*3);f.shake=Math.max(0,f.shake-dt*3);f.anim.hitT=Math.max(0,f.anim.hitT-dt*2);
+    const a=f.anim;a.t+=dt;
+    if(a.state==='tele'&&a.t>=f.tele){a.state='strike';a.t=0}
+    else if(a.state==='strike'&&a.t>=ATK[a.atk].speed*0.6&&!a.resolved){a.resolved=true;resolve(f)}
+    else if(a.state==='strike'&&a.t>=ATK[a.atk].speed){a.state='recover';a.t=0;a.resolved=false}
+    else if((a.state==='recover'&&a.t>0.4)||(a.state==='hit'&&a.t>0.35)){a.state='idle';a.t=0;a.resolved=false}
+  }
+  // draw avatars: in bot mode only the bot; in pvp both
+  for(const f of F){if(f.ctrl==='bot'||opt.mode==='pvp'){
+    const sh=targetOf(f).shake;if(sh>0){ctx.save();ctx.translate((Math.random()-.5)*16*sh,(Math.random()-.5)*16*sh)}
+    drawBoxer(f,now);if(sh>0)ctx.restore()}}
+  for(const f of F){if(f.ctrl!=='bot')drawFirstPersonGlove(f,now);drawStance(f);
+    if(f.flash>0){const vh=victimHalf(f);ctx.fillStyle='rgba(227,49,45,'+f.flash*0.45+')';ctx.fillRect(vh.x0,0,vh.x1-vh.x0,H)}}
+  // popups
+  ctx.font='900 '+Math.max(22,Math.min(W,H)*0.07)+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';
+  for(const p of pops){p.y-=dt*50;p.life-=dt*1.3;ctx.globalAlpha=Math.max(0,Math.min(1,p.life));ctx.lineWidth=6;ctx.strokeStyle='rgba(0,0,0,.7)';ctx.fillStyle=p.c;ctx.strokeText(p.txt,p.x,p.y);ctx.fillText(p.txt,p.x,p.y)}ctx.globalAlpha=1;pops=pops.filter(p=>p.life>0);
+
+  if(input==='pose'&&(phase==='fight'||phase==='ready')){noPersonT=noPerson?noPersonT+dt:0;if(noPersonT>1){ctx.save();ctx.fillStyle='rgba(10,10,15,.6)';ctx.fillRect(0,H*0.3,W,H*0.16);ctx.fillStyle='#F5C542';ctx.font='700 '+Math.min(22,W*0.05)+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText('Không thấy bạn trong hình',W/2,H*0.37);ctx.font='500 '+Math.min(15,W*0.038)+'px "Be Vietnam Pro",sans-serif';ctx.fillText('Lùi lại để camera thấy từ đầu tới hông, đủ sáng',W/2,H*0.42);ctx.restore()}}
+  // round clock
+  if(phase==='fight'){timeLeft-=dt;$('tm').textContent=Math.ceil(Math.max(0,timeLeft));if(timeLeft<=0)endRound()}
+  if(phase==='ko'){koT-=dt;if(koT<=0){koCount++;koT=1;if(koCount<=10){sfx.count(koCount);flash(String(koCount),'#F5C542');setStatus('Đếm '+koCount+'…')}if(koCount>10)endMatch()}}
+  // HUD
+  const [A,B]=F;if(A){$('hA').textContent=A.hp;$('hB').textContent=B.hp;$('bA').style.width=(A.hp/A.maxHp*100)+'%';$('bB').style.width=(B.hp/B.maxHp*100)+'%'}
+  requestAnimationFrame(frame);
+}
+
+// ---------- flow ----------
+function newMatch(){
+  const bot=BOT[opt.lvl];
+  F=[mkFighter(opt.mode==='pvp'?'Người 1 (trái)':'Bạn',input,0,'#1E6BFF',100),
+     opt.mode==='pvp'?mkFighter('Người 2 (phải)',input,1,'#E3312D',100):mkFighter('Máy · '+bot.name,'bot',1,'#E3312D',bot.hp)];
+  $('nA').textContent=F[0].name;$('nB').textContent=F[1].name;round=1;pops=[];winner=null;
+  $('ovStart').hidden=true;$('ovEnd').hidden=true;startRound();
+}
+function startRound(){
+  timeLeft=60;$('rnd').textContent='Hiệp '+round+'/'+opt.rounds;F.forEach(f=>{f.anim.state='idle';f.anim.t=0;f.stun=0;f.nextAtk=2});
+  phase='ready';setStatus('Chuẩn bị…');flash('HIỆP '+round,'#F5C542');
+  setTimeout(()=>{if(phase!=='ready')return;phase='fight';sfx.bell();setStatus(input==='pose'?'Đấm! Nghiêng đầu để né.':'Chạm: đấm · Vuốt ngang: né · Giữ: thủ');flash('ĐẤU!','#E3312D')},1600);
+}
+function ko(att,def){phase='ko';koCount=0;koT=0.8;winner=att;sfx.bell();flash('KO!','#E3312D');setStatus(def.name+' ngã!');def.anim.state='hit';def.anim.t=0}
+function endRound(){
+  phase='rest';sfx.bell();
+  if(round>=opt.rounds){endMatch();return}
+  setStatus('Hết hiệp '+round);flash('HẾT HIỆP','#F5C542');round++;
+  setTimeout(()=>{F.forEach(f=>{f.hp=Math.min(f.maxHp,f.hp+Math.round(f.maxHp*0.15))});startRound()},2500);
+}
+function endMatch(){
+  phase='end';const [A,B]=F;let w=winner||(A.hp===B.hp?null:A.hp>B.hp?A:B);
+  let title,txt;
+  if(!w){title='Hoà';txt='Hai bên ngang điểm. Đấu lại phân thắng bại.'}
+  else{title=w.name+' thắng!';txt=winner?'Thắng bằng knock-out.':'Thắng bằng điểm sau '+opt.rounds+' hiệp.';
+    txt+=' Trúng đích: '+A.name+' '+A.landed+' cú, '+B.name+' '+B.landed+' cú.'}
+  if(opt.mode==='bot')txt+=w===A?' Thử mức cao hơn?':w===B?' Mẹo: né khi thấy chữ đỏ báo, rồi đấm ngay lúc máy vừa vung hụt.':'';
+  $('endTitle').textContent=title;$('endText').textContent=txt;$('ovEnd').hidden=false;setStatus('Kết thúc');(w===A?sfx.cheer:sfx.ooh)();
+}
+$('bCam').onclick=async()=>{initAudio();$('err').textContent='Đang xin quyền camera…';const ok=navigator.mediaDevices&&await startCam();
+  if(!ok){const e=window.__camErr||'';$('err').textContent='Không mở được camera. '+(/NotAllowed|Permission/i.test(e)?'Trang này đang bị chặn camera, hãy mở link trực tiếp trên trình duyệt.':'Hãy cho phép quyền camera.')+' Hoặc chơi bằng chạm màn hình.';return}
+  $('err').textContent='Đang tải bộ nhận diện cơ thể (khoảng 5 MB)…';if(!poseReady){const pk=await loadPose();if(!pk){$('err').textContent='Không tải được bộ nhận diện (cần mạng). Bạn vẫn có thể chơi bằng chạm màn hình.';return}}
+  input='pose';newMatch();firstHelp()};
+$('bTouch').onclick=()=>{initAudio();input='touch';newMatch()};
+$('bAgain').onclick=()=>{initAudio();newMatch()};
+$('bMenu').onclick=()=>{phase='menu';$('ovEnd').hidden=true;$('ovStart').hidden=false;setStatus('Đang chuẩn bị…')};
+layout();requestAnimationFrame(frame);
+</script>
+</body>
+</html>

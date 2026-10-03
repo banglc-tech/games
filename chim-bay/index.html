@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chim bay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0B0D12;--paper:#F3F1EC;--acc:#F5C542;--red:#F25C54;--jade:#06D6A0;--panel:rgba(11,13,18,.8);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--panel:rgba(11,13,18,.84)}}
+:root[data-theme="dark"]{--panel:rgba(11,13,18,.84)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:var(--ink);color:var(--paper);font-family:"Be Vietnam Pro",system-ui,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:none}
+#stage{position:relative;width:100%;height:100%;display:flex;flex-direction:column}
+#hud{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;gap:8px;font-family:"Press Start 2P",monospace}
+.box{background:var(--panel);border-radius:8px;padding:7px 10px;min-width:70px}.box small{display:block;font-size:8px;opacity:.7;margin-bottom:5px}.box b{font-size:14px;color:var(--acc);font-weight:400}
+#wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:4px}
+canvas#c{display:block;max-width:100%;max-height:100%;background:#000;border:3px solid #333;image-rendering:pixelated}
+#pad{display:flex;justify-content:space-between;align-items:center;padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));gap:12px}
+.dpad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(3,64px);gap:5px}
+.dpad button{border:none;border-radius:12px;background:rgba(243,241,236,.12);color:var(--paper);font-size:26px;font-weight:900;touch-action:none}
+.dpad .mid{border-radius:50%;background:rgba(243,241,236,.05)}.dpad button:active{background:var(--acc);color:var(--ink)}
+.abtn{display:flex;gap:10px}
+.abtn button{width:84px;height:84px;border-radius:50%;border:4px solid var(--acc);background:var(--panel);color:var(--paper);font:inherit;font-weight:900;font-size:13px;line-height:1.1}.abtn button:active{background:var(--acc);color:var(--ink)}
+@media (min-width:900px){#pad{display:none}}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,13,18,.92);padding:22px;z-index:10}.ov[hidden]{display:none}
+.card{max-width:440px;width:100%;text-align:center}
+.card h1{font-family:"Press Start 2P",monospace;font-size:clamp(20px,6vw,32px);line-height:1.3;margin:0;color:var(--acc)}.card h1 span{display:block;font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:700;color:var(--paper);margin-top:12px;opacity:.85}
+.card ol{text-align:left;font-size:13.5px;line-height:1.5;padding-left:18px;margin:14px 0}
+.lbl{margin:12px 0 6px;font-weight:700;font-size:14px;text-align:left}.row{display:flex;gap:6px}
+.opt{flex:1;padding:10px 4px;border-radius:8px;border:2px solid rgba(243,241,236,.3);background:transparent;color:var(--paper);font:inherit;font-weight:700;font-size:13px;cursor:pointer}.opt.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.btn{display:block;width:100%;padding:15px;margin-top:12px;border-radius:10px;border:none;font:inherit;font-weight:700;font-size:16px;cursor:pointer}.btn.primary{background:var(--acc);color:var(--ink)}.btn.ghost{background:transparent;color:var(--paper);border:2px solid rgba(243,241,236,.35);margin-top:8px}
+a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
+#big{position:absolute;left:0;right:0;top:40%;text-align:center;font-family:"Press Start 2P",monospace;font-size:clamp(18px,5vw,40px);pointer-events:none;opacity:0;transform:scale(.6);transition:.2s;text-shadow:3px 3px 0 #000;z-index:5}#big.show{opacity:1;transform:scale(1)}
+#tools{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}#tools button{width:38px;height:38px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
+#endText{font-size:14px;line-height:1.5;opacity:.9}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="hud"><div class="box"><small>ĐIỂM</small><b id="score">0</b></div><div class="box"><small>ỐNG</small><b id="mid">1</b></div><div class="box"><small>KỶ LỤC</small><b id="best">0</b></div></div>
+  <div id="wrap"><canvas id="c"></canvas></div>
+  <div id="pad">
+    <div class="dpad" id="dpad"><span></span><button data-d="up">▲</button><span></span><button data-d="left">◀</button><span class="mid"></span><button data-d="right">▶</button><span></span><button data-d="down">▼</button><span></span></div>
+    <div class="abtn"></div>
+  </div>
+  <div id="tools"><button id="bMute">🔊</button><button id="bPause">II</button></div>
+  <div id="big"></div>
+  <div class="ov" id="ovStart"><div class="card">
+    <h1>Chim bay<span>Chạm để vỗ cánh, lách qua ống</span></h1>
+    <ol><li>Chạm màn hình (hoặc phím cách) để chim vỗ cánh bay lên, thả tay thì rơi.</li><li>Lách qua khe giữa hai ống, mỗi ống qua được 1 điểm.</li><li>Chạm ống hoặc chạm đất là thua.</li></ol>
+    
+    <button class="btn primary" id="bStart">Chơi</button>
+    <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
+  </div></div>
+  <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Chơi lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const cv=$('c'),ctx=cv.getContext('2d');const KEY='cb';
+let opt={};try{const o=JSON.parse(localStorage.getItem(KEY+'-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
+function bindRow(id,key,parse){const row=$(id);if(!row)return;row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem(KEY+'-opt',JSON.stringify(opt))}catch(e){}}})}
+let best=0;try{best=+localStorage.getItem(KEY+'-best')||0}catch(e){}$('best').textContent=best;
+function saveBest(v){if(v>best){best=v;try{localStorage.setItem(KEY+'-best',v)}catch(e){}$('best').textContent=best;return true}return false}
+let ac=null,master=null,muted=false;try{muted=localStorage.getItem(KEY+'-mute')==='1'}catch(e){}
+function out(){if(!master){master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination)}return master}
+function initAudio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){}}
+function tone(f,d,type='square',v=.08,slide){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;if(slide)o.frequency.exponentialRampToValueAtTime(slide,ac.currentTime+d);g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g).connect(out());o.start();o.stop(ac.currentTime+d)}
+function nz(d,f,q,v){if(!ac)return;const b=ac.createBuffer(1,ac.sampleRate*d,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);const s=ac.createBufferSource(),fl=ac.createBiquadFilter(),g=ac.createGain();s.buffer=b;fl.type='bandpass';fl.frequency.value=f;fl.Q.value=q;g.gain.value=v;s.connect(fl).connect(g).connect(out());s.start()}
+$('bMute').onclick=()=>{muted=!muted;try{localStorage.setItem(KEY+'-mute',muted?'1':'0')}catch(e){}$('bMute').textContent=muted?'🔇':'🔊';if(master)master.gain.value=muted?0:1};$('bMute').textContent=muted?'🔇':'🔊';
+let phase='menu',paused=false,keys={},held={};
+$('bPause').onclick=()=>{if(phase!=='play')return;paused=!paused;$('bPause').textContent=paused?'▶':'II';flash(paused?'TẠM DỪNG':'',' #F3F1EC')};
+function flash(t,c){const b=$('big');b.textContent=t;b.style.color=c;b.classList.add('show');clearTimeout(flash.t);flash.t=setTimeout(()=>b.classList.remove('show'),900)}
+function showEnd(title,txt){phase='end';$('endTitle').textContent=title;$('endText').textContent=txt;$('ovEnd').hidden=false}
+const KM={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right',' ':'a',Enter:'a',x:'b',X:'b',z:'a',Z:'a'};
+window.addEventListener('keydown',e=>{const k=KM[e.key];if(!k)return;e.preventDefault();if(!held[k])press(k);held[k]=true});window.addEventListener('keyup',e=>{const k=KM[e.key];if(k)held[k]=false});
+document.querySelectorAll('.abtn [data-d]').forEach(b=>{const k=b.dataset.d;const on=e=>{e.preventDefault();if(!held[k])press(k);held[k]=true};const off=e=>{e.preventDefault();held[k]=false};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off)});
+// D-pad: one touch, slide between arrows; also direction by angle from pad centre
+(()=>{const pad=$('dpad');let active=null;const dirs=['up','down','left','right'];
+  const setDir=d=>{if(d===active)return;if(active)held[active]=false;active=d;if(d){if(!held[d])press(d);held[d]=true}};
+  const fromPoint=(x,y)=>{const r=pad.getBoundingClientRect();const dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2);if(Math.hypot(dx,dy)<r.width*0.12)return null;return Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up')};
+  pad.addEventListener('pointerdown',e=>{e.preventDefault();pad.setPointerCapture(e.pointerId);setDir(fromPoint(e.clientX,e.clientY))});
+  pad.addEventListener('pointermove',e=>{if(!pad.hasPointerCapture(e.pointerId))return;setDir(fromPoint(e.clientX,e.clientY))});
+  const end=e=>{setDir(null)};pad.addEventListener('pointerup',end);pad.addEventListener('pointercancel',end)})();
+// Swipe / tap / drag on the play area
+let swipeMode='dir';(()=>{let st=null,moved=false;const wrap=$('wrap');
+  wrap.addEventListener('pointerdown',e=>{st={x:e.clientX,y:e.clientY,t:performance.now()};moved=false;if(swipeMode==='drag'&&window.onDragX)window.onDragX(e.clientX)});
+  wrap.addEventListener('pointermove',e=>{if(!st)return;if(swipeMode==='drag'){window.onDragX&&window.onDragX(e.clientX);return}const dx=e.clientX-st.x,dy=e.clientY-st.y;if(Math.hypot(dx,dy)>28){moved=true;press(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));st={x:e.clientX,y:e.clientY,t:performance.now()}}});
+  wrap.addEventListener('pointerup',e=>{if(st&&!moved&&swipeMode!=='drag'){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*cv.width,y=(e.clientY-r.top)/r.height*cv.height;if(performance.now()-st.t>=450&&window.onLongXY)window.onLongXY(x,y);else{if(window.onTapXY)window.onTapXY(x,y);press('a')}}st=null});wrap.addEventListener('pointercancel',()=>{st=null})})();
+function canvasXY(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*cv.width,y:(e.clientY-r.top)/r.height*cv.height}}
+function fit(w,h){const ww=$('wrap').clientWidth-10,hh=$('wrap').clientHeight-10;const s=Math.min(ww/w,hh/h);cv.width=w;cv.height=h;cv.style.width=w*s+'px';cv.style.height=h*s+'px'}
+function txt(t,x,y,size,col='#F3F1EC',align='center'){ctx.fillStyle=col;ctx.font=size+'px "Press Start 2P",monospace';ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+function hidePad(){$('pad').style.display='none'}
+$('bStart').onclick=()=>{initAudio();newGame()};$('bAgain').onclick=()=>{initAudio();newGame()};$('bMenu').onclick=()=>{phase='menu';$('ovEnd').hidden=true;$('ovStart').hidden=false};
+function start(){$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';paused=false;$('bPause').textContent='II'}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='play'&&!paused)update(dt);draw(now);requestAnimationFrame(loop)}
+let W=320,H=480,bird,pipes=[],score=0,t=0,gap=130,started=false;
+function layout(){fit(W,H)}window.addEventListener('resize',layout);hidePad();
+function press(k){if(phase!=='play')return;started=true;bird.vy=-260;tone(600,.05)}
+function newGame(){bird={y:H/2,vy:0};pipes=[];score=0;t=0;started=false;$('score').textContent=0;$('mid').textContent=0;start()}
+function update(dt){if(!started)return;t+=dt;bird.vy+=800*dt;bird.y+=bird.vy*dt;
+  if(pipes.length===0||pipes[pipes.length-1].x<W-170)pipes.push({x:W+30,h:60+Math.random()*(H-gap-180),p:false});
+  for(const p of pipes){p.x-=130*dt;if(!p.p&&p.x+26<80){p.p=true;score++;tone(900,.05);$('score').textContent=score;$('mid').textContent=score}
+    if(80+12>p.x&&80-12<p.x+52&&(bird.y-12<p.h||bird.y+12>p.h+gap))return die()}
+  pipes=pipes.filter(p=>p.x>-60);if(bird.y>H-40||bird.y<-20)die()}
+function die(){nz(.3,300,.8,.6);tone(300,.4,'sawtooth',.12,80);const nb=saveBest(score);showEnd(nb?'KỶ LỤC MỚI!':'RƠI RỒI','Qua được '+score+' ống. Kỷ lục '+best+'.')}
+function draw(now){ctx.fillStyle='#4ec0ca';ctx.fillRect(0,0,W,H);ctx.fillStyle='#8ed9a0';for(let i=0;i<6;i++)ctx.fillRect(((i*90-now/30)%(W+90)+W+90)%(W+90)-45,H-80-(i%3)*20,60,40);
+  for(const p of pipes){ctx.fillStyle='#5cb83a';ctx.fillRect(p.x,0,52,p.h);ctx.fillRect(p.x,p.h+gap,52,H);ctx.fillStyle='#3f8f2a';ctx.fillRect(p.x-4,p.h-20,60,20);ctx.fillRect(p.x-4,p.h+gap,60,20)}
+  ctx.fillStyle='#c9a24a';ctx.fillRect(0,H-40,W,40);ctx.fillStyle='#e0c070';ctx.fillRect(0,H-40,W,6);
+  ctx.save();ctx.translate(80,bird.y);ctx.rotate(Math.max(-0.5,Math.min(0.8,bird.vy/400)));ctx.fillStyle='#F5C542';ctx.fillRect(-12,-10,24,20);ctx.fillStyle='#fff';ctx.fillRect(2,-8,8,8);ctx.fillStyle='#000';ctx.fillRect(6,-6,3,3);ctx.fillStyle='#F28C28';ctx.fillRect(10,0,10,5);ctx.fillStyle='#e0a030';ctx.fillRect(-10,2,10,6);ctx.restore();
+  if(!started&&phase==='play')txt('CHẠM ĐỂ BAY',W/2,H/2-60,11)}
+bird={y:H/2,vy:0};layout();requestAnimationFrame(loop);
+
+</script></body></html>
