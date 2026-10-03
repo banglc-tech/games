@@ -39,13 +39,13 @@ footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
 <main>
   <header>
     <h1>Góc game camera<small>Chơi bằng cơ thể thật, không cần tay cầm</small></h1>
-    <p>Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game đều có chế độ chạm màn hình để thử khi không có camera.</p>
+    <p>Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game có nút <b>?</b> hướng dẫn cách chơi và chế độ chạm màn hình để thử khi không có camera.</p>
   </header>
 
   <h2 id="hReady">Chơi được ngay</h2>
   <div class="grid" id="ready"></div>
 
-  <h2 id="hSoon">Đang lên kế hoạch</h2>
+  <h2 id="hSoon" hidden>Đang lên kế hoạch</h2>
   <div class="grid" id="soon"></div>
 
   <footer>Thêm game mới: sửa mảng <code>GAMES</code> trong file này, mỗi game một dòng. Game nào có <code>url</code> sẽ hiện ở mục "Chơi được ngay", chưa có thì nằm ở "Đang lên kế hoạch".</footer>
@@ -66,21 +66,21 @@ const GAMES=[
   {ico:'🎯',name:'Phi tiêu',desc:'Vung tay ném phi tiêu vào bia, ghi điểm theo vòng. Có bia di chuyển.',url:'https://banglc-tech.github.io/phi-tieu/',tags:['1–2 người','tay']},
   {ico:'🏃',name:'Chạy 100 m',desc:'Chạy tại chỗ, nhấc gối càng nhanh nhân vật chạy càng nhanh. Đua với máy.',url:'https://banglc-tech.github.io/chay-100m/',tags:['1–2 người','chân']},
   {ico:'🎸',name:'Trống không khí',desc:'Vung tay đúng vùng đúng lúc để chơi nhạc, như Guitar Hero không cần đàn.',url:'https://banglc-tech.github.io/trong/',tags:['1 người','tay']},
-  {ico:'🏐',name:'Bóng chuyền',desc:'Bóng rơi xuống, dùng hai tay đẩy lên qua lưới. Chạm sàn là mất điểm.',tags:['1–2 người','tay']},
-  {ico:'🎾',name:'Tennis tường',desc:'Đánh bóng vào tường, bóng nảy về, đánh tiếp. Góc tay quyết định hướng bóng.',tags:['1 người','tay']},
-  {ico:'🥋',name:'Taekwondo đá mục tiêu',desc:'Đích đá hiện ở nhiều độ cao, đá chân thật trúng đích đúng lúc.',tags:['1 người','chân']},
-  {ico:'🧘',name:'Yoga giữ dáng',desc:'Giữ đúng tư thế yoga trong 10 giây, càng ít rung càng nhiều điểm.',tags:['1 người','toàn thân']},
-  {ico:'🪢',name:'Nhảy dây',desc:'Nhảy thật theo dây ảo quay quanh người, nhịp nhanh dần, đếm số lần.',tags:['1–2 người','toàn thân']},
-  {ico:'🛡️',name:'Chắn mưa tên',desc:'Mũi tên bay tới, giơ tay làm khiên chắn đúng hướng, tay sai hướng là trúng.',tags:['1 người','tay']},
-  {ico:'🧟',name:'Zombie đến gần',desc:'Đứng im thì zombie tiến, giơ tay bắn khi nó vào tầm, cúi để né đòn.',tags:['1 người','toàn thân']},
-  {ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật mạnh khi phao chìm, cá lớn phải giật nhiều lần.',tags:['1 người','tay']},
-  {ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, đưa tay lau sạch trong 30 giây, lau nhanh nhất thắng.',tags:['1–2 người','tay']},
-  {ico:'👻',name:'Trốn ma',desc:'Ma chỉ di chuyển khi bạn cử động. Đứng yên khi nó quay lại nhìn, chạy tại chỗ khi nó quay đi.',tags:['1 người','toàn thân']},
+  {ico:'🏐',name:'Bóng chuyền',desc:'Bóng rơi xuống, dùng hai tay đẩy lên qua lưới. Chạm sàn là mất điểm.',url:'https://banglc-tech.github.io/bong-chuyen/',tags:['1–2 người','tay']},
+  {ico:'🎾',name:'Tennis tường',desc:'Đánh bóng vào tường, bóng nảy về, đánh tiếp. Góc tay quyết định hướng bóng.',url:'https://banglc-tech.github.io/tennis-tuong/',tags:['1 người','tay']},
+  {ico:'🥋',name:'Taekwondo đá mục tiêu',desc:'Đích đá hiện ở nhiều độ cao, đá chân thật trúng đích đúng lúc.',url:'https://banglc-tech.github.io/taekwondo/',tags:['1 người','chân']},
+  {ico:'🧘',name:'Yoga giữ dáng',desc:'Giữ đúng tư thế yoga trong 10 giây, càng ít rung càng nhiều điểm.',url:'https://banglc-tech.github.io/yoga/',tags:['1 người','toàn thân']},
+  {ico:'🪢',name:'Nhảy dây',desc:'Nhảy thật theo dây ảo quay quanh người, nhịp nhanh dần, đếm số lần.',url:'https://banglc-tech.github.io/nhay-day/',tags:['1–2 người','toàn thân']},
+  {ico:'🛡️',name:'Chắn mưa tên',desc:'Mũi tên bay tới, giơ tay làm khiên chắn đúng hướng, tay sai hướng là trúng.',url:'https://banglc-tech.github.io/chan-ten/',tags:['1 người','tay']},
+  {ico:'🧟',name:'Zombie đến gần',desc:'Đứng im thì zombie tiến, giơ tay bắn khi nó vào tầm, cúi để né đòn.',url:'https://banglc-tech.github.io/zombie/',tags:['1 người','toàn thân']},
+  {ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật mạnh khi phao chìm, cá lớn phải giật nhiều lần.',url:'https://banglc-tech.github.io/cau-ca/',tags:['1 người','tay']},
+  {ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, đưa tay lau sạch trong 30 giây, lau nhanh nhất thắng.',url:'https://banglc-tech.github.io/lau-kinh/',tags:['1–2 người','tay']},
+  {ico:'👻',name:'Trốn ma',desc:'Ma chỉ di chuyển khi bạn cử động. Đứng yên khi nó quay lại nhìn, chạy tại chỗ khi nó quay đi.',url:'https://banglc-tech.github.io/tron-ma/',tags:['1 người','toàn thân']},
 ];
 function card(g){const el=document.createElement('div');el.className='card'+(g.url?'':' soon');
   el.innerHTML='<div class="ico">'+g.ico+'</div><h3>'+g.name+'</h3><p>'+g.desc+'</p><div class="meta">'+(g.tags||[]).map(t=>'<span>'+t+'</span>').join('')+'</div>'+
   (g.url?'<a class="play" href="'+g.url+'">Chơi ngay</a>':'<span class="tag">Sắp có</span>');return el}
-GAMES.forEach(g=>document.getElementById(g.url?'ready':'soon').appendChild(card(g)));
+GAMES.forEach(g=>document.getElementById(g.url?'ready':'soon').appendChild(card(g)));document.getElementById('hSoon').hidden=!GAMES.some(g=>!g.url);
 </script>
 </body>
 </html>
