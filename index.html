@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Góc game camera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D0F14;--card:#171A22;--ink:#F3F1EC;--mute:#9AA0AE;--gold:#F5C542;--line:rgba(243,241,236,.1);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0D0F14}}
+:root[data-theme="dark"]{--bg:#0D0F14}
+*{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
+header{margin-bottom:22px}
+h1{font-size:clamp(34px,7vw,56px);font-weight:900;letter-spacing:-.03em;line-height:.95;margin:0}
+h1 small{display:block;font-size:.34em;font-weight:700;color:var(--gold);letter-spacing:0;margin-top:10px}
+header p{color:var(--mute);font-size:15px;line-height:1.5;max-width:60ch;margin:14px 0 0}
+h2{font-size:14px;font-weight:700;color:var(--mute);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;min-height:170px}
+.card .ico{font-size:40px;line-height:1}
+.card h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.01em}
+.card p{margin:0;color:var(--mute);font-size:13.5px;line-height:1.45;flex:1}
+.card a.play{display:inline-block;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:700;padding:11px 16px;border-radius:9px;text-align:center;font-size:14px}
+.card a.play:hover{background:var(--gold)}
+.card a.play:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.card.soon{opacity:.72;border:1px dashed var(--line)}
+.card.soon .tag{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 8px}
+.meta{display:flex;gap:6px;flex-wrap:wrap}
+.meta span{font-size:11px;font-weight:700;color:var(--mute);background:rgba(255,255,255,.06);border-radius:6px;padding:3px 7px}
+footer{margin-top:40px;color:var(--mute);font-size:12.5px;line-height:1.6}
+footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Góc game camera<small>Chơi bằng cơ thể thật, không cần tay cầm</small></h1>
+    <p>Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game đều có chế độ chạm màn hình để thử khi không có camera.</p>
+  </header>
+
+  <h2 id="hReady">Chơi được ngay</h2>
+  <div class="grid" id="ready"></div>
+
+  <h2 id="hSoon">Đang lên kế hoạch</h2>
+  <div class="grid" id="soon"></div>
+
+  <footer>Thêm game mới: sửa mảng <code>GAMES</code> trong file này, mỗi game một dòng. Game nào có <code>url</code> sẽ hiện ở mục "Chơi được ngay", chưa có thì nằm ở "Đang lên kế hoạch".</footer>
+</main>
+<script>
+const GAMES=[
+  {ico:'⚽',name:'Đá phạt đền',desc:'Vung chân thật trước camera để sút 20 quả. Thủ môn 4 mức, khán đài reo hò.',url:'https://banglc-tech.github.io/da-phat/',tags:['1 người','chân']},
+  {ico:'🥷',name:'Chém Ninja',desc:'Trái cây bay lên, vung tay chém, tránh bom. Đấu với ninja máy hoặc 2 người.',url:'https://banglc-tech.github.io/chem-ninja/',tags:['1–2 người','tay']},
+  {ico:'🥊',name:'Đấu Boxing',desc:'Đấm thẳng, đấm móc, nghiêng đầu né, giơ tay thủ. Võ sĩ máy 4 mức hoặc 2 người.',url:'https://banglc-tech.github.io/boxing/',tags:['1–2 người','toàn thân']},
+
+  {ico:'🏐',name:'Thủ môn bắt bóng',desc:'Đổi vai: bóng bay tới, dùng tay thật chụp hoặc đấm bóng ra. Bóng nhanh dần.',tags:['1 người','tay']},
+  {ico:'🏓',name:'Bóng bàn',desc:'Lòng bàn tay là vợt, đánh trả bóng của máy, tính set 11 điểm.',tags:['1–2 người','tay']},
+  {ico:'🏀',name:'Ném rổ',desc:'Vung tay ném, lực và góc theo tốc độ tay. 60 giây ghi càng nhiều càng tốt.',tags:['1 người','tay']},
+  {ico:'🧗',name:'Vượt chướng ngại',desc:'Nhảy thật để qua rào, cúi để chui ống, nghiêng người tránh cột. Tốc độ tăng dần.',tags:['1 người','toàn thân']},
+  {ico:'🕺',name:'Nhảy theo nhịp',desc:'Bắt chước tư thế hiện trên màn hình đúng nhịp nhạc, chấm điểm độ khớp.',tags:['1–2 người','toàn thân']},
+  {ico:'🎈',name:'Đập bóng bay',desc:'Bóng bay trôi lên, chạm tay để nổ, bóng đen thì tránh. Hợp trẻ em.',tags:['1–2 người','tay']},
+  {ico:'🧱',name:'Tường tư thế',desc:'Tường có lỗ hình người lao tới, phải tạo đúng dáng để lọt qua.',tags:['1 người','toàn thân']},
+  {ico:'🎯',name:'Phi tiêu',desc:'Vung tay ném phi tiêu vào bia, ghi điểm theo vòng. Có bia di chuyển.',tags:['1–2 người','tay']},
+  {ico:'🏃',name:'Chạy 100 m',desc:'Chạy tại chỗ, nhấc gối càng nhanh nhân vật chạy càng nhanh. Đua với máy.',tags:['1–2 người','chân']},
+  {ico:'🎸',name:'Air guitar / trống',desc:'Vung tay đúng vùng đúng lúc để chơi nhạc, như Guitar Hero không cần đàn.',tags:['1 người','tay']},
+];
+function card(g){const el=document.createElement('div');el.className='card'+(g.url?'':' soon');
+  el.innerHTML='<div class="ico">'+g.ico+'</div><h3>'+g.name+'</h3><p>'+g.desc+'</p><div class="meta">'+(g.tags||[]).map(t=>'<span>'+t+'</span>').join('')+'</div>'+
+  (g.url?'<a class="play" href="'+g.url+'">Chơi ngay</a>':'<span class="tag">Sắp có</span>');return el}
+GAMES.forEach(g=>document.getElementById(g.url?'ready':'soon').appendChild(card(g)));
+</script>
+</body>
+</html>
