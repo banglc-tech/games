@@ -3,86 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Góc game camera</title>
+<title>Góc game camera · chơi bằng cơ thể thật</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0D0F14;--card:#171A22;--ink:#F3F1EC;--mute:#9AA0AE;--gold:#F5C542;--line:rgba(243,241,236,.1);
+:root{--bg:#0C0E13;--bg2:#141821;--ink:#F3F1EC;--mute:#98A0B0;--gold:#F5C542;--jade:#06D6A0;--red:#F25C54;--sky:#4CC9F0;--line:rgba(243,241,236,.1);
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0D0F14}}
-:root[data-theme="dark"]{--bg:#0D0F14}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0C0E13}}
+:root[data-theme="dark"]{--bg:#0C0E13}
 *{box-sizing:inherit}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:28px 18px 60px}
-header{margin-bottom:22px}
-h1{font-size:clamp(34px,7vw,56px);font-weight:900;letter-spacing:-.03em;line-height:.95;margin:0}
-h1 small{display:block;font-size:.34em;font-weight:700;color:var(--gold);letter-spacing:0;margin-top:10px}
-header p{color:var(--mute);font-size:15px;line-height:1.5;max-width:60ch;margin:14px 0 0}
-h2{font-size:14px;font-weight:700;color:var(--mute);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{background:var(--card);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;min-height:170px}
-.card .ico{font-size:40px;line-height:1}
-.card h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.01em}
-.card p{margin:0;color:var(--mute);font-size:13.5px;line-height:1.45;flex:1}
-.card a.play{display:inline-block;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:700;padding:11px 16px;border-radius:9px;text-align:center;font-size:14px}
-.card a.play:hover{background:var(--gold)}
-.card a.play:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.card.soon{opacity:.72;border:1px dashed var(--line)}
-.card.soon .tag{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:3px 8px}
-.meta{display:flex;gap:6px;flex-wrap:wrap}
-.meta span{font-size:11px;font-weight:700;color:var(--mute);background:rgba(255,255,255,.06);border-radius:6px;padding:3px 7px}
-footer{margin-top:40px;color:var(--mute);font-size:12.5px;line-height:1.6}
+main{max-width:1120px;margin:0 auto;padding:22px 16px 70px}
+.hero{display:grid;grid-template-columns:1fr;gap:16px;align-items:center;margin-bottom:18px}
+@media (min-width:760px){.hero{grid-template-columns:1.2fr 1fr}}
+h1{font-size:clamp(38px,8vw,66px);font-weight:900;letter-spacing:-.04em;line-height:.92;margin:0}
+h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:var(--mute);font-size:15px;line-height:1.55;max-width:52ch;margin:14px 0 0}
+.stats{display:flex;gap:18px;margin-top:16px;flex-wrap:wrap}
+.stats div{font-size:13px;color:var(--mute)}.stats b{display:block;font-size:26px;color:var(--ink);font-weight:900;line-height:1}
+.pick{background:var(--bg2);border-radius:16px;padding:16px;border:1px solid var(--line)}
+.pick small{color:var(--mute);font-size:12px;font-weight:700}
+.pick .big{display:flex;gap:14px;align-items:center;margin-top:8px}
+.pick .ico{font-size:52px;line-height:1}
+.pick h3{margin:0;font-size:22px;font-weight:900}
+.pick p{margin:4px 0 0;color:var(--mute);font-size:13.5px;line-height:1.45}
+.pick a{display:inline-block;margin-top:12px;background:var(--gold);color:var(--bg);text-decoration:none;font-weight:900;padding:11px 18px;border-radius:10px}
+.pick button{margin-top:12px;margin-left:8px;background:transparent;color:var(--ink);border:1px solid var(--line);font:inherit;font-weight:700;padding:10px 14px;border-radius:10px;cursor:pointer}
+.bar{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 80%,transparent);padding:10px 0 12px;margin:6px 0 10px}
+.search{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.search input{flex:1;background:transparent;border:none;color:var(--ink);font:inherit;font-size:15px;outline:none;min-width:0}
+.search input::placeholder{color:var(--mute)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--bg2);color:var(--ink);font:inherit;font-weight:700;font-size:13px;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.on[data-f="tay"]{background:var(--sky);border-color:var(--sky)}.chip.on[data-f="toan-than"]{background:var(--jade);border-color:var(--jade)}.chip.on[data-f="chan"]{background:var(--gold);border-color:var(--gold)}.chip.on[data-f="2nguoi"]{background:var(--red);border-color:var(--red);color:#fff}
+h2{font-size:13px;font-weight:700;color:var(--mute);margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+h2 span{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+@media (max-width:420px){.grid{grid-template-columns:1fr 1fr;gap:8px}}
+.card{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px;text-decoration:none;color:inherit;min-height:160px;transition:transform .12s,border-color .12s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:rgba(243,241,236,.35);outline:none}
+.card .ico{font-size:36px;line-height:1}
+.card h3{margin:0;font-size:16.5px;font-weight:900;letter-spacing:-.01em;line-height:1.15}
+.card p{margin:0;color:var(--mute);font-size:12.5px;line-height:1.4;flex:1}
+.card .meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.card .meta span{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--mute)}
+.card .meta .b-tay{color:var(--sky)}.card .meta .b-toan-than{color:var(--jade)}.card .meta .b-chan{color:var(--gold)}.card .meta .b-2nguoi{color:var(--red)}
+.card.soon{opacity:.6;border-style:dashed;cursor:default}
+.card.soon .tag{position:absolute;top:10px;right:12px;font-size:10px;font-weight:700;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:2px 7px}
+.empty{color:var(--mute);padding:30px 0;text-align:center}
+footer{margin-top:44px;color:var(--mute);font-size:12.5px;line-height:1.6;border-top:1px solid var(--line);padding-top:16px}
 footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
+.card:focus-visible,.chip:focus-visible,.pick a:focus-visible,.pick button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>Góc game camera<small>Chơi bằng cơ thể thật, không cần tay cầm</small></h1>
-    <p>Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game có nút <b>?</b> hướng dẫn cách chơi và chế độ chạm màn hình để thử khi không có camera.</p>
-  </header>
-
-  <h2 id="hReady">Chơi được ngay</h2>
-  <div class="grid" id="ready"></div>
-
-  <h2 id="hSoon" hidden>Đang lên kế hoạch</h2>
-  <div class="grid" id="soon"></div>
-
-  <footer>Thêm game mới: sửa mảng <code>GAMES</code> trong file này, mỗi game một dòng. Game nào có <code>url</code> sẽ hiện ở mục "Chơi được ngay", chưa có thì nằm ở "Đang lên kế hoạch".</footer>
+  <section class="hero">
+    <div>
+      <h1>Góc game<br><em>camera</em></h1>
+      <p>Chơi bằng cơ thể thật, không cần tay cầm. Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game có nút <b>?</b> hướng dẫn và chế độ chạm màn hình để thử khi không có camera.</p>
+      <div class="stats"><div><b id="stReady">0</b>game chơi được</div><div><b id="st2">0</b>game 2 người</div><div><b id="stBody">0</b>game toàn thân</div></div>
+    </div>
+    <div class="pick"><small>HÔM NAY CHƠI GÌ?</small><div class="big"><div class="ico" id="pkIco">🎲</div><div><h3 id="pkName">…</h3><p id="pkDesc"></p></div></div><a id="pkLink" href="#">Chơi ngay</a><button id="pkNext">Đổi game khác</button></div>
+  </section>
+  <div class="bar">
+    <label class="search">🔍<input id="q" type="search" placeholder="Tìm game: bóng, chạy, ninja…" autocomplete="off"></label>
+    <div class="chips" id="chips">
+      <button class="chip on" data-f="all">Tất cả</button>
+      <button class="chip" data-f="tay">✋ Dùng tay</button>
+      <button class="chip" data-f="toan-than">🧍 Toàn thân</button>
+      <button class="chip" data-f="chan">🦶 Dùng chân</button>
+      <button class="chip" data-f="2nguoi">👥 2 người</button>
+      <button class="chip" data-f="treem">🧒 Hợp trẻ em</button>
+      <button class="chip" data-f="vandong">🔥 Vận động mạnh</button>
+    </div>
+  </div>
+  <div id="sections"></div>
+  <div class="empty" id="empty" hidden>Không có game nào khớp. Thử từ khoá khác.</div>
+  <footer>Thêm game mới: thêm một dòng vào mảng <code>GAMES</code> trong file này. <code>cat</code> là nhóm hiển thị, <code>body</code> là bộ phận dùng (tay / toan-than / chan), <code>players</code> là số người tối đa, <code>tags</code> gồm <code>treem</code>, <code>vandong</code>. Game chưa có <code>url</code> sẽ hiện "Sắp có".</footer>
 </main>
 <script>
+const B='https://banglc-tech.github.io/';
 const GAMES=[
-  {ico:'⚽',name:'Đá phạt đền',desc:'Vung chân thật trước camera để sút 20 quả. Thủ môn 4 mức, khán đài reo hò.',url:'https://banglc-tech.github.io/da-phat/',tags:['1 người','chân']},
-  {ico:'🥷',name:'Chém Ninja',desc:'Trái cây bay lên, vung tay chém, tránh bom. Đấu với ninja máy hoặc 2 người.',url:'https://banglc-tech.github.io/chem-ninja/',tags:['1–2 người','tay']},
-  {ico:'🥊',name:'Đấu Boxing',desc:'Đấm thẳng, đấm móc, nghiêng đầu né, giơ tay thủ. Võ sĩ máy 4 mức hoặc 2 người.',url:'https://banglc-tech.github.io/boxing/',tags:['1–2 người','toàn thân']},
-
-  {ico:'🏐',name:'Thủ môn bắt bóng',desc:'Đổi vai: bóng bay tới, dùng tay thật chụp hoặc đấm bóng ra. Bóng nhanh dần.',url:'https://banglc-tech.github.io/thu-mon/',tags:['1 người','tay']},
-  {ico:'🏓',name:'Bóng bàn',desc:'Lòng bàn tay là vợt, đánh trả bóng của máy, tính set 11 điểm.',url:'https://banglc-tech.github.io/bong-ban/',tags:['1–2 người','tay']},
-  {ico:'🏀',name:'Ném rổ',desc:'Vung tay ném, lực và góc theo tốc độ tay. 60 giây ghi càng nhiều càng tốt.',url:'https://banglc-tech.github.io/nem-ro/',tags:['1 người','tay']},
-  {ico:'🧗',name:'Vượt chướng ngại',desc:'Nhảy thật để qua rào, cúi để chui ống, nghiêng người tránh cột. Tốc độ tăng dần.',url:'https://banglc-tech.github.io/vuot-rao/',tags:['1 người','toàn thân']},
-  {ico:'🕺',name:'Nhảy theo nhịp',desc:'Bắt chước tư thế hiện trên màn hình đúng nhịp nhạc, chấm điểm độ khớp.',url:'https://banglc-tech.github.io/nhay-nhip/',tags:['1–2 người','toàn thân']},
-  {ico:'🎈',name:'Đập bóng bay',desc:'Bóng bay trôi lên, chạm tay để nổ, bóng đen thì tránh. Hợp trẻ em.',url:'https://banglc-tech.github.io/bong-bay/',tags:['1–2 người','tay']},
-  {ico:'🧱',name:'Tường tư thế',desc:'Tường có lỗ hình người lao tới, phải tạo đúng dáng để lọt qua.',url:'https://banglc-tech.github.io/tuong-tu-the/',tags:['1 người','toàn thân']},
-  {ico:'🎯',name:'Phi tiêu',desc:'Vung tay ném phi tiêu vào bia, ghi điểm theo vòng. Có bia di chuyển.',url:'https://banglc-tech.github.io/phi-tieu/',tags:['1–2 người','tay']},
-  {ico:'🏎️',name:'Lái siêu xe',desc:'Hai tay là vô lăng, nghiêng tay để lái, hạ tay phanh, giơ tay nitro. Đua với máy hoặc chạy thời gian.',url:'https://banglc-tech.github.io/sieu-xe/',tags:['1 người','tay']},
-  {ico:'🏞️',name:'Chạy bộ',desc:'Chạy tại chỗ, đường chạy trôi theo tốc độ của bạn. Nghiêng người đổi làn nhặt xu, tránh vũng nước. 2 phút.',url:'https://banglc-tech.github.io/chay-bo/',tags:['1 người','chân']},
-  {ico:'🏃',name:'Chạy 100 m',desc:'Chạy tại chỗ, nhấc gối càng nhanh nhân vật chạy càng nhanh. Đua với máy.',url:'https://banglc-tech.github.io/chay-100m/',tags:['1–2 người','chân']},
-  {ico:'🎸',name:'Trống không khí',desc:'Vung tay đúng vùng đúng lúc để chơi nhạc, như Guitar Hero không cần đàn.',url:'https://banglc-tech.github.io/trong/',tags:['1 người','tay']},
-  {ico:'🏐',name:'Bóng chuyền',desc:'Bóng rơi xuống, dùng hai tay đẩy lên qua lưới. Chạm sàn là mất điểm.',url:'https://banglc-tech.github.io/bong-chuyen/',tags:['1–2 người','tay']},
-  {ico:'🎾',name:'Tennis tường',desc:'Đánh bóng vào tường, bóng nảy về, đánh tiếp. Góc tay quyết định hướng bóng.',url:'https://banglc-tech.github.io/tennis-tuong/',tags:['1 người','tay']},
-  {ico:'🥋',name:'Taekwondo đá mục tiêu',desc:'Đích đá hiện ở nhiều độ cao, đá chân thật trúng đích đúng lúc.',url:'https://banglc-tech.github.io/taekwondo/',tags:['1 người','chân']},
-  {ico:'🧘',name:'Yoga giữ dáng',desc:'Giữ đúng tư thế yoga trong 10 giây, càng ít rung càng nhiều điểm.',url:'https://banglc-tech.github.io/games/yoga/',tags:['1 người','toàn thân']},
-  {ico:'🪢',name:'Nhảy dây',desc:'Nhảy thật theo dây ảo quay quanh người, nhịp nhanh dần, đếm số lần.',url:'https://banglc-tech.github.io/games/nhay-day/',tags:['1–2 người','toàn thân']},
-  {ico:'🛡️',name:'Chắn mưa tên',desc:'Mũi tên bay tới, giơ tay làm khiên chắn đúng hướng, tay sai hướng là trúng.',url:'https://banglc-tech.github.io/chan-ten/',tags:['1 người','tay']},
-  {ico:'🧟',name:'Zombie đến gần',desc:'Đứng im thì zombie tiến, giơ tay bắn khi nó vào tầm, cúi để né đòn.',url:'https://banglc-tech.github.io/games/zombie/',tags:['1 người','toàn thân']},
-  {ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật mạnh khi phao chìm, cá lớn phải giật nhiều lần.',url:'https://banglc-tech.github.io/games/cau-ca/',tags:['1 người','tay']},
-  {ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, đưa tay lau sạch trong 30 giây, lau nhanh nhất thắng.',url:'https://banglc-tech.github.io/lau-kinh/',tags:['1–2 người','tay']},
-  {ico:'👻',name:'Trốn ma',desc:'Ma chỉ di chuyển khi bạn cử động. Đứng yên khi nó quay lại nhìn, chạy tại chỗ khi nó quay đi.',url:'https://banglc-tech.github.io/tron-ma/',tags:['1 người','toàn thân']},
+  {cat:'Thể thao',ico:'⚽',name:'Đá phạt đền',desc:'Vung chân thật để sút 20 quả. Thủ môn 4 mức, khán đài reo hò.',url:B+'da-phat/',body:'chan',players:1,tags:['vandong']},
+  {cat:'Thể thao',ico:'🧤',name:'Thủ môn bắt bóng',desc:'Bóng sút về phía bạn, vòng vàng báo điểm tới, đưa tay vào cản.',url:B+'thu-mon/',body:'tay',players:1,tags:['treem']},
+  {cat:'Thể thao',ico:'🏓',name:'Bóng bàn',desc:'Lòng bàn tay là vợt, đỡ và đánh chéo. Set 11 điểm, máy 4 mức.',url:B+'bong-ban/',body:'tay',players:1,tags:[]},
+  {cat:'Thể thao',ico:'🏐',name:'Bóng chuyền',desc:'Đập tay từ dưới lên đẩy bóng qua lưới. Set 15 điểm.',url:B+'bong-chuyen/',body:'tay',players:1,tags:[]},
+  {cat:'Thể thao',ico:'🎾',name:'Tennis tường',desc:'Vẩy tay đánh bóng lên tường, đếm loạt dài nhất. 3 mạng.',url:B+'tennis-tuong/',body:'tay',players:1,tags:[]},
+  {cat:'Thể thao',ico:'🏀',name:'Ném rổ',desc:'Vung tay ném, lực và góc theo tay. Chuỗi 3 quả được 3 điểm.',url:B+'nem-ro/',body:'tay',players:2,tags:['treem']},
+  {cat:'Thể thao',ico:'🎯',name:'Phi tiêu',desc:'Vung tay rồi dừng để ném. Hồng tâm 50, bia đứng yên hoặc di chuyển.',url:B+'phi-tieu/',body:'tay',players:2,tags:[]},
+  {cat:'Thể thao',ico:'🥊',name:'Đấu Boxing',desc:'Đấm thẳng, móc, nghiêng đầu né, giơ tay thủ. Võ sĩ máy hoặc 2 người.',url:B+'boxing/',body:'toan-than',players:2,tags:['vandong']},
+  {cat:'Thể thao',ico:'🥋',name:'Taekwondo',desc:'Đích đá ở 3 độ cao hai bên người, đá chân thật trúng đúng lúc.',url:B+'taekwondo/',body:'chan',players:1,tags:['vandong']},
+  {cat:'Chạy & nhảy',ico:'🏎️',name:'Lái siêu xe',desc:'Hai tay là vô lăng, hạ tay phanh, giơ tay nitro. Đua với máy hoặc chạy thời gian.',url:B+'sieu-xe/',body:'tay',players:1,tags:['treem']},
+  {cat:'Chạy & nhảy',ico:'🏃',name:'Chạy 100 m',desc:'Chạy tại chỗ, gối cao hơn hông mới tính bước. Đua với máy hoặc 2 người.',url:B+'chay-100m/',body:'chan',players:2,tags:['vandong']},
+  {cat:'Chạy & nhảy',ico:'🏞️',name:'Chạy bộ',desc:'Đường chạy trôi theo nhịp chân, nghiêng người đổi làn nhặt xu. 2 phút.',url:B+'chay-bo/',body:'chan',players:1,tags:['vandong']},
+  {cat:'Chạy & nhảy',ico:'🧗',name:'Vượt chướng ngại',desc:'Nhảy qua rào, cúi qua xà, nghiêng tránh cột. Tốc độ tăng dần.',url:B+'vuot-rao/',body:'toan-than',players:1,tags:['vandong','treem']},
+  {cat:'Chạy & nhảy',ico:'🪢',name:'Nhảy dây',desc:'Dây ảo quay quanh người, bật nhảy khi màn hình nháy vàng. Nhanh dần.',url:B+'games/nhay-day/',body:'toan-than',players:1,tags:['vandong']},
+  {cat:'Chạy & nhảy',ico:'🧱',name:'Tường tư thế',desc:'Tường có lỗ hình người lao tới, tạo đúng dáng để lọt qua.',url:B+'tuong-tu-the/',body:'toan-than',players:1,tags:['treem']},
+  {cat:'Phản xạ',ico:'🥷',name:'Chém Ninja',desc:'Vung tay chém trái cây, tránh bom. Đấu ninja máy hoặc 2 người.',url:B+'chem-ninja/',body:'tay',players:2,tags:['treem']},
+  {cat:'Phản xạ',ico:'🎈',name:'Đập bóng bay',desc:'Chạm tay cho bóng nổ, tránh bóng đen. Dễ, hợp trẻ nhỏ.',url:B+'bong-bay/',body:'tay',players:2,tags:['treem']},
+  {cat:'Phản xạ',ico:'🛡️',name:'Chắn mưa tên',desc:'Tên bay từ mọi hướng, giơ tay về hướng đó làm khiên. 5 tim.',url:B+'chan-ten/',body:'tay',players:1,tags:[]},
+  {cat:'Phản xạ',ico:'🧟',name:'Zombie đến gần',desc:'3 làn, giơ tay chỉ làn để bắn, thấy chữ CÚI! thì khom người né.',url:B+'games/zombie/',body:'toan-than',players:1,tags:[]},
+  {cat:'Phản xạ',ico:'👻',name:'Trốn ma',desc:'Ma quay đi thì chạy tại chỗ, ma quay lại thì đứng im. Tiến tới 100.',url:B+'tron-ma/',body:'toan-than',players:1,tags:['treem','vandong']},
+  {cat:'Phản xạ',ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật tay lên khi phao chìm. Cá to giật nhiều lần.',url:B+'games/cau-ca/',body:'tay',players:1,tags:['treem']},
+  {cat:'Phản xạ',ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, tay lướt tới đâu sạch tới đó. 2 người đua.',url:B+'lau-kinh/',body:'tay',players:2,tags:['treem']},
+  {cat:'Nhịp điệu & thư giãn',ico:'🕺',name:'Nhảy theo nhịp',desc:'Dãy dáng chạy theo nhịp trống, tạo đúng dáng khi chạm vạch. 90→150 bpm.',url:B+'nhay-nhip/',body:'toan-than',players:2,tags:['vandong','treem']},
+  {cat:'Nhịp điệu & thư giãn',ico:'🥁',name:'Trống không khí',desc:'4 mặt trống quanh người, vỗ tay xuống đúng lúc nốt chạm.',url:B+'trong/',body:'tay',players:1,tags:['treem']},
+  {cat:'Nhịp điệu & thư giãn',ico:'🧘',name:'Yoga giữ dáng',desc:'5 tư thế, giữ yên 10 giây mỗi tư thế, chấm độ rung.',url:B+'games/yoga/',body:'toan-than',players:1,tags:[]},
 ];
-function card(g){const el=document.createElement('div');el.className='card'+(g.url?'':' soon');
-  el.innerHTML='<div class="ico">'+g.ico+'</div><h3>'+g.name+'</h3><p>'+g.desc+'</p><div class="meta">'+(g.tags||[]).map(t=>'<span>'+t+'</span>').join('')+'</div>'+
-  (g.url?'<a class="play" href="'+g.url+'">Chơi ngay</a>':'<span class="tag">Sắp có</span>');return el}
-GAMES.forEach(g=>document.getElementById(g.url?'ready':'soon').appendChild(card(g)));document.getElementById('hSoon').hidden=!GAMES.some(g=>!g.url);
+const CATS=['Thể thao','Chạy & nhảy','Phản xạ','Nhịp điệu & thư giãn'];
+const BODY={tay:'✋ tay','toan-than':'🧍 toàn thân',chan:'🦶 chân'};
+let filter='all',q='';
+function match(g){const s=(g.name+' '+g.desc+' '+g.cat).toLowerCase();if(q&&!s.includes(q))return false;
+  if(filter==='all')return true;if(filter==='2nguoi')return g.players>=2;if(filter==='treem'||filter==='vandong')return g.tags.includes(filter);return g.body===filter}
+function card(g){const a=document.createElement(g.url?'a':'div');a.className='card'+(g.url?'':' soon');if(g.url)a.href=g.url;
+  a.innerHTML=`<div class="ico">${g.ico}</div><h3>${g.name}</h3><p>${g.desc}</p><div class="meta"><span class="b-${g.body}">${BODY[g.body]}</span>${g.players>=2?'<span class="b-2nguoi">👥 2 người</span>':''}${g.tags.includes('treem')?'<span>🧒 trẻ em</span>':''}${g.tags.includes('vandong')?'<span>🔥 vận động</span>':''}</div>${g.url?'':'<span class="tag">Sắp có</span>'}`;return a}
+function render(){const root=document.getElementById('sections');root.innerHTML='';let n=0;
+  for(const c of CATS){const list=GAMES.filter(g=>g.cat===c&&match(g));if(!list.length)continue;n+=list.length;const h=document.createElement('h2');h.innerHTML=`<span>${c}</span> ${list.length} game`;root.appendChild(h);const grid=document.createElement('div');grid.className='grid';list.forEach(g=>grid.appendChild(card(g)));root.appendChild(grid)}
+  document.getElementById('empty').hidden=n>0}
+document.getElementById('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;filter=b.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));render()});
+document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
+document.getElementById('stReady').textContent=GAMES.filter(g=>g.url).length;document.getElementById('st2').textContent=GAMES.filter(g=>g.players>=2).length;document.getElementById('stBody').textContent=GAMES.filter(g=>g.body==='toan-than').length;
+const ready=GAMES.filter(g=>g.url);let pi=(new Date().getDate()+new Date().getMonth())%ready.length;
+function pick(){const g=ready[pi];document.getElementById('pkIco').textContent=g.ico;document.getElementById('pkName').textContent=g.name;document.getElementById('pkDesc').textContent=g.desc;document.getElementById('pkLink').href=g.url}
+document.getElementById('pkNext').onclick=()=>{pi=(pi+1+Math.floor(Math.random()*(ready.length-1)))%ready.length;pick()};pick();render();
 </script>
 </body>
 </html>
