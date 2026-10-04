@@ -1,0 +1,1 @@
+Bỏ ảnh logo được phép sử dụng vào đây, tên file theo mã: toyota.png, honda.png, mazda.png, nissan.png, mitsubishi.png, lexus.png, hyundai.png, kia.png, vinfast.png, ford.png, chevrolet.png, tesla.png, mercedes.png, bmw.png, audi.png, volkswagen.png, porsche.png, ferrari.png, lamborghini.png, rollsroyce.png, landrover.png, peugeot.png, volvo.png, subaru.png, byd.png, suzuki.png
