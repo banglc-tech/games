@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Góc game · 56 game chơi bằng cơ thể và chạm</title>
+<title>Góc game · chơi bằng cơ thể, chạm và học</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -79,6 +79,7 @@ footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
       <button class="chip" data-f="treem">🧒 Hợp trẻ em</button>
       <button class="chip" data-f="vandong">🔥 Vận động mạnh</button>
       <button class="chip" data-f="ngon-tay">📱 Không cần camera</button>
+      <button class="chip" data-f="hoc">📚 Học mà chơi</button>
     </div>
   </div>
   <div id="sections"></div>
@@ -110,6 +111,16 @@ const GAMES=[
   {cat:'Phản xạ',ico:'👻',name:'Trốn ma',desc:'Ma quay đi thì chạy tại chỗ, ma quay lại thì đứng im. Tiến tới 100.',url:B+'tron-ma/',body:'toan-than',players:1,tags:['treem','vandong']},
   {cat:'Phản xạ',ico:'🎣',name:'Câu cá',desc:'Vung tay quăng cần, giật tay lên khi phao chìm. Cá to giật nhiều lần.',url:B+'cau-ca/',body:'tay',players:1,tags:['treem']},
   {cat:'Phản xạ',ico:'🧹',name:'Lau cửa kính',desc:'Kính mờ phủ màn hình, tay lướt tới đâu sạch tới đó. 2 người đua.',url:B+'lau-kinh/',body:'tay',players:2,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🍎',name:'Toán trái cây',desc:'Cộng trừ có hình trái cây minh hoạ, 3 mức.',url:B+'toan-trai-cay/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🔢',name:'Đếm số',desc:'Đếm đồ vật trong khung rồi chọn số.',url:B+'dem-so/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🔤',name:'Chữ cái đầu',desc:'Tên con vật, đồ vật bắt đầu bằng chữ gì, đủ Ă Â Đ Ê Ô Ơ Ư.',url:B+'chu-cai/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🇬🇧',name:'Tiếng Anh từ vựng',desc:'30 từ cơ bản, học hai chiều hình ↔ từ ↔ nghĩa.',url:B+'tieng-anh/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'✖️',name:'Bảng cửu chương',desc:'Luyện bảng 2–9, có chấm minh hoạ hàng cột.',url:B+'cuu-chuong/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🕒',name:'Xem đồng hồ',desc:'Đọc giờ trên đồng hồ kim, từ giờ chẵn tới 15 phút.',url:B+'dong-ho/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'♻️',name:'Phân loại rác',desc:'Bỏ rác vào đúng thùng hữu cơ, tái chế, nguy hại.',url:B+'phan-loai-rac/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'🔷',name:'Hình học vui',desc:'Gọi tên hình và đếm cạnh.',url:B+'hinh-hoc/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'⚖️',name:'So sánh số',desc:'Điền dấu <, =, > tới 1000.',url:B+'so-sanh/',body:'ngon-tay',players:1,tags:['treem']},
+  {cat:'Học mà chơi',ico:'📶',name:'Sắp xếp số',desc:'Chạm các số từ bé đến lớn, 8 vòng khó dần.',url:B+'sap-xep/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Vui nhanh',ico:'🐱',name:'Mèo phiêu lưu',desc:'Đi cảnh: nhảy, dẫm quái, ăn xu, đội hộp ?, cắm cờ cuối màn. 2 màn.',url:B+'meo-phieu-luu/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Vui nhanh',ico:'🐤',name:'Chim bay',desc:'Chạm để vỗ cánh, lách qua ống.',url:V+'chim-bay/',body:'ngon-tay',players:1,tags:['treem']},
   {cat:'Vui nhanh',ico:'🔢',name:'2048',desc:'Vuốt để gộp số tới 2048.',url:V+'2048/',body:'ngon-tay',players:1,tags:[]},
@@ -141,11 +152,11 @@ const GAMES=[
   {cat:'Nhịp điệu & thư giãn',ico:'🥁',name:'Trống không khí',desc:'4 mặt trống quanh người, vỗ tay xuống đúng lúc nốt chạm.',url:B+'trong/',body:'tay',players:1,tags:['treem']},
   {cat:'Nhịp điệu & thư giãn',ico:'🧘',name:'Yoga giữ dáng',desc:'5 tư thế, giữ yên 10 giây mỗi tư thế, chấm độ rung.',url:B+'yoga/',body:'toan-than',players:1,tags:[]},
 ];
-const CATS=['Thể thao','Chạy & nhảy','Phản xạ','Nhịp điệu & thư giãn','Vui nhanh','Không cần camera'];
+const CATS=['Thể thao','Chạy & nhảy','Phản xạ','Nhịp điệu & thư giãn','Học mà chơi','Vui nhanh','Không cần camera'];
 const BODY={tay:'✋ tay','toan-than':'🧍 toàn thân',chan:'🦶 chân','ngon-tay':'📱 chạm / phím'};
 let filter='all',q='';
 function match(g){const s=(g.name+' '+g.desc+' '+g.cat).toLowerCase();if(q&&!s.includes(q))return false;
-  if(filter==='all')return true;if(filter==='2nguoi')return g.players>=2;if(filter==='treem'||filter==='vandong')return g.tags.includes(filter);return g.body===filter}
+  if(filter==='all')return true;if(filter==='2nguoi')return g.players>=2;if(filter==='treem'||filter==='vandong')return g.tags.includes(filter);if(filter==='hoc')return g.cat==='Học mà chơi';return g.body===filter}
 function card(g){const a=document.createElement(g.url?'a':'div');a.className='card'+(g.url?'':' soon');if(g.url)a.href=g.url;
   a.innerHTML=`<div class="ico">${g.ico}</div><h3>${g.name}</h3><p>${g.desc}</p><div class="meta"><span class="b-${g.body}">${BODY[g.body]}</span>${g.players>=2?'<span class="b-2nguoi">👥 2 người</span>':''}${g.tags.includes('treem')?'<span>🧒 trẻ em</span>':''}${g.tags.includes('vandong')?'<span>🔥 vận động</span>':''}</div>${g.url?'':'<span class="tag">Sắp có</span>'}`;return a}
 function render(){const root=document.getElementById('sections');root.innerHTML='';let n=0;
