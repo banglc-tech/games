@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Camera chấm công</title>
+<meta name="description" content="Theo dõi camera và chấm công bằng nhận diện khuôn mặt, chạy trực tiếp trên trình duyệt.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230061FF'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23fff'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span class="brand-name">Camera chấm công</span>
+    <span class="badge badge-muted" id="model-status">Đang tải mô hình…</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab is-active" data-tab="camera" role="tab">Camera</button>
+    <button class="tab" data-tab="staff" role="tab">Nhân sự <span class="count" id="staff-count">0</span></button>
+    <button class="tab" data-tab="history" role="tab">Lịch sử</button>
+  </nav>
+  <button class="icon-btn" id="btn-settings" title="Cài đặt" aria-label="Cài đặt">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  </button>
+</header>
+
+<main>
+
+<!-- ============ TAB: CAMERA ============ -->
+<section class="panel is-active" id="tab-camera">
+  <div class="camera-layout">
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="stage-top">
+          <div class="clock">
+            <div class="clock-time" id="clock-time">--:--</div>
+            <div class="clock-date" id="clock-date">—</div>
+          </div>
+          <div class="chips">
+            <span class="chip" id="chip-faces">0 khuôn mặt</span>
+            <span class="chip" id="chip-fps">— fps</span>
+          </div>
+        </div>
+        <div class="stage-center" id="stage-msg">
+          <div class="msg-card">
+            <div class="spinner"></div>
+            <p id="stage-msg-text">Đang chuẩn bị camera và mô hình nhận diện…</p>
+          </div>
+        </div>
+        <div class="greet" id="greet" hidden>
+          <img class="greet-avatar" id="greet-avatar" alt="">
+          <div>
+            <div class="greet-name" id="greet-name">Xin chào</div>
+            <div class="greet-sub" id="greet-sub"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-controls">
+        <label class="switch">
+          <input type="checkbox" id="toggle-attendance" checked>
+          <span class="switch-track"></span>
+          <span>Chấm công tự động</span>
+        </label>
+        <div class="manual-btns" id="manual-btns" hidden>
+          <button class="btn btn-primary" id="btn-manual-in">Vào</button>
+          <button class="btn btn-outline" id="btn-manual-out">Ra</button>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-ghost" id="btn-flip" title="Đổi camera">Đổi camera</button>
+        <button class="btn btn-ghost" id="btn-fullscreen" title="Toàn màn hình">Toàn màn hình</button>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card">
+        <div class="card-head">
+          <h3>Đang có mặt</h3>
+          <span class="badge" id="present-count">0</span>
+        </div>
+        <ul class="present-list" id="present-list">
+          <li class="empty">Chưa có ai chấm công hôm nay.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Hôm nay</h3>
+          <span class="muted" id="today-count">0 lượt</span>
+        </div>
+        <ul class="event-list" id="today-events">
+          <li class="empty">Chưa có lượt chấm công.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ TAB: NHÂN SỰ ============ -->
+<section class="panel" id="tab-staff">
+  <div class="staff-layout">
+    <div class="card">
+      <div class="card-head">
+        <h3>Thêm nhân viên</h3>
+        <span class="muted">Cần ít nhất 3 mẫu khuôn mặt</span>
+      </div>
+      <form id="enroll-form" class="form" autocomplete="off">
+        <div class="field-row">
+          <label class="field">
+            <span>Họ và tên *</span>
+            <input type="text" id="enroll-name" required placeholder="Nguyễn Văn A">
+          </label>
+          <label class="field">
+            <span>Mã nhân viên</span>
+            <input type="text" id="enroll-code" placeholder="NV001">
+          </label>
+        </div>
+        <label class="field">
+          <span>Phòng ban</span>
+          <input type="text" id="enroll-dept" placeholder="Kinh doanh">
+        </label>
+
+        <div class="enroll-cam">
+          <div class="enroll-preview" id="enroll-preview">
+            <canvas id="enroll-canvas"></canvas>
+            <div class="enroll-hint" id="enroll-hint">Nhìn thẳng vào camera, giữ khuôn mặt trong khung.</div>
+          </div>
+          <div class="enroll-actions">
+            <button type="button" class="btn btn-primary" id="btn-capture">Chụp mẫu</button>
+            <label class="btn btn-outline file-btn">
+              Thêm từ ảnh
+              <input type="file" id="enroll-file" accept="image/*" multiple hidden>
+            </label>
+          </div>
+          <div class="samples" id="samples"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="btn-enroll-reset">Làm lại</button>
+          <button type="submit" class="btn btn-primary" id="btn-enroll-save" disabled>Lưu nhân viên</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Danh sách nhân viên</h3>
+        <input type="search" id="staff-search" class="search" placeholder="Tìm tên, mã…">
+      </div>
+      <ul class="staff-list" id="staff-list">
+        <li class="empty">Chưa có nhân viên nào. Thêm ở bên trái.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB: LỊCH SỬ ============ -->
+<section class="panel" id="tab-history">
+  <div class="card">
+    <div class="card-head wrap">
+      <h3>Lịch sử chấm công</h3>
+      <div class="toolbar">
+        <label class="field inline">
+          <span>Từ</span>
+          <input type="date" id="hist-from">
+        </label>
+        <label class="field inline">
+          <span>Đến</span>
+          <input type="date" id="hist-to">
+        </label>
+        <select id="hist-emp" class="select">
+          <option value="">Tất cả nhân viên</option>
+        </select>
+        <button class="btn btn-outline" id="btn-export-logs">Xuất CSV chi tiết</button>
+        <button class="btn btn-outline" id="btn-export-summary">Xuất CSV tổng hợp</button>
+      </div>
+    </div>
+
+    <div class="summary-grid" id="summary-grid"></div>
+
+    <div class="table-wrap">
+      <table class="table" id="hist-table">
+        <thead>
+          <tr><th>Thời gian</th><th>Nhân viên</th><th>Mã</th><th>Loại</th><th>Ảnh</th><th>Độ lệch</th><th></th></tr>
+        </thead>
+        <tbody id="hist-body">
+          <tr><td colspan="7" class="empty">Chưa có dữ liệu trong khoảng này.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ MODAL: CÀI ĐẶT ============ -->
+<div class="modal" id="modal-settings" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Cài đặt</h3>
+      <button class="icon-btn" id="btn-settings-close" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body form">
+      <h4>Camera</h4>
+      <label class="field"><span>Thiết bị</span><select id="set-device" class="select"></select></label>
+      <label class="check"><input type="checkbox" id="set-mirror"> Lật gương (soi như gương)</label>
+      <label class="check"><input type="checkbox" id="set-landmarks"> Vẽ điểm mốc khuôn mặt</label>
+
+      <h4>Nhận diện</h4>
+      <div class="field-row">
+        <label class="field"><span>Bộ phát hiện</span>
+          <select id="set-detector" class="select">
+            <option value="tiny">Nhanh (Tiny)</option>
+            <option value="ssd">Chính xác hơn (SSD MobileNet)</option>
+          </select>
+        </label>
+        <label class="field"><span>Độ phân giải xử lý</span>
+          <select id="set-inputsize" class="select">
+            <option value="224">224 (nhanh)</option>
+            <option value="320">320 (cân bằng)</option>
+            <option value="416">416 (xa hơn)</option>
+            <option value="512">512 (chi tiết)</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span>Ngưỡng khớp khuôn mặt: <b id="set-threshold-val">0.50</b> <small class="muted">(thấp = chặt hơn)</small></span>
+        <input type="range" id="set-threshold" min="0.35" max="0.65" step="0.01">
+      </label>
+      <label class="field"><span>Số khung hình xác nhận trước khi ghi nhận</span><input type="number" id="set-confirm" min="2" max="30"></label>
+
+      <h4>Chấm công</h4>
+      <label class="field"><span>Chế độ</span>
+        <select id="set-mode" class="select">
+          <option value="auto">Tự động luân phiên Vào / Ra</option>
+          <option value="manual">Nhận diện rồi bấm nút Vào / Ra</option>
+        </select>
+      </label>
+      <div class="field-row">
+        <label class="field"><span>Chống ghi trùng (giây)</span><input type="number" id="set-cooldown" min="5" max="3600"></label>
+        <label class="field"><span>Cách tối thiểu giữa Vào và Ra (phút)</span><input type="number" id="set-mingap" min="0" max="720"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="set-snap"> Lưu ảnh nhỏ khi chấm công</label>
+      <label class="field"><span>Giờ bắt đầu ca (để nhận biết đi muộn)</span><input type="time" id="set-workstart"></label>
+
+      <h4>Robot chào hỏi</h4>
+      <label class="check"><input type="checkbox" id="set-voice"> Chào bằng giọng nói (tiếng Việt, dùng giọng của trình duyệt)</label>
+      <label class="check"><input type="checkbox" id="set-guests"> Chào cả người lạ / khách</label>
+      <label class="field"><span>Tốc độ nói</span>
+        <select id="set-voicerate" class="select">
+          <option value="0.9">Chậm</option>
+          <option value="1">Bình thường</option>
+          <option value="1.15">Nhanh</option>
+        </select>
+      </label>
+
+      <h4>Dữ liệu</h4>
+      <p class="muted">Dữ liệu lưu trong trình duyệt này (localStorage). Đang dùng <b id="set-usage">0 KB</b>.</p>
+      <div class="btn-row">
+        <button class="btn btn-outline" id="btn-backup">Sao lưu JSON</button>
+        <label class="btn btn-outline file-btn">Khôi phục JSON<input type="file" id="restore-file" accept="application/json" hidden></label>
+        <button class="btn btn-danger" id="btn-clear-logs">Xóa toàn bộ lịch sử</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="js/store.js"></script>
+<script src="js/facelib.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
