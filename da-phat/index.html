@@ -121,7 +121,7 @@ video{display:none}
     </div>
   </div>
 
-  <div class="ov" id="ovHelp" hidden><div class="card help"><h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1><ol><li>Đặt điện thoại dựng đứng dưới sàn hoặc dùng webcam, camera hướng về bạn, lùi 1,5–2 m.</li><li>Kéo quả bóng trên màn hình tới đúng chỗ chân bạn đang đứng trong hình. Có thể chỉnh kích thước vùng sút ở nút ⚙.</li><li>Đứng yên tới khi dấu X đỏ biến mất, vòng chuyển xanh và có tiếng còi "Sẵn sàng".</li><li>Vung chân qua bóng. Vung từ trái sang thì bóng đi phải, vung mạnh thì bóng bay cao.</li><li>Mỗi lượt 20 cú. Thủ môn chọn 4 mức ở nút ⚙.</li></ol>
+  <div class="ov" id="ovHelp" hidden><div class="card help"><h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1><ol><li>Đặt điện thoại dựng đứng dưới sàn hoặc dùng webcam, camera hướng về bạn, lùi 1,5–2 m.</li><li>Game tự tìm người đứng gần bóng nhất, vẽ khung xương xanh và chữ NGƯỜI CHƠI lên người đó, rồi chỉ nhận cú đá của người này. Người khác đi ngang không ảnh hưởng. Bóng tự đặt giữa hai chân, vẫn kéo được nếu muốn.</li><li>Đứng yên tới khi dấu X đỏ biến mất, vòng chuyển xanh và có tiếng còi "Sẵn sàng".</li><li>Vung chân qua bóng. Vung từ trái sang thì bóng đi phải, vung mạnh thì bóng bay cao.</li><li>Mỗi lượt 20 cú. Thủ môn chọn 4 mức ở nút ⚙.</li></ol>
 <div class="tips"><b>Để camera nhận tốt</b><ul><li>Đứng cách camera 1,5–2 m, đủ sáng, không ngược sáng.</li><li>Camera thấy từ hông tới chân, cả vùng chân vung qua bóng.</li><li>Nền phía sau càng gọn càng dễ nhận.</li></ul></div>
 <button class="btn primary" id="bHelpClose">Đã hiểu, chơi thôi</button></div></div>
   <div class="ov" id="ovEnd" hidden>
@@ -216,7 +216,7 @@ let ball, keeper, phaseT=0, stillT=0;
 let sens=5, facing='user', stream=null;
 const motionHist=[];
 
-function resetShot(){
+function resetShot(){ankHist.length=0;
   ball={t:0,tx:0,ty:0,dur:0.8,x:L.bx,y:L.by,r:L.r,spin:0,state:'idle',vx:0,vy:0};
   keeper={x:0,tx:0,dive:0,ty:0.5,delay:0,anim:0,react:false};
   phase='wait'; stillT=0; motionHist.length=0; prevGray=null;
@@ -294,6 +294,17 @@ async function startCam(){
     video.srcObject=stream; await video.play(); return true;
   }catch(e){ window.__camErr=(e&&e.name||'')+' '+(e&&e.message||''); return false }
 }
+// ---------- nhận diện người & khoá người chơi ----------
+let pose=null,poseReady=false,poseFail=false,lockP=null,lockLostT=0,people=[],ankHist=[];
+function toScreen(lm){const vw=video.videoWidth,vh=video.videoHeight;let x=(lm.x*vw-crop.sx)/crop.sw*W,y=(lm.y*vh-crop.sy)/crop.sh*H;if(mirrored())x=W-x;return{x,y}}
+async function loadPose(){try{const mod=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');const vision=await mod.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+  pose=await mod.PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',delegate:'GPU'},runningMode:'VIDEO',numPoses:3});poseReady=true}catch(e){console.warn('pose fail',e);poseFail=true}}
+function readPeople(now){if(!poseReady||video.readyState<2)return;try{const res=pose.detectForVideo(video,now);people=(res.landmarks||[]).map(lm=>{const S=i=>toScreen(lm[i]);const P={nose:S(0),ls:S(11),rs:S(12),lh:S(23),rh:S(24),la:S(27),ra:S(28),lf:S(31),rf:S(32)};P.sw=Math.max(30,Math.hypot(P.ls.x-P.rs.x,P.ls.y-P.rs.y));P.cx=(P.lh.x+P.rh.x)/2;P.feetY=Math.max(P.la.y,P.ra.y);P.vis=Math.min(lm[27].visibility??1,lm[28].visibility??1);return P})}catch(e){}}
+function pickLock(){ // người đứng gần bóng nhất, nhìn thấy đủ chân
+  const c=people.filter(P=>P.vis>0.4&&P.feetY>H*0.45);if(!c.length)return null;c.sort((a,b)=>Math.hypot(a.cx-L.bx,a.feetY-L.by)-Math.hypot(b.cx-L.bx,b.feetY-L.by));return c[0]}
+function trackLock(dt){ // bám theo người đã khoá bằng vị trí hông
+  if(!lockP){return}let best=null,bd=1e9;for(const P of people){const d=Math.hypot(P.cx-lockP.cx,P.nose.y-lockP.nose.y);if(d<bd){bd=d;best=P}}
+  if(best&&bd<lockP.sw*2.5){lockP=best;lockLostT=0}else{lockLostT+=dt;if(lockLostT>2){lockP=null;ankHist.length=0;phase='wait';stillT=0;setStatus('Mất dấu người chơi, đang tìm lại…')}}}
 function computeCrop(){
   const vw=video.videoWidth,vh=video.videoHeight; if(!vw)return false;
   const s=Math.max(W/vw,H/vh); const sw=W/s,sh=H/s; crop={sx:(vw-sw)/2,sy:(vh-sh)/2,sw,sh}; return true;
@@ -440,6 +451,9 @@ function drawBall(x,y,r,spin){
   ctx.restore();
 }
 
+function drawPeople(){if(mode!=='cam'||!poseReady)return;ctx.save();for(const P of people){const me=P===lockP;ctx.strokeStyle=me?'#3BD16F':'rgba(243,241,236,.25)';ctx.lineWidth=me?4:2;ctx.lineCap='round';ctx.beginPath();for(const [a,b] of [['ls','rs'],['ls','lh'],['rs','rh'],['lh','rh'],['lh','la'],['rh','ra']]){ctx.moveTo(P[a].x,P[a].y);ctx.lineTo(P[b].x,P[b].y)}ctx.stroke();
+    ctx.fillStyle=me?'#3BD16F':'rgba(243,241,236,.3)';ctx.beginPath();ctx.arc(P.nose.x,P.nose.y,me?9:6,0,7);ctx.fill();if(me){ctx.fillStyle='#F5C542';for(const k of ['la','ra']){ctx.beginPath();ctx.arc(P[k].x,P[k].y,10,0,7);ctx.fill()}ctx.font='700 13px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillStyle='#3BD16F';ctx.fillText('NGƯỜI CHƠI',P.nose.x,P.nose.y-22)}}
+  if(!lockP&&(phase==='wait'||phase==='ready')){ctx.fillStyle='rgba(6,48,31,.6)';ctx.fillRect(0,H*0.3,W,H*0.14);ctx.fillStyle='#F5C542';ctx.font='700 '+Math.min(22,W*0.05)+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText('Đang tìm người chơi…',W/2,H*0.36);ctx.font='500 '+Math.min(14,W*0.036)+'px "Be Vietnam Pro",sans-serif';ctx.fillStyle='#F3F1EC';ctx.fillText('Đứng vào giữa hình, camera thấy từ hông tới chân',W/2,H*0.41)}ctx.restore()}
 function drawZone(ready,level){
   if(mode!=='cam'||(phase!=='wait'&&phase!=='ready'))return;
   ctx.save();ctx.setLineDash([8,8]);ctx.lineWidth=3;
@@ -465,7 +479,21 @@ function frame(now){
   drawBG();
 
   // camera detection
-  if(mode==='cam'&&video.readyState>=2&&crop.sw>1&&(phase==='wait'||phase==='ready')){
+  if(mode==='cam'&&poseReady&&video.readyState>=2&&crop.sw>1&&(phase==='wait'||phase==='ready')){
+    readPeople(now);
+    if(!lockP){lockP=pickLock();if(lockP){setStatus('Đã khoá người chơi. Đứng yên để chuẩn bị…');tone(700,.08,'sine',.1);stillT=0;ankHist.length=0;
+        // tự đặt bóng giữa hai chân người chơi
+        pos.x=Math.min(.95,Math.max(.05,((lockP.la.x+lockP.ra.x)/2)/W));pos.y=Math.min(.95,Math.max(.4,(lockP.feetY-lockP.sw*0.15)/H));layout()}}
+    else trackLock(dt);
+    if(lockP){const P=lockP;const t=now/1000;ankHist.push({t,lx:P.la.x,ly:P.la.y,rx:P.ra.x,ry:P.ra.y,fx:P.lf.x,fy:P.lf.y,gx:P.rf.x,gy:P.rf.y});while(ankHist.length>8)ankHist.shift();
+      let spd=0,vx=0,vy=0,near=false;if(ankHist.length>=3){const a=ankHist[0],b=ankHist[ankHist.length-1],dtp=Math.max(.03,b.t-a.t);
+        for(const [kx,ky] of [['lx','ly'],['rx','ry']]){const sx=(b[kx]-a[kx])/dtp,sy=(b[ky]-a[ky])/dtp;const sp=Math.hypot(sx,sy)/P.sw;if(sp>spd){spd=sp;vx=sx/P.sw;vy=sy/P.sw}}
+        near=[['lx','ly'],['rx','ry'],['fx','fy'],['gx','gy']].some(([kx,ky])=>Math.hypot(b[kx]-L.bx,b[ky]-L.by)<L.zr*1.1)}
+      mLevel=spd/4;$('mFill').style.height=Math.min(100,mLevel*100)+'%';
+      if(phase==='wait'){if(spd<0.8)stillT+=dt;else stillT=Math.max(0,stillT-dt*2);if(stillT>0.8){phase='ready';setStatus('Sẵn sàng. Sút đi!');whistle();tension(true)}}
+      else if(phase==='ready'&&spd>3.2&&near){const tx=vx*0.35+(Math.random()-.5)*0.15;const ty=Math.max(0,-vy*0.25)+(spd-3.2)*0.12+Math.random()*0.1;kick(tx,ty,0.7+spd*0.18);ankHist.length=0}}
+    else{$('mFill').style.height='0%'}
+  }else if(mode==='cam'&&video.readyState>=2&&crop.sw>1&&(phase==='wait'||phase==='ready')){
     const m=detect(); const kickThr=0.30-sens*0.02;
     mLevel=m.ratio/kickThr;
     $('mFill').style.height=Math.min(100,mLevel*100)+'%'; $('mLine').style.bottom='100%';
@@ -517,7 +545,7 @@ function frame(now){
 
   if(ball.state==='idle'){ball.x=L.bx;ball.y=L.by;ball.r=L.r}
   if(ballBehind){drawBall(ball.x,ball.y,ball.r,ball.spin);drawKeeper()}
-  else{drawKeeper();drawZone(phase==='ready',mLevel);drawBall(ball.x,ball.y,ball.r,ball.spin)}
+  else{drawKeeper();drawPeople();drawZone(phase==='ready',mLevel);drawBall(ball.x,ball.y,ball.r,ball.spin)}
 
   if(cheerT>0)cheerT-=dt/2.2;
   if(phase==='result'){
@@ -549,7 +577,8 @@ $('bCam').onclick=async()=>{
     if(/NotAllowed|Permission|mediaDevices/i.test(e))hint='Trang này đang bị chặn camera (do khung nhúng hoặc chưa cấp quyền). Mở trang trực tiếp trên tên miền HTTPS của bạn, hoặc chơi bằng vuốt tay.';
     if(/NotFound|Overconstrained/i.test(e))hint='Không tìm thấy camera phù hợp. Thử bấm ⟲ đổi camera.';
     $('err').textContent='Không mở được camera. '+hint+(e?' (Mã lỗi: '+e.trim()+')':'');return}
-  mode='cam'; $('ovStart').hidden=true; newGame();firstHelp();
+  $('err').textContent='Đang tải bộ nhận diện người (khoảng 5 MB)…';if(!poseReady&&!poseFail)await loadPose();
+  mode='cam'; $('ovStart').hidden=true; lockP=null; newGame();firstHelp();if(poseFail)setStatus('Không tải được bộ nhận diện, dùng cách dò chuyển động');
 };
 $('bSwipe').onclick=()=>{initAudio();mode='swipe';$('ovStart').hidden=true;$('meter').style.display='none';$('bFlip').style.display='none';newGame()};
 $('bAgain').onclick=newGame;
