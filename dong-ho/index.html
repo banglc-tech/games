@@ -110,7 +110,7 @@ function draw(now){ctx.fillStyle='#fdf6e3';ctx.fillRect(0,0,W,H);if(!Q)return;Q.
   const k=Q.opts.length,cols=k>3?2:k,rows=Math.ceil(k/cols),bw=(W-30)/cols,bh=70,y0=H-20-rows*(bh+10);
   Q.opts.forEach((o,i)=>{const c=i%cols,r=Math.floor(i/cols),x=10+c*(bw+10),y=y0+r*(bh+10);let col='#fff';if(fb>0){if(i===Q.ans)col='#9be39b';else if(i===sel)col='#f5a0a0'}
     ctx.fillStyle=col;ctx.fillRect(x,y,bw,bh);ctx.strokeStyle='#c9b98a';ctx.lineWidth=3;ctx.strokeRect(x,y,bw,bh);
-    if(typeof o==='string'&&/\p{Extended_Pictographic}/u.test(o)){EMO(34);ctx.fillStyle='#000';ctx.fillText(o,x+bw/2,y+bh/2+2)}else txt(String(o),x+bw/2,y+bh/2+1,String(o).length>6?11:16,'#2a2a2a')});
+    if(typeof o==='string'&&o.length<=4&&/\p{Extended_Pictographic}/u.test(o)){EMO(34);ctx.fillStyle='#000';ctx.fillText(o,x+bw/2,y+bh/2+2)}else{const L=String(o).length;txt(String(o),x+bw/2,y+bh/2+1,L>12?7.5:L>6?10:16,'#2a2a2a')}});
   if(fb>0&&!fbOk){txt('Đáp án đúng được tô xanh',W/2,y0-16,8,'#a05050')}}
 function shuffle(a){return a.sort(()=>Math.random()-.5)}function ri(n){return Math.random()*n|0}
 function card(y,h){ctx.fillStyle='#fff';ctx.fillRect(12,y,W-24,h);ctx.strokeStyle='#c9b98a';ctx.lineWidth=3;ctx.strokeRect(12,y,W-24,h)}
