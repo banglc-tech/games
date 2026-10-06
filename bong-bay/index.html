@@ -154,4 +154,15 @@ function newGame(){balloons=[];parts=[];pops=[];hands.clear();score=[0,0];timeLe
 function endGame(){phase='end';const [a,b]=score;let t,x;if(opt.mode==='pvp'){t=a>b?'Người 1 thắng!':a<b?'Người 2 thắng!':'Hoà';x='Mỗi người đứng trọn trong nửa màn hình của mình.';showEnd(t,x,['Người 1','Người 2'],score);(a!==b?cheer:groan)()}
   else{t=a+' điểm';x=a>=60?'Tay nhanh như chớp!':a>=35?'Khá lắm, thử tránh bóng đen tốt hơn.':'Giơ tay cao hơn và đón bóng từ sớm.';showEnd(t,x,['Điểm'],[a]);cheer()}}
 bindRow('rowMode','mode',v=>v);bindRow('rowTime','time',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

@@ -153,4 +153,15 @@ function laneX(l,k){return W/2+l*(W*0.06+W*0.22*k*k)}
 function newGame(){dist=0;speed=0;cad=[];up=[false,false];items=[];got=0;timeLeft=120;lane=0;baseX=null;pops=[];scroll=0;lastTap=-1;$('n1').textContent='Quãng đường';$('n2').textContent='Xu';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Chạy tại chỗ, nghiêng người để đổi làn nhặt xu':'Chạm trái/phải luân phiên để chạy, chạm nửa trên để chọn làn');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const d=Math.floor(dist);if(d>best){best=d;try{localStorage.setItem('cb-best',best)}catch(e){}}showEnd(d+' m','Nhặt được '+got+' xu trong 2 phút. Kỷ lục '+best+' m. Nhấc gối đều và nhanh để giữ tốc độ, nghiêng người sang làn có xu.',['Quãng đường','Xu','Kỷ lục'],[d,got,best]);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

@@ -147,4 +147,15 @@ function wrap(t,x,y,mw,lh){const w=t.split(' ');let line='';for(const k of w){co
 function newGame(){idx=0;holdT=0;scores=[];prev=null;phaseIn='rest';restT=4;$('n1').textContent='Độ tĩnh';$('n2').textContent='Tư thế';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Vào đúng tư thế rồi giữ yên 10 giây':'Giữ ngón tay trên màn hình 10 giây')}
 function endGame(){phase='end';const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);showEnd(avg+' điểm tĩnh','Hoàn thành '+POSES.length+' tư thế. '+(avg>=90?'Thăng bằng tuyệt vời.':avg>=75?'Khá ổn, thở chậm sẽ bớt rung.':'Nhìn một điểm cố định phía trước để giữ thăng bằng.'),['Độ tĩnh trung bình'],[avg]);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

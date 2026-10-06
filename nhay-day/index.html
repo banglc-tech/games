@@ -144,4 +144,15 @@ let lastAir=0;
 function newGame(){ang=0;speed=2.2;jumps=0;trip=false;base=null;airborne=false;lastPass=-1;lives=3;lastAir=0;$('n1').textContent='Số lần';$('n2').textContent='Kỷ lục';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Bật nhảy khi dây vàng xuống sát chân, màn hình sáng vàng':'Chạm để nhảy khi màn hình sáng vàng');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';if(jumps>best){best=jumps;try{localStorage.setItem('nd-best',best)}catch(e){}}showEnd(jumps+' cái','Dây quay nhanh dần tới '+speed.toFixed(1)+'x. Nhảy ngay khi màn hình nháy vàng, chân rời đất rõ ràng mới tính.',['Số lần','Kỷ lục'],[jumps,best]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

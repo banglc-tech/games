@@ -121,4 +121,15 @@ function make(){const h=1+ri(12),m=opt.lv===0?0:opt.lv===1?[0,30][ri(2)]:[0,15,3
     const ma=m/60*6.28-1.57,ha=((h%12)+m/60)/12*6.28-1.57;ctx.lineCap='round';ctx.strokeStyle='#1E6BFF';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ma)*r*0.65,cy+Math.sin(ma)*r*0.65);ctx.stroke();ctx.strokeStyle='#F25C54';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ha)*r*0.45,cy+Math.sin(ha)*r*0.45);ctx.stroke();ctx.fillStyle='#2a2a2a';ctx.beginPath();ctx.arc(cx,cy,5,0,7);ctx.fill()}}}
 bindRow('rowLv','lv',v=>+v);layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

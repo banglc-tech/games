@@ -106,4 +106,15 @@ function update(dt){}
 function draw(now){ctx.fillStyle='#14181f';ctx.fillRect(0,0,W,H);const s=W/N;for(let y=0;y<N;y++)for(let x=0;x<N;x++){ctx.fillStyle=g[y][x]?'#F5C542':'#2a2e38';ctx.fillRect(x*s+4,y*s+4,s-8,s-8);if(g[y][x]){ctx.fillStyle='rgba(255,255,255,.5)';ctx.fillRect(x*s+10,y*s+10,s*0.3,s*0.15)}}}
 setup();layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

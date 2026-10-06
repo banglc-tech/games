@@ -156,4 +156,15 @@ function newGame(){seq=[];let l=-1;for(let i=0;i<TOTAL;i++){let r;do{r=Math.rand
   $('box2').style.display=opt.mode==='pvp'?'':'none';$('n1').textContent=opt.mode==='pvp'?'Người 1 (trái)':'Điểm';$('n2').textContent='Người 2 (phải)';$('status').style.bottom=input==='touch'?'122px':'18px';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Tạo dáng vàng đúng lúc nó chạm vạch!')}
 function endGame(){phase='end';if(opt.mode==='pvp'){const [a,b]=score;showEnd(a>b?'Người 1 thắng!':a<b?'Người 2 thắng!':'Hoà','',['Người 1','Người 2'],score)}else showEnd(score[0]+' điểm','Đúng '+perfect+'/'+TOTAL+' nhịp. '+(perfect>=28?'Vũ công chính hiệu!':perfect>=18?'Nhịp tốt, giữ dáng tới đúng lúc vạch.':'Nhìn dáng kế tiếp bên phải để chuẩn bị trước.'),['Điểm'],[score[0]]);cheer()}
 bindRow('rowMode','mode',v=>v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

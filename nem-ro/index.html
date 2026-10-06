@@ -143,4 +143,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){balls=[];score=[0,0];timeLeft=60;armed={};streak=0;hands.clear();$('box2').style.display=opt.mode==='pvp'?'':'none';$('n1').textContent=opt.mode==='pvp'?'Người 1 (trái)':'Điểm';$('n2').textContent='Người 2 (phải)';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Vung tay từ dưới lên nhanh để ném');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';if(opt.mode==='pvp'){const [a,b]=score;showEnd(a>b?'Người 1 thắng!':a<b?'Người 2 thắng!':'Hoà','',['Người 1','Người 2'],score)}else showEnd(score[0]+' điểm',score[0]>=30?'Tay ném ba điểm!':score[0]>=14?'Ổn, giữ chuỗi để được 3 điểm mỗi quả.':'Vung tay chậm hơn một chút để bóng không bay quá rổ.',['Điểm'],[score[0]]);cheer()}
 bindRow('rowMode','mode',v=>v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

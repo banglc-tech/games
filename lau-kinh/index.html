@@ -141,4 +141,15 @@ function newGame(){timeLeft=opt.mode==='pvp'?30:40;pct=[0,0];done=false;hands.cl
 function endGame(){phase='end';measure();if(opt.mode==='pvp'){const [a,b]=pct;showEnd(a>b?'Người 1 sạch hơn!':a<b?'Người 2 sạch hơn!':'Hoà','Người 1 lau được '+a+'%, Người 2 '+b+'%.',['Người 1','Người 2'],[a+'%',b+'%']);(a!==b?cheer:groan)()}
   else{const used=Math.round((40-Math.max(0,timeLeft))*10)/10;showEnd(pct[0]>=95?'Sạch bong!':pct[0]+'% sạch',pct[0]>=95?'Lau sạch trong '+used+' giây.':'Lau các góc và mép kính, tay lướt nhanh thì vết lau rộng hơn.',['Đã lau','Thời gian'],[pct[0]+'%',used+' s']);cheer()}}
 bindRow('rowMode','mode',v=>v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

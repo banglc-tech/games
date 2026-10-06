@@ -147,4 +147,15 @@ function endGame(){phase='end';const f=i=>done[i]!==null?done[i].toFixed(2)+' s'
   if(opt.mode==='pvp'){t=rank[0]===0?'Người 1 thắng!':rank[0]===1?'Người 2 thắng!':'Chưa ai về đích';x='Người 1: '+f(0)+' · Người 2: '+f(1);showEnd(t,x,['Người 1','Người 2'],[f(0),f(1)])}
   else{t=rank[0]===0?'Bạn thắng!':rank[0]==='bot'?'Máy thắng':'Hết giờ';x='Bạn: '+f(0)+' · Máy: '+(bot.t?bot.t.toFixed(2)+' s':'chưa về')+'. Nhấc gối cao hơn hông thì mới tính một bước.';showEnd(t,x,['Bạn','Máy'],[f(0),bot.t?bot.t.toFixed(2)+' s':'—'])}}
 bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

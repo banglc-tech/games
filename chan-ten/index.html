@@ -139,4 +139,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){arrows=[];lives=5;blocked=0;nextT=1.5;spd=1;center={x:W/2,y:H*0.55};hands.clear();$('n1').textContent='Đã chắn';$('box2').style.display='none';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Giơ tay về hướng tên bay tới');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';showEnd(blocked+' mũi tên',blocked>=40?'Khiên bất khả xâm phạm!':blocked>=20?'Chắn tốt, tên càng về sau càng dày.':'Nhìn mũi tên từ xa và giơ tay sẵn về hướng đó.',['Đã chắn'],[blocked]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

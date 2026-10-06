@@ -159,4 +159,15 @@ function newGame(){obs=[];dist=0;lives=3;nextT=1.5;base=null;state='run';pops=[]
   setStatus(input==='pose'?'Nhảy, cúi, nghiêng người theo chữ trên chướng ngại':'Vuốt lên/xuống/trái/phải');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const d=Math.floor(dist);if(d>best){best=d;try{localStorage.setItem('vr-best',best)}catch(e){}}showEnd(d+' m',(d>=300?'Vận động viên thực thụ!':d>=150?'Khá lắm, nhịp càng về sau càng nhanh.':'Làm động tác sớm hơn một chút, ngay khi chướng ngại tới gần vạch.')+' Kỷ lục: '+best+' m.',['Quãng đường','Kỷ lục'],[d,best]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

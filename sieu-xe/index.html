@@ -204,4 +204,15 @@ function newGame(){$('timer').style.fontSize='17px';$('timer').style.whiteSpace=
   let c=3;const cd=setInterval(()=>{if(phase!=='ready'){clearInterval(cd);return}flash(c>0?String(c):'ĐUA!',c>0?'#F5C542':ACC);tone(c>0?600:1200,.2,'square',.12);if(c===0){clearInterval(cd);phase='play';setStatus(input==='pose'?'Nghiêng hai tay để lái · hạ tay: phanh · giơ tay: nitro':'Chạm trái/phải để lái · chạm đáy: phanh · chạm đỉnh: nitro')}c--},900)}
 function endGame(){finish()}
 buildTrack();bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);bindRow('rowCar','car',v=>+v);bindRow('rowLaps','laps',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

@@ -152,4 +152,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){zs=[];lives=3;kills=0;nextT=1.5;aimT=[0,0,0];aimLane=-1;shootCd=0;duck=false;base=null;pops=[];wave=1;$('n1').textContent='Hạ gục';$('n2').textContent='Đợt';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Giơ tay chỉ về làn có zombie để bắn, cúi khi nó tới sát':'Chạm làn để bắn, chạm sát đáy để cúi');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';showEnd(kills+' zombie','Trụ tới đợt '+wave+'. Giơ tay chỉ về làn giữ 0,25 giây mỗi phát; zombie ×2 cần 2 phát. Thấy chữ CÚI! thì khom người ngay.',['Hạ gục','Đợt'],[kills,wave]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

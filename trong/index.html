@@ -142,4 +142,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){notes=[];t=0;bpm=100;next=4;score=0;combo=0;hit=0;total=0;hands.clear();$('n1').textContent='Điểm';$('n2').textContent='Combo';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Vỗ tay xuống mặt trống đúng lúc nốt chạm');for(let i=0;i<4;i++)setTimeout(()=>nz(.05,7000,1,.3),i*600)}
 function endGame(){phase='end';const acc=total?Math.round(hit/total*100):0;showEnd(score+' điểm','Chính xác '+acc+'%. '+(acc>=85?'Tay trống thứ thiệt!':acc>=60?'Ổn, nhìn nốt rơi để đánh sớm hơn một nhịp.':'Đánh dứt khoát từ trên xuống, tay đi qua mặt trống.'),['Điểm','Chính xác'],[score,acc+'%']);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

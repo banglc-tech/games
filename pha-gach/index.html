@@ -121,4 +121,15 @@ function draw(now){ctx.fillStyle='#07070c';ctx.fillRect(0,0,W,H);ctx.fillStyle='
   ctx.fillStyle='#F25C54';for(let i=0;i<lives;i++)ctx.fillRect(8+i*14,8,10,10);
   if(sticky&&phase==='play'){ctx.fillStyle='#F3F1EC';ctx.font='9px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('CHẠM / NÚT A ĐỂ BẮN',W/2,H/2)}}
 pad={x:W/2,y:H-24,w:60};ball={x:W/2,y:H-34,vx:0,vy:0,r:5};layout();requestAnimationFrame(loop);
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>

@@ -111,4 +111,15 @@ function update(dt){}
 function draw(now){ctx.fillStyle='#bbada0';ctx.fillRect(0,0,W,H);const c=72,p=8;for(let y=0;y<4;y++)for(let x=0;x<4;x++){const v=g[y]?g[y][x]:0;ctx.fillStyle=v?COLS[v]||'#3c3a32':'#cdc1b4';ctx.fillRect(p+x*(c+p),p+y*(c+p),c,c);if(v)txt(String(v),p+x*(c+p)+c/2,p+y*(c+p)+c/2+1,v<100?16:v<1000?12:10,v<8?'#776e65':'#f9f6f2')}}
 layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const m=document.getElementById('bMenu');if(m){m.click();return}ov.hidden=true;const st=document.getElementById('ovStart');if(st)st.hidden=false}
+  function startCd(){stop();n=3;el.textContent='Tự về màn hình đầu sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự về màn hình đầu sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+</body></html>
