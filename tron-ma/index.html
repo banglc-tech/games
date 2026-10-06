@@ -50,7 +50,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   </div></div>
   <div class="ov" id="ovHelp" hidden><div class="card help">
     <h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1>
-    <ol id="helpSteps"><li>Ma ở đầu màn hình, thanh tiến độ ở dưới. Cột bên phải đo mức cử động của bạn.</li><li>Khi ma quay đi và hiện chữ xanh CHẠY!, chạy tại chỗ, vung tay thật mạnh để tiến nhanh.</li><li>Khi nghe tiếng rít và ma đỏ quay lại, hiện chữ ĐỨNG IM!, bạn có 0,35 giây để dừng hẳn.</li><li>Cử động khi ma đang nhìn (cột bên phải đỏ) là bị bắt ngay.</li><li>Tiến đủ 100 là thoát. Thời gian càng ngắn càng giỏi.</li></ol>
+    <ol id="helpSteps"><li>Ma ở đầu màn hình, thanh tiến độ ở dưới. Cột bên phải đo mức cử động của bạn, vạch trắng là ngưỡng bị phát hiện.</li><li>Khi ma quay đi và hiện chữ xanh CHẠY!, chạy tại chỗ, vung tay để tiến nhanh.</li><li>Nghe hai tiếng bíp và chữ SẮP QUAY… là ma sắp quay lại: bắt đầu dừng dần.</li><li>Khi ma đỏ quay lại (chữ ĐỨNG IM!), bạn còn gần 1 giây để đứng yên hẳn. Cử động mạnh quá vạch trắng liên tục 0,3 giây mới bị bắt, rung nhẹ không sao.</li><li>Tiến đủ 100 là thoát. Thời gian càng ngắn càng giỏi.</li></ol>
     <div class="tips"><b>Để camera nhận tốt</b><ul><li>Đứng cách camera 1,5–2 m, đủ sáng, không ngược sáng.</li><li>Camera thấy cả người từ đầu tới chân.</li><li>Nền phía sau càng gọn càng dễ nhận.</li><li>Lần đầu mở game cần tải bộ nhận diện khoảng 5 MB, chờ vài giây.</li></ul></div>
     <button class="btn primary" id="bHelpClose">Đã hiểu, chơi thôi</button>
   </div></div>
@@ -119,7 +119,7 @@ function drawSkeleton(P,col){ctx.save();ctx.strokeStyle=col;ctx.globalAlpha=.55;
 function noBodyHint(dt,on){noBodyT=(on&&input==='pose'&&bodies.length===0)?noBodyT+dt:0;if(noBodyT>1){ctx.save();ctx.fillStyle='rgba(11,13,18,.6)';ctx.fillRect(0,H*0.3,W,H*0.16);ctx.fillStyle='#F5C542';ctx.font='700 '+Math.min(22,W*0.05)+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText('Không thấy bạn trong hình',W/2,H*0.37);ctx.font='500 '+Math.min(15,W*0.038)+'px "Be Vietnam Pro",sans-serif';ctx.fillText('Lùi lại để camera thấy cả người, đủ sáng',W/2,H*0.42);ctx.restore()}}
 
 // ===== Trốn ma =====
-let prog=0,look=false,lookT=2,motion=0,caught=false,won=false,warnT=0,rounds=0,best=0,timeT=0,prevN=null,lastTap=0;
+let preW=false,overT=0,prog=0,look=false,lookT=2,motion=0,caught=false,won=false,warnT=0,rounds=0,best=0,timeT=0,prevN=null,lastTap=0;
 try{best=+localStorage.getItem('tmma-best')||0}catch(e){}
 function HAND_R(){return 20}
 cv.addEventListener('pointerdown',e=>{if(input!=='touch'||phase!=='play')return;motion=Math.min(1,motion+0.5)});
@@ -127,24 +127,24 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
   if(phase==='play'){timeT+=dt;readBody(now,()=>0);
     if(input==='pose'){const b=bodies[0];if(b){const P=b.P;const pts=[P.nose,P.lw,P.rw,P.lk,P.rk];if(prevN){let m=0;pts.forEach((p,i)=>{m+=Math.hypot(p.x-prevN[i].x,p.y-prevN[i].y)});m/=P.sw;motion=motion*0.6+Math.min(1,m*1.6)*0.4}prevN=pts.map(p=>({x:p.x,y:p.y}))}else motion*=0.8}
     else motion*=0.92;
-    lookT-=dt;if(lookT<=0){look=!look;lookT=look?1.2+Math.random()*1.8:2+Math.random()*3;if(look){rounds++;tone(300,.25,'sawtooth',.2,90);nz(.3,400,.6,.4);warnT=0.35}else tone(900,.12,'sine',.1)}
-    if(look&&warnT<=0&&motion>0.22){caught=true;endGame()}
+    lookT-=dt;if(!look&&lookT<0.7&&!preW){preW=true;tone(500,.15,'square',.08);tone(500,.15,'square',.08)}if(lookT<=0){look=!look;preW=false;lookT=look?1.0+Math.random()*1.2:3+Math.random()*3;if(look){rounds++;tone(300,.25,'sawtooth',.2,90);nz(.3,400,.6,.4);warnT=0.8}else tone(900,.12,'sine',.1)}
+    if(look&&warnT<=0&&motion>0.4){overT+=dt;if(overT>0.3){caught=true;endGame()}}else overT=0;
     warnT=Math.max(0,warnT-dt);
-    if(!look)prog+=motion*dt*22;
+    if(!look)prog+=motion*dt*32;
     if(prog>=100){won=true;endGame()}}
   // ghost at top
   const gx=W/2,gy=H*0.17,s=Math.min(W,H)*0.16;ctx.save();ctx.translate(gx,gy+Math.sin(now/400)*6);
   ctx.fillStyle=look?'#F25C54':'rgba(243,241,236,.9)';ctx.beginPath();ctx.arc(0,0,s*0.5,Math.PI,0);ctx.lineTo(s*0.5,s*0.5);for(let i=0;i<5;i++){ctx.lineTo(s*0.5-s*(i+0.5)/5,s*0.5+(i%2?0:s*0.12))}ctx.lineTo(-s*0.5,s*0.5);ctx.closePath();ctx.fill();
   if(look){ctx.fillStyle='#0B0D12';ctx.beginPath();ctx.ellipse(-s*0.17,-s*0.05,s*0.1,s*0.14,0,0,7);ctx.ellipse(s*0.17,-s*0.05,s*0.1,s*0.14,0,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-s*0.15,-s*0.08,s*0.04,0,7);ctx.arc(s*0.19,-s*0.08,s*0.04,0,7);ctx.fill();ctx.strokeStyle='#0B0D12';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,s*0.2,s*0.14,0.2,Math.PI-0.2);ctx.stroke()}
   else{ctx.fillStyle='rgba(0,0,0,.15)';ctx.beginPath();ctx.arc(0,0,s*0.3,0,7);ctx.fill()}ctx.restore();
-  ctx.fillStyle=look?'#F25C54':ACC;ctx.font='900 '+Math.min(W,H)*0.08+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText(look?'ĐỨNG IM!':'CHẠY!',gx,gy+s*0.9);
+  ctx.fillStyle=look?'#F25C54':ACC;ctx.font='900 '+Math.min(W,H)*0.08+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText(look?'ĐỨNG IM!':(!look&&lookT<0.7?'SẮP QUAY…':'CHẠY!'),gx,gy+s*0.9);
   // progress
   const bx=W*0.1,bw=W*0.8,by=H*0.9;ctx.fillStyle='rgba(11,13,18,.6)';ctx.fillRect(bx,by-14,bw,28);ctx.fillStyle=ACC;ctx.fillRect(bx,by-14,bw*prog/100,28);ctx.fillStyle='#F3F1EC';ctx.font='700 12px sans-serif';ctx.fillText(Math.floor(prog)+' / 100',W/2,by+5);
-  const mx=W-30;ctx.fillStyle='rgba(243,241,236,.15)';ctx.fillRect(mx-6,H*0.35,12,H*0.3);ctx.fillStyle=motion>0.22?'#F25C54':ACC;ctx.fillRect(mx-6,H*0.65-H*0.3*motion,12,H*0.3*motion);
+  const mx=W-30;ctx.fillStyle='rgba(243,241,236,.15)';ctx.fillRect(mx-6,H*0.35,12,H*0.3);ctx.fillStyle=motion>0.4?'#F25C54':ACC;ctx.fillRect(mx-6,H*0.65-H*0.3*motion,12,H*0.3*motion);ctx.fillStyle='#F3F1EC';ctx.fillRect(mx-9,H*0.65-H*0.3*0.4,18,2);
   for(const b of bodies)drawSkeleton(b.P,look?'#F25C54':ACC);noBodyHint(dt,phase==='play');
   $('s1').textContent=Math.floor(prog);$('s2').textContent=best;$('timer').textContent=timeT.toFixed(0);requestAnimationFrame(frame)}
-function newGame(){prog=0;look=false;lookT=2.5;motion=0;caught=false;won=false;rounds=0;timeT=0;prevN=null;$('n1').textContent='Tiến';$('n2').textContent='Kỷ lục';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Chạy tại chỗ khi ma quay đi, đứng im khi ma nhìn':'Chạm liên tục để chạy, dừng chạm khi ma nhìn');tone(900,.12,'sine',.1)}
+function newGame(){preW=false;overT=0;prog=0;look=false;lookT=3.5;motion=0;caught=false;won=false;rounds=0;timeT=0;prevN=null;$('n1').textContent='Tiến';$('n2').textContent='Kỷ lục';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Chạy tại chỗ khi ma quay đi, đứng im khi ma nhìn':'Chạm liên tục để chạy, dừng chạm khi ma nhìn');tone(900,.12,'sine',.1)}
 function endGame(){phase='end';const p=Math.floor(prog);if(p>best){best=p;try{localStorage.setItem('tmma-best',best)}catch(e){}}
-  if(won){cheer();showEnd('Thoát rồi!','Về đích trong '+timeT.toFixed(1)+' giây, qua '+rounds+' lần ma quay lại.',['Thời gian'],[timeT.toFixed(1)+' s'])}else{nz(.6,200,.5,.9);tone(80,.8,'sawtooth',.4,30);showEnd('Bị bắt!','Ma quay lại thấy bạn cử động ở mốc '+p+'. Có 0,35 giây để dừng sau khi ma quay, hãy dừng ngay khi nghe tiếng.',['Tiến được','Kỷ lục'],[p,best])}}
+  if(won){cheer();showEnd('Thoát rồi!','Về đích trong '+timeT.toFixed(1)+' giây, qua '+rounds+' lần ma quay lại.',['Thời gian'],[timeT.toFixed(1)+' s'])}else{nz(.6,200,.5,.9);tone(80,.8,'sawtooth',.4,30);showEnd('Bị bắt!','Ma quay lại thấy bạn cử động ở mốc '+p+'. Nghe hai tiếng bíp là ma sắp quay, dừng dần; sau khi ma quay còn gần 1 giây để đứng yên hẳn.',['Tiến được','Kỷ lục'],[p,best])}}
 layout();requestAnimationFrame(frame);
 </script></body></html>
