@@ -50,7 +50,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   </div></div>
   <div class="ov" id="ovHelp" hidden><div class="card help">
     <h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1>
-    <ol id="helpSteps"><li>Đường đua hiện ở phía trên: chấm xanh là bạn, chấm đỏ là máy (hoặc người 2).</li><li>Khi thấy chữ CHẠY!, chạy tại chỗ. Mỗi lần đầu gối nhấc lên cao hơn hông được tính một bước.</li><li>Nhấc gối thấp sẽ không tính. Nhấc luân phiên hai chân càng nhanh càng tốt.</li><li>Về đích 100 m trước máy là thắng. Quá 60 giây chưa về thì dừng.</li><li>Chơi 2 người: mỗi người đứng một nửa màn hình.</li></ol>
+    <ol id="helpSteps"><li>Đường đua hiện ở phía trên: chấm xanh là bạn, chấm đỏ là máy (hoặc người 2).</li><li>Khi thấy chữ CHẠY!, chạy tại chỗ. Mỗi lần đầu gối nhấc lên cao hơn hông được tính một bước.</li><li>Nhấc gối thấp sẽ không tính. Nhấc luân phiên hai chân càng nhanh càng tốt.</li><li>Về đích 100 m trước máy là thắng. Quá 120 giây chưa về thì dừng.</li><li>Chơi 2 người: mỗi người đứng một nửa màn hình.</li></ol>
     <div class="tips"><b>Để camera nhận tốt</b><ul><li>Đứng cách camera 1,5–2 m, đủ sáng, không ngược sáng.</li><li>Camera thấy cả người từ đầu tới chân, đặc biệt là hông và đầu gối.</li><li>Nền phía sau càng gọn càng dễ nhận.</li><li>Lần đầu mở game cần tải bộ nhận diện khoảng 5 MB, chờ vài giây.</li></ul></div>
     <button class="btn primary" id="bHelpClose">Đã hiểu, chơi thôi</button>
   </div></div>
@@ -127,7 +127,7 @@ cv.addEventListener('pointerdown',e=>{if(input!=='touch'||phase!=='play')return;
 function knees(dt){for(const b of bodies){const i=opt.mode==='pvp'?b.owner:0;const P=b.P,r=run[i];const th=P.sw*0.35;for(const [k,idx] of [['lk',0],['rk',1]]){const up=P[k].y<P.hy-th;if(up&&!r.up[idx]){r.up[idx]=true;stepP(i)}else if(!up&&P[k].y>P.hy-th*0.4)r.up[idx]=false}}}
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHelp').hidden){requestAnimationFrame(frame);return}ctx.clearRect(0,0,W,H);drawCam();
   if(phase==='play'){readBody(now,x=>x<W/2?0:1);if(input==='pose')knees(dt);tm+=dt;if(opt.mode==='bot'&&bot.d<DIST){bot.d+=BOTS[opt.lvl]*dt;if(bot.d>=DIST){bot.d=DIST;bot.t=tm;rank.push('bot');flash('MÁY VỀ ĐÍCH','#F25C54');groan()}}
-    const all=[0,...(opt.mode==='pvp'?[1]:[])].every(i=>done[i])&&(opt.mode!=='bot'||bot.d>=DIST);if(all||tm>60)endGame()}
+    const all=[0,...(opt.mode==='pvp'?[1]:[])].every(i=>done[i])&&(opt.mode!=='bot'||bot.d>=DIST);if(all||tm>120)endGame()}
   // track lanes at top
   const lanes=opt.mode==='pvp'?[{n:'Người 1',d:run[0].d,c:ACC},{n:'Người 2',d:run[1].d,c:ACC2}]:[{n:'Bạn',d:run[0].d,c:ACC},{n:'Máy',d:bot.d,c:ACC2}];
   const ty=H*0.1,lh=Math.min(70,H*0.09),x0=W*0.06,x1=W*0.94;
