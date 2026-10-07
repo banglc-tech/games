@@ -57,6 +57,16 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Chơi lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
 <script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
+  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+<script>
 const $=id=>document.getElementById(id);const cv=$('c'),ctx=cv.getContext('2d');const KEY='pt';
 let opt={};try{const o=JSON.parse(localStorage.getItem(KEY+'-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
 function bindRow(id,key,parse){const row=$(id);if(!row)return;row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem(KEY+'-opt',JSON.stringify(opt))}catch(e){}}})}
@@ -86,7 +96,11 @@ document.querySelectorAll('.abtn [data-d]').forEach(b=>{const k=b.dataset.d;cons
 let swipeMode='dir';(()=>{let st=null,moved=false;const wrap=$('wrap');
   wrap.addEventListener('pointerdown',e=>{st={x:e.clientX,y:e.clientY,t:performance.now()};moved=false;if(swipeMode==='drag'&&window.onDragX)window.onDragX(e.clientX)});
   wrap.addEventListener('pointermove',e=>{if(!st)return;if(swipeMode==='drag'){window.onDragX&&window.onDragX(e.clientX);return}const dx=e.clientX-st.x,dy=e.clientY-st.y;if(Math.hypot(dx,dy)>28){moved=true;press(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));st={x:e.clientX,y:e.clientY,t:performance.now()}}});
-  wrap.addEventListener('pointerup',e=>{if(st&&!moved&&performance.now()-st.t<300&&swipeMode!=='drag')press('a');st=null});wrap.addEventListener('pointercancel',()=>{st=null})})();
+  wrap.addEventListener('pointerup',e=>{if(st&&!moved&&swipeMode!=='drag'){const r=cv.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*cv.width,y=(e.clientY-r.top)/r.height*cv.height;if(performance.now()-st.t>=450&&window.onLongXY)window.onLongXY(x,y);else{if(window.onTapXY)window.onTapXY(x,y);press('a')}}st=null});wrap.addEventListener('pointercancel',()=>{st=null})})();
+function canvasXY(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*cv.width,y:(e.clientY-r.top)/r.height*cv.height}}
+function fit(w,h){const ww=$('wrap').clientWidth-10,hh=$('wrap').clientHeight-10;const s=Math.min(ww/w,hh/h);cv.width=w;cv.height=h;cv.style.width=w*s+'px';cv.style.height=h*s+'px'}
+function txt(t,x,y,size,col='#F3F1EC',align='center'){ctx.fillStyle=col;ctx.font=size+'px "Press Start 2P",monospace';ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+function hidePad(){$('pad').style.display='none'}
 $('bStart').onclick=()=>{initAudio();newGame()};$('bAgain').onclick=()=>{initAudio();newGame()};$('bMenu').onclick=()=>{phase='menu';$('ovEnd').hidden=true;$('ovStart').hidden=false};
 function start(){$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';paused=false;$('bPause').textContent='II'}
 let last=performance.now();
@@ -128,15 +142,4 @@ function draw(now){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.fillStyle='#22
   for(const e of exp){ctx.fillStyle='#F5C542';for(let i=0;i<6;i++){const a=i/6*6.28,r=(0.5-e.t)*40;ctx.fillRect(e.x+Math.cos(a)*r-2,e.y+Math.sin(a)*r-2,4,4)}}
   ctx.fillStyle='#4CC9F0';for(let i=0;i<lives;i++)ctx.fillRect(8+i*16,8,12,6);ctx.fillStyle='#222';ctx.fillRect(0,H-40,W,1)}
 ship={x:W/2,y:H-30};layout();requestAnimationFrame(loop);
-</script>
-<script>
-(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
-  const card=ov.querySelector('.card')||ov;card.appendChild(el);
-  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
-  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
-  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
-  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
-  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
-})();
-</script>
-</body></html>
+</script></body></html>

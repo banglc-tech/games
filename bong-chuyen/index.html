@@ -57,6 +57,33 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><div id="endScores"></div><p id="endText"></p>
     <button class="btn primary" id="bAgain">Chơi lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
+<script>// ===== Camera điện thoại qua QR (PeerJS, cùng Wi-Fi) =====
+(()=>{
+const $=id=>document.getElementById(id);const bCam=$('bCam');if(!bCam)return;
+const btn=document.createElement('button');btn.className='btn ghost';btn.id='bPhone';btn.textContent='📱 Dùng camera điện thoại (quét QR)';bCam.insertAdjacentElement('afterend',btn);
+const box=document.createElement('div');box.id='qrBox';box.hidden=true;box.style.cssText='margin-top:12px;background:#fff;border-radius:12px;padding:12px;color:#111;text-align:center';box.innerHTML='<div id="qrImg" style="display:flex;justify-content:center"></div><div style="font-weight:700;margin-top:8px;font-size:14px">Mở camera điện thoại, quét mã này</div><div id="qrCode" style="font-size:12px;opacity:.7;margin-top:4px"></div><div id="qrSt" style="font-size:13px;margin-top:8px;color:#1a6">Đang chờ điện thoại kết nối…</div>';btn.insertAdjacentElement('afterend',box);
+function load(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=j;document.head.appendChild(s)})}
+let peer=null;
+btn.onclick=async()=>{btn.disabled=true;btn.textContent='Đang tạo mã…';try{await Promise.all([load('https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'),load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js')])}catch(e){btn.textContent='Không tải được thư viện kết nối';return}
+  const id='ihz-'+Math.random().toString(36).slice(2,8);const url=location.origin+location.pathname.replace(/[^/]*$/,'').replace(/\/[^/]+\/$/,'/')+'cam/?id='+id;
+  peer=new Peer(id,{debug:0});peer.on('open',()=>{const q=qrcode(0,'M');q.addData(url);q.make();$('qrImg').innerHTML=q.createSvgTag({cellSize:5,margin:2});$('qrCode').textContent='Mã: '+id+' · '+url;box.hidden=false;btn.textContent='📱 Đang chờ điện thoại…';
+    if(window.__initAudio)window.__initAudio()});
+  peer.on('error',e=>{$('qrSt').textContent='Lỗi kết nối: '+e.type;btn.disabled=false;btn.textContent='📱 Thử lại'});
+  peer.on('call',call=>{call.answer();call.on('stream',async s=>{$('qrSt').textContent='Đã nhận hình từ điện thoại!';const v=document.getElementById('v');v.srcObject=s;v.muted=true;try{await v.play()}catch(e){}window.__remoteCam=true;box.hidden=true;btn.disabled=false;btn.textContent='📱 Dùng camera điện thoại (quét QR)';if(window.__afterCam)window.__afterCam()});
+    call.on('close',()=>{if(window.__setStatus)window.__setStatus('Điện thoại đã ngắt kết nối')})});
+};
+})();
+</script>
+<script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
+  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
 <script type="module">
 const $=id=>document.getElementById(id);const cv=$('c'),ctx=cv.getContext('2d'),video=$('v');let W=0,H=0,DPR=1;
 function layout(){DPR=Math.min(window.devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}window.addEventListener('resize',layout);
@@ -80,7 +107,7 @@ const mirrored=()=>facing==='user';
 function toScreen(lm){const vw=video.videoWidth,vh=video.videoHeight;let x=(lm.x*vw-crop.sx)/crop.sw*W,y=(lm.y*vh-crop.sy)/crop.sh*H;if(mirrored())x=W-x;return{x,y}}
 async function loadPose(n){try{const mod=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');const vision=await mod.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
   pose=await mod.PoseLandmarker.createFromOptions(vision,{baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',delegate:'GPU'},runningMode:'VIDEO',numPoses:n});poseReady=true;return true}catch(e){console.warn(e);return false}}
-$('bFlip').onclick=async()=>{if(input!=='pose')return;facing=facing==='user'?'environment':'user';await startCam()};
+$('bFlip').onclick=async()=>{if(input!=='pose')return;facing=facing==='user'?'environment':'user';if(window.__remoteCam)return;await startCam()};
 function drawCam(){if(input==='pose'&&video.readyState>=2&&computeCrop()){ctx.save();if(mirrored()){ctx.translate(W,0);ctx.scale(-1,1)}ctx.drawImage(video,crop.sx,crop.sy,crop.sw,crop.sh,0,0,W,H);ctx.restore();ctx.fillStyle='rgba(11,13,18,.25)';ctx.fillRect(0,0,W,H);return true}
   const g=ctx.createRadialGradient(W/2,H*0.4,20,W/2,H*0.4,Math.max(W,H));g.addColorStop(0,'#1E2433');g.addColorStop(1,'#0B0D12');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);return false}
 function flash(txt,col){const b=$('big');b.textContent=txt;b.style.color=col;b.classList.add('show');clearTimeout(flash.t);flash.t=setTimeout(()=>b.classList.remove('show'),800)}
@@ -99,9 +126,11 @@ cv.addEventListener('pointerdown',e=>{if(input!=='touch')return;cv.setPointerCap
 cv.addEventListener('pointermove',e=>{if(input!=='touch'||!hands.has('p'+e.pointerId))return;setHand('p'+e.pointerId,ownerOfX(e.clientX),e.clientX,e.clientY,performance.now())});
 cv.addEventListener('pointerup',e=>{hands.delete('p'+e.pointerId)});
 function ownerOfX(x){return opt.mode==='pvp'?(x<W/2?0:1):0}
+async function afterCam(){$('err').textContent='Đang tải bộ nhận diện (khoảng 5 MB)…';if(!poseReady){const pk=await loadPose(opt.mode==='pvp'?2:1);if(!pk){$('err').textContent='Không tải được bộ nhận diện (cần mạng). Bạn vẫn có thể chơi bằng chạm màn hình.';return}}input='pose';newGame();firstHelp()}
+window.__afterCam=afterCam;window.__initAudio=initAudio;window.__setStatus=setStatus;
 $('bCam').onclick=async()=>{initAudio();$('err').textContent='Đang xin quyền camera…';const ok=navigator.mediaDevices&&await startCam();
-  if(!ok){const e=window.__camErr||'';$('err').textContent='Không mở được camera. '+(/NotAllowed|Permission/i.test(e)?'Trang này đang bị chặn camera, hãy mở link trực tiếp trên trình duyệt.':'Hãy cho phép quyền camera.')+' Hoặc chơi bằng chạm màn hình.';return}
-  $('err').textContent='Đang tải bộ nhận diện (khoảng 5 MB)…';if(!poseReady){const pk=await loadPose(opt.mode==='pvp'?2:1);if(!pk){$('err').textContent='Không tải được bộ nhận diện (cần mạng). Bạn vẫn có thể chơi bằng chạm màn hình.';return}}input='pose';newGame();firstHelp()};
+  if(!ok){const e=window.__camErr||'';$('err').textContent='Không mở được camera. '+(/NotAllowed|Permission/i.test(e)?'Trang này đang bị chặn camera, hãy mở link trực tiếp trên trình duyệt.':'Hãy cho phép quyền camera.')+' Hoặc dùng camera điện thoại qua QR, hoặc chơi bằng chạm màn hình.';return}
+  window.__remoteCam=false;afterCam()};
 $('bTouch').onclick=()=>{initAudio();input='touch';newGame()};$('bAgain').onclick=()=>{initAudio();newGame()};
 $('bMenu').onclick=()=>{phase='menu';$('ovEnd').hidden=true;$('ovStart').hidden=false;setStatus('Đang chuẩn bị…')};
 function showEnd(title,txt,names,scores){$('endTitle').textContent=title;$('endText').textContent=txt;$('endScores').innerHTML=names.map((n,i)=>'<div><span>'+n+'</span>'+scores[i]+'</div>').join('');$('ovEnd').hidden=false}
@@ -145,15 +174,4 @@ function check(){const [a,b]=score;if((a>=15||b>=15)&&Math.abs(a-b)>=2)endGame()
 function newGame(){ball=null;score=[0,0];rally=0;serveT=1.5;hands.clear();$('n1').textContent='Bạn';$('n2').textContent='Máy · '+['Dễ','Vừa','Khó','Huyền thoại'][opt.lvl];$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Đập tay vào bóng từ dưới lên để đẩy qua lưới');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const w=score[0]>score[1];showEnd(w?'Bạn thắng!':'Máy thắng','Set '+score[0]+'–'+score[1]+'. '+(w?'Thử mức khó hơn?':'Đón bóng sớm khi còn cao, vòng vàng báo chỗ bóng rơi.'),['Bạn','Máy'],score);(w?cheer:groan)()}
 bindRow('rowLvl','lvl',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script>
-<script>
-(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
-  const card=ov.querySelector('.card')||ov;card.appendChild(el);
-  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
-  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
-  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
-  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
-  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
-})();
-</script>
-</body></html>
+</script></body></html>

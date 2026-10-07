@@ -57,6 +57,16 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Chơi lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
 <script>
+(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
+  const card=ov.querySelector('.card')||ov;card.appendChild(el);
+  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
+  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
+  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
+  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
+  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+<script>
 const $=id=>document.getElementById(id);const cv=$('c'),ctx=cv.getContext('2d');const KEY='caro';
 let opt={mode:'bot'};try{const o=JSON.parse(localStorage.getItem(KEY+'-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
 function bindRow(id,key,parse){const row=$(id);if(!row)return;row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem(KEY+'-opt',JSON.stringify(opt))}catch(e){}}})}
@@ -112,15 +122,4 @@ function draw(now){ctx.fillStyle='#e8d9b5';ctx.fillRect(0,0,W,H);const s=W/N;ctx
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=b[y]&&b[y][x];if(!v)continue;ctx.strokeStyle=v===1?'#1E6BFF':'#F25C54';ctx.lineWidth=3;const cx=x*s+s/2,cy=y*s+s/2,r=s*0.3;if(v===1){ctx.beginPath();ctx.moveTo(cx-r,cy-r);ctx.lineTo(cx+r,cy+r);ctx.moveTo(cx+r,cy-r);ctx.lineTo(cx-r,cy+r);ctx.stroke()}else{ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke()}}}
 bindRow('rowMode','mode',v=>v);layout();requestAnimationFrame(loop);
 
-</script>
-<script>
-(()=>{const ov=document.getElementById('ovEnd');if(!ov)return;let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';
-  const card=ov.querySelector('.card')||ov;card.appendChild(el);
-  function stop(){if(t){clearInterval(t);t=null}el.textContent=''}
-  function back(){stop();const a=document.getElementById('bAgain');if(a){a.click();return}const m=document.getElementById('bMenu');if(m)m.click()}
-  function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
-  new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
-  ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
-})();
-</script>
-</body></html>
+</script></body></html>

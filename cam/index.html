@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Camera điện thoại · Góc game</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700;900&display=swap" rel="stylesheet">
+<style>:root{box-sizing:border-box}*{box-sizing:inherit}html,body{height:100%;margin:0;background:#0B0D12;color:#F3F1EC;font-family:"Be Vietnam Pro",system-ui,sans-serif}
+#v{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#ui{position:fixed;left:0;right:0;bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(11,13,18,.9) 40%)}
+#st{font-weight:700;font-size:15px;margin-bottom:10px}#st b{color:#06D6A0}#st i{color:#F5C542;font-style:normal}
+.row{display:flex;gap:8px}button{flex:1;padding:14px;border-radius:10px;border:none;font:inherit;font-weight:700;font-size:15px;background:#F5C542;color:#0B0D12}button.g{background:rgba(243,241,236,.15);color:#F3F1EC}
+#code{font-size:12px;opacity:.7;margin-top:8px}#tip{position:fixed;top:12px;left:12px;right:12px;background:rgba(11,13,18,.75);padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}</style></head>
+<body><video id="v" playsinline muted autoplay></video>
+<div id="tip">Đặt điện thoại dựng đứng, camera hướng về người chơi, cách 1,5–2 m. Giữ màn hình này mở trong lúc chơi.</div>
+<div id="ui"><div id="st">Đang chuẩn bị…</div><div class="row"><button id="bStart">Bật camera và kết nối</button><button class="g" id="bFlip">⟲ Đổi camera</button></div><div id="code"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);const id=new URLSearchParams(location.search).get('id');let stream=null,facing='user',peer=null,call=null;
+$('code').textContent=id?'Mã kết nối: '+id:'Thiếu mã kết nối. Hãy quét lại mã QR trên màn hình lớn.';
+function st(h){$('st').innerHTML=h}
+async function cam(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:960},height:{ideal:720},frameRate:{ideal:30}},audio:false});$('v').srcObject=stream;$('v').style.transform=facing==='user'?'scaleX(-1)':'';await $('v').play()}
+function connect(){if(!id)return;st('Đang kết nối tới màn hình lớn…');if(call)call.close();peer=peer||new Peer(undefined,{debug:0});const go=()=>{call=peer.call(id,stream);call.on('stream',()=>{});call.on('close',()=>st('<i>Mất kết nối.</i> Bấm Kết nối lại.'));call.on('error',e=>st('<i>Lỗi: '+e.type+'</i>'));setTimeout(()=>{if(call&&call.open)st('<b>Đã kết nối.</b> Hình đang truyền sang màn hình lớn.');},1500);call.on('iceStateChanged',s=>{if(s==='connected')st('<b>Đã kết nối.</b> Hình đang truyền sang màn hình lớn.');if(s==='disconnected'||s==='failed')st('<i>Mất kết nối.</i> Bấm Kết nối lại.')})};
+  if(peer.open)go();else{peer.on('open',go);peer.on('error',e=>st('<i>Không kết nối được ('+e.type+').</i> Kiểm tra cả hai máy cùng Wi-Fi rồi bấm lại.'))}}
+$('bStart').onclick=async()=>{try{await cam();$('bStart').textContent='Kết nối lại';connect()}catch(e){st('<i>Không mở được camera:</i> '+e.name)}};
+$('bFlip').onclick=async()=>{facing=facing==='user'?'environment':'user';try{await cam();if(call&&call.peerConnection){const s=call.peerConnection.getSenders().find(x=>x.track&&x.track.kind==='video');if(s)s.replaceTrack(stream.getVideoTracks()[0])}}catch(e){st('<i>Không đổi được camera</i>')}};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&stream&&call&&!call.open)connect()});
+</script></body></html>
