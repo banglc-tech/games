@@ -113,6 +113,23 @@ video{display:none}
   </div>
 </div>
 
+<script>// ===== Camera điện thoại qua QR (PeerJS, cùng Wi-Fi) =====
+(()=>{
+const $=id=>document.getElementById(id);const bCam=$('bCam');if(!bCam)return;
+const btn=document.createElement('button');btn.className='btn ghost';btn.id='bPhone';btn.textContent='📱 Dùng camera điện thoại (quét QR)';bCam.insertAdjacentElement('afterend',btn);
+const box=document.createElement('div');box.id='qrBox';box.hidden=true;box.style.cssText='margin-top:12px;background:#fff;border-radius:12px;padding:12px;color:#111;text-align:center';box.innerHTML='<div id="qrImg" style="display:flex;justify-content:center"></div><div style="font-weight:700;margin-top:8px;font-size:14px">Mở camera điện thoại, quét mã này</div><div id="qrCode" style="font-size:12px;opacity:.7;margin-top:4px"></div><div id="qrSt" style="font-size:13px;margin-top:8px;color:#1a6">Đang chờ điện thoại kết nối…</div>';btn.insertAdjacentElement('afterend',box);
+function load(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=j;document.head.appendChild(s)})}
+let peer=null;
+btn.onclick=async()=>{btn.disabled=true;btn.textContent='Đang tạo mã…';try{await Promise.all([load('https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'),load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js')])}catch(e){btn.textContent='Không tải được thư viện kết nối';return}
+  const id='ihz-'+Math.random().toString(36).slice(2,8);const url=location.origin+location.pathname.replace(/[^/]*$/,'').replace(/\/[^/]+\/$/,'/')+'cam/?id='+id;
+  peer=new Peer(id,{debug:0});peer.on('open',()=>{const q=qrcode(0,'M');q.addData(url);q.make();$('qrImg').innerHTML=q.createSvgTag({cellSize:5,margin:2});$('qrCode').textContent='Mã: '+id+' · '+url;box.hidden=false;btn.textContent='📱 Đang chờ điện thoại…';
+    if(window.__initAudio)window.__initAudio()});
+  peer.on('error',e=>{$('qrSt').textContent='Lỗi kết nối: '+e.type;btn.disabled=false;btn.textContent='📱 Thử lại'});
+  peer.on('call',call=>{call.answer();call.on('stream',async s=>{$('qrSt').textContent='Đã nhận hình từ điện thoại!';const v=document.getElementById('v');v.srcObject=s;v.muted=true;try{await v.play()}catch(e){}window.__remoteCam=true;box.hidden=true;btn.disabled=false;btn.textContent='📱 Dùng camera điện thoại (quét QR)';if(window.__afterCam)window.__afterCam()});
+    call.on('close',()=>{if(window.__setStatus)window.__setStatus('Điện thoại đã ngắt kết nối')})});
+};
+})();
+</script>
 <script type="module">
 const $=id=>document.getElementById(id);
 $('bHelp').onclick=()=>{$('ovHelp').hidden=!$('ovHelp').hidden};$('bHelpClose').onclick=()=>{$('ovHelp').hidden=true;try{localStorage.setItem('cn-help','1')}catch(e){}};
@@ -169,7 +186,7 @@ async function loadPose(){
     poseReady=true;return true;
   }catch(e){console.warn(e);return false}
 }
-$('bFlip').onclick=async()=>{if(input!=='pose')return;facing=facing==='user'?'environment':'user';await startCam()};
+$('bFlip').onclick=async()=>{if(input!=='pose')return;facing=facing==='user'?'environment':'user';if(window.__remoteCam)return;await startCam()};
 
 // ---------- blades (hands) ----------
 // each blade: {id, owner(0|1), pts:[{x,y,t}], color}
@@ -357,13 +374,15 @@ function endGame(){
   $('endScores').innerHTML='<div><span>'+$('n1').textContent+'</span>'+a+'</div><div><span>'+$('n2').textContent+'</span>'+b+'</div>';
   $('ovEnd').hidden=false;setStatus('Hết giờ');
 }
+async function afterCam(){$('err').textContent='Đang tải bộ nhận diện tay, chờ vài giây…';if(!poseReady){const pk=await loadPose();if(!pk){$('err').textContent='Không tải được bộ nhận diện tay (cần mạng). Bạn vẫn có thể chơi bằng tay chạm màn hình.';return}}input='pose';newGame();firstHelp()}
+window.__afterCam=afterCam;window.__initAudio=initAudio;window.__setStatus=setStatus;
 $('bCam').onclick=async()=>{
   initAudio();$('err').textContent='Đang xin quyền camera…';
   const ok=navigator.mediaDevices&&await startCam();
   if(!ok){const e=window.__camErr||'';$('err').textContent='Không mở được camera. '+(/NotAllowed|Permission/i.test(e)?'Trang này đang bị chặn camera, hãy mở link trực tiếp trên trình duyệt.':'Hãy cho phép quyền camera.')+' Hoặc chơi bằng tay chạm màn hình.';return}
   $('err').textContent='Đang tải bộ nhận diện tay, chờ vài giây…';
   if(!poseReady){const pk=await loadPose();if(!pk){$('err').textContent='Không tải được bộ nhận diện tay (cần mạng). Bạn vẫn có thể chơi bằng tay chạm màn hình.';return}}
-  input='pose';newGame();firstHelp();
+  window.__remoteCam=false;afterCam();
 };
 $('bTouch').onclick=()=>{initAudio();input='touch';newGame()};
 $('bAgain').onclick=()=>{initAudio();newGame()};
