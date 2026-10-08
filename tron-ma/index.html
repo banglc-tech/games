@@ -154,7 +154,7 @@ function HAND_R(){return 20}
 cv.addEventListener('pointerdown',e=>{if(input!=='touch'||phase!=='play')return;motion=Math.min(1,motion+0.5)});
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHelp').hidden){requestAnimationFrame(frame);return}ctx.clearRect(0,0,W,H);drawCam();
   if(phase==='play'){timeT+=dt;readBody(now,()=>0);
-    if(input==='pose'){const b=bodies[0];if(b){const P=b.P;const pts=[P.nose,P.lw,P.rw,P.lk,P.rk];if(prevN){let m=0;pts.forEach((p,i)=>{m+=Math.hypot(p.x-prevN[i].x,p.y-prevN[i].y)});m/=P.sw;motion=motion*0.6+Math.min(1,m*1.6)*0.4}prevN=pts.map(p=>({x:p.x,y:p.y}))}else motion*=0.8}
+    if(input==='pose'){const b=bodies[0];if(b){const P=b.P;const pts=[P.nose,P.lw,P.rw,P.lk,P.rk];if(prevN){let m=0;pts.forEach((p,i)=>{m+=Math.hypot(p.x-prevN[i].x,p.y-prevN[i].y)});m=m/P.sw/Math.max(0.016,dt);motion=motion*0.5+Math.min(1,m/6)*0.5}prevN=pts.map(p=>({x:p.x,y:p.y}))}else motion*=0.8}
     else motion*=0.92;
     lookT-=dt;if(!look&&lookT<0.7&&!preW){preW=true;tone(500,.15,'square',.08);tone(500,.15,'square',.08)}if(lookT<=0){look=!look;preW=false;lookT=look?1.0+Math.random()*1.2:4+Math.random()*3;if(look){rounds++;tone(300,.25,'sawtooth',.2,90);nz(.3,400,.6,.4);warnT=0.8}else tone(900,.12,'sine',.1)}
     if(look&&warnT<=0&&motion>0.4){overT+=dt;if(overT>0.3){caught=true;endGame()}}else overT=0;
