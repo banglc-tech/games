@@ -50,7 +50,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   </div></div>
   <div class="ov" id="ovHelp" hidden><div class="card help">
     <h1 style="font-size:clamp(26px,7vw,40px)">Cách chơi</h1>
-    <ol id="helpSteps"><li>Ma ở đầu màn hình, thanh tiến độ ở dưới. Cột bên phải đo mức cử động của bạn, vạch trắng là ngưỡng bị phát hiện.</li><li>Khi ma quay đi và hiện chữ xanh CHẠY!, chạy tại chỗ, vung tay để tiến nhanh.</li><li>Nghe hai tiếng bíp và chữ SẮP QUAY… là ma sắp quay lại: bắt đầu dừng dần.</li><li>Khi ma đỏ quay lại (chữ ĐỨNG IM!), bạn còn gần 1 giây để đứng yên hẳn. Cử động mạnh quá vạch trắng liên tục 0,3 giây mới bị bắt, rung nhẹ không sao.</li><li>Tiến đủ 100 là thoát, thường mất khoảng 5–6 lượt ma quay đi. Số ở giữa là số lần ma đã quay lại và thời gian.</li></ol>
+    <ol id="helpSteps"><li>Ma ở đầu màn hình, thanh tiến độ ở dưới. Cột bên phải đo mức cử động của bạn, vạch trắng là ngưỡng bị phát hiện.</li><li>Khi ma quay đi và hiện chữ xanh CHẠY!, chạy tại chỗ, vung tay để tiến nhanh.</li><li>Nghe hai tiếng bíp và chữ SẮP QUAY… là ma sắp quay lại: bắt đầu dừng dần.</li><li>Khi ma đỏ quay lại (chữ ĐỨNG IM!), bạn còn gần 1 giây để đứng yên hẳn. Cử động mạnh quá vạch trắng liên tục 0,3 giây mới bị bắt, rung nhẹ không sao.</li><li>Tiến đủ 100 là thoát, thường mất khoảng 3 lượt ma quay đi. Số ở giữa là số lần ma đã quay lại và thời gian.</li></ol>
     <div class="tips"><b>Để camera nhận tốt</b><ul><li>Đứng cách camera 1,5–2 m, đủ sáng, không ngược sáng.</li><li>Camera thấy cả người từ đầu tới chân.</li><li>Nền phía sau càng gọn càng dễ nhận.</li><li>Lần đầu mở game cần tải bộ nhận diện khoảng 5 MB, chờ vài giây.</li></ul></div>
     <button class="btn primary" id="bHelpClose">Đã hiểu, chơi thôi</button>
   </div></div>
@@ -159,7 +159,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
     lookT-=dt;if(!look&&lookT<0.7&&!preW){preW=true;tone(500,.15,'square',.08);tone(500,.15,'square',.08)}if(lookT<=0){look=!look;preW=false;lookT=look?1.0+Math.random()*1.2:4+Math.random()*3;if(look){rounds++;tone(300,.25,'sawtooth',.2,90);nz(.3,400,.6,.4);warnT=0.8}else tone(900,.12,'sine',.1)}
     if(look&&warnT<=0&&motion>0.45){overT+=dt;if(overT>0.45){caught=true;endGame()}}else overT=Math.max(0,overT-dt);
     warnT=Math.max(0,warnT-dt);
-    if(!look)prog+=motion*dt*7;
+    if(!look)prog+=motion*dt*14;
     if(prog>=100){won=true;endGame()}}
   // ghost at top
   const gx=W/2,gy=H*0.17,s=Math.min(W,H)*0.16;ctx.save();ctx.translate(gx,gy+Math.sin(now/400)*6);
