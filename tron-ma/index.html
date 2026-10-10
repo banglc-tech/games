@@ -154,10 +154,10 @@ function HAND_R(){return 20}
 cv.addEventListener('pointerdown',e=>{if(input!=='touch'||phase!=='play')return;motion=Math.min(1,motion+0.5)});
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHelp').hidden){requestAnimationFrame(frame);return}ctx.clearRect(0,0,W,H);drawCam();
   if(phase==='play'){timeT+=dt;readBody(now,()=>0);
-    if(input==='pose'){const b=bodies[0];if(b){const P=b.P;const pts=[P.nose,P.lw,P.rw,P.lk,P.rk];if(prevN){let m=0;pts.forEach((p,i)=>{m+=Math.hypot(p.x-prevN[i].x,p.y-prevN[i].y)});m=m/P.sw/Math.max(0.016,dt);motion=motion*0.5+Math.min(1,m/6)*0.5}prevN=pts.map(p=>({x:p.x,y:p.y}))}else motion*=0.8}
+    if(input==='pose'){const b=bodies[0];if(b){const P=b.P;const pts=[P.nose,P.lw,P.rw,P.lk,P.rk];if(prevN){let m=0;const d=Math.max(0.016,dt);pts.forEach((p,i)=>{const v=Math.hypot(p.x-prevN[i].x,p.y-prevN[i].y)/P.sw/d;if(v>1.2)m+=v-1.2});motion=motion*0.75+Math.min(1,m/7)*0.25}prevN=pts.map(p=>({x:p.x,y:p.y}))}else motion*=0.8}
     else motion*=0.92;
     lookT-=dt;if(!look&&lookT<0.7&&!preW){preW=true;tone(500,.15,'square',.08);tone(500,.15,'square',.08)}if(lookT<=0){look=!look;preW=false;lookT=look?1.0+Math.random()*1.2:4+Math.random()*3;if(look){rounds++;tone(300,.25,'sawtooth',.2,90);nz(.3,400,.6,.4);warnT=0.8}else tone(900,.12,'sine',.1)}
-    if(look&&warnT<=0&&motion>0.4){overT+=dt;if(overT>0.3){caught=true;endGame()}}else overT=0;
+    if(look&&warnT<=0&&motion>0.45){overT+=dt;if(overT>0.45){caught=true;endGame()}}else overT=Math.max(0,overT-dt);
     warnT=Math.max(0,warnT-dt);
     if(!look)prog+=motion*dt*7;
     if(prog>=100){won=true;endGame()}}
@@ -169,7 +169,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
   ctx.fillStyle=look?'#F25C54':ACC;ctx.font='900 '+Math.min(W,H)*0.08+'px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.fillText(look?'ĐỨNG IM!':(!look&&lookT<0.7?'SẮP QUAY…':'CHẠY!'),gx,gy+s*0.9);
   // progress
   const bx=W*0.1,bw=W*0.8,by=H*0.9;ctx.fillStyle='rgba(11,13,18,.6)';ctx.fillRect(bx,by-14,bw,28);ctx.fillStyle=ACC;ctx.fillRect(bx,by-14,bw*prog/100,28);ctx.fillStyle='#F3F1EC';ctx.font='700 12px sans-serif';ctx.fillText(Math.floor(prog)+' / 100',W/2,by+5);
-  const mx=W-30;ctx.fillStyle='rgba(243,241,236,.15)';ctx.fillRect(mx-6,H*0.35,12,H*0.3);ctx.fillStyle=motion>0.4?'#F25C54':ACC;ctx.fillRect(mx-6,H*0.65-H*0.3*motion,12,H*0.3*motion);ctx.fillStyle='#F3F1EC';ctx.fillRect(mx-9,H*0.65-H*0.3*0.4,18,2);
+  const mx=W-30;ctx.fillStyle='rgba(243,241,236,.15)';ctx.fillRect(mx-6,H*0.35,12,H*0.3);ctx.fillStyle=motion>0.45?'#F25C54':ACC;ctx.fillRect(mx-6,H*0.65-H*0.3*motion,12,H*0.3*motion);ctx.fillStyle='#F3F1EC';ctx.fillRect(mx-9,H*0.65-H*0.3*0.45,18,2);
   for(const b of bodies)drawSkeleton(b.P,look?'#F25C54':ACC);noBodyHint(dt,phase==='play');
   $('s1').textContent=Math.floor(prog);$('s2').textContent=best;$('timer').textContent=rounds+'↻ '+timeT.toFixed(0)+'s';requestAnimationFrame(frame)}
 function newGame(){preW=false;overT=0;prog=0;look=false;lookT=3.5;motion=0;caught=false;won=false;rounds=0;timeT=0;prevN=null;$('n1').textContent='Tiến';$('n2').textContent='Kỷ lục';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Chạy tại chỗ khi ma quay đi, đứng im khi ma nhìn':'Chạm liên tục để chạy, dừng chạm khi ma nhìn');tone(900,.12,'sine',.1)}
