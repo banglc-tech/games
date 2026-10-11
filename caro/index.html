@@ -36,6 +36,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 #tools{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}#tools button{width:38px;height:38px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
 #endText{font-size:14px;line-height:1.5;opacity:.9}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -122,4 +123,5 @@ function draw(now){ctx.fillStyle='#e8d9b5';ctx.fillRect(0,0,W,H);const s=W/N;ctx
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){const v=b[y]&&b[y][x];if(!v)continue;ctx.strokeStyle=v===1?'#1E6BFF':'#F25C54';ctx.lineWidth=3;const cx=x*s+s/2,cy=y*s+s/2,r=s*0.3;if(v===1){ctx.beginPath();ctx.moveTo(cx-r,cy-r);ctx.lineTo(cx+r,cy+r);ctx.moveTo(cx+r,cy-r);ctx.lineTo(cx-r,cy+r);ctx.stroke()}else{ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke()}}}
 bindRow('rowMode','mode',v=>v);layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

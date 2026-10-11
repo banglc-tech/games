@@ -36,6 +36,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 #tools{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}#tools button{width:38px;height:38px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
 #endText{font-size:14px;line-height:1.5;opacity:.9}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -142,4 +143,5 @@ function draw(now){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);ctx.fillStyle='#22
   for(const e of exp){ctx.fillStyle='#F5C542';for(let i=0;i<6;i++){const a=i/6*6.28,r=(0.5-e.t)*40;ctx.fillRect(e.x+Math.cos(a)*r-2,e.y+Math.sin(a)*r-2,4,4)}}
   ctx.fillStyle='#4CC9F0';for(let i=0;i<lives;i++)ctx.fillRect(8+i*16,8,12,6);ctx.fillStyle='#222';ctx.fillRect(0,H-40,W,1)}
 ship={x:W/2,y:H-30};layout();requestAnimationFrame(loop);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

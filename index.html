@@ -57,6 +57,7 @@ footer{margin-top:44px;color:var(--mute);font-size:12.5px;line-height:1.6;border
 footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
 .card:focus-visible,.chip:focus-visible,.pick a:focus-visible,.pick button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <main>
@@ -64,6 +65,7 @@ footer code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px}
     <div>
       <h1>Góc game<br><em>camera</em></h1>
       <p>Chơi bằng cơ thể thật, không cần tay cầm. Mở trên điện thoại hoặc máy tính có webcam, cho phép quyền camera rồi chơi. Mỗi game có nút <b>?</b> hướng dẫn và chế độ chạm màn hình để thử khi không có camera.</p>
+      <button id="bInstall" hidden style="margin-top:14px;background:var(--gold);color:var(--bg);border:none;font:inherit;font-weight:900;padding:12px 18px;border-radius:10px;cursor:pointer">⬇ Cài thành ứng dụng</button>
       <div class="stats"><div><b id="stReady">0</b>game chơi được</div><div><b id="st2">0</b>game 2 người</div><div><b id="stBody">0</b>game toàn thân</div></div>
     </div>
     <div class="pick"><small>HÔM NAY CHƠI GÌ?</small><div class="big"><div class="ico" id="pkIco">🎲</div><div><h3 id="pkName">…</h3><p id="pkDesc"></p></div></div><a id="pkLink" href="#">Chơi ngay</a><button id="pkNext">Đổi game khác</button></div>
@@ -170,6 +172,12 @@ document.getElementById('stReady').textContent=GAMES.filter(g=>g.url).length;doc
 const ready=GAMES.filter(g=>g.url);let pi=(new Date().getDate()+new Date().getMonth())%ready.length;
 function pick(){const g=ready[pi];document.getElementById('pkIco').textContent=g.ico;document.getElementById('pkName').textContent=g.name;document.getElementById('pkDesc').textContent=g.desc;document.getElementById('pkLink').href=g.url}
 document.getElementById('pkNext').onclick=()=>{pi=(pi+1+Math.floor(Math.random()*(ready.length-1)))%ready.length;pick()};pick();render();
+</script>
+<script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+<script>
+let dp=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;document.getElementById('bInstall').hidden=false});
+document.getElementById('bInstall').onclick=async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;document.getElementById('bInstall').hidden=true};
+window.addEventListener('appinstalled',()=>{document.getElementById('bInstall').hidden=true});
 </script>
 </body>
 </html>

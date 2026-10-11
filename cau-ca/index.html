@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -180,4 +181,5 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){st='idle';caught=[];timeLeft=90;total=0;armed={};hands.clear();$('n1').textContent='Tổng cân';$('n2').textContent='Số cá';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Vung tay xuống để quăng, giật tay lên khi phao chìm');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const names=caught.filter(f=>!f.junk).map(f=>f.n).join(', ')||'không có cá';showEnd(total.toFixed(1)+' kg','Câu được: '+names+'. Cá to cần giật nhiều lần, mỗi lần trong 1,6 giây.',['Tổng cân','Số cá'],[total.toFixed(1)+' kg',caught.filter(f=>!f.junk).length]);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

@@ -36,6 +36,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 #tools{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}#tools button{width:38px;height:38px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
 #endText{font-size:14px;line-height:1.5;opacity:.9}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -115,4 +116,5 @@ function update(dt){t+=dt}
 function draw(now){ctx.fillStyle='#14181f';ctx.fillRect(0,0,W,H);if(!cards.length)return;const cols=4,rows=cards.length/4,cw=W/cols,ch=H/rows;cards.forEach((c,i)=>{const x=(i%cols)*cw+4,y=Math.floor(i/cols)*ch+4;ctx.fillStyle=c.done?'#1b3a2a':c.o?'#F3F1EC':'#2E5BC8';ctx.fillRect(x,y,cw-8,ch-8);if(c.o||c.done){ctx.font=Math.min(cw,ch)*0.5+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.v,x+(cw-8)/2,y+(ch-8)/2+2)}else{ctx.fillStyle='#1E3A8A';ctx.fillRect(x+6,y+6,cw-20,ch-20)}})}
 bindRow('rowN','n',v=>+v);layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

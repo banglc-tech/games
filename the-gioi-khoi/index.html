@@ -39,6 +39,7 @@ canvas#c{display:block;width:100%;height:100%}
 a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 #msg{position:absolute;left:50%;top:14%;transform:translateX(-50%);background:var(--panel);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}#msg.show{opacity:1}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -166,5 +167,6 @@ $('bStart').onclick=()=>{if(!started){if(!load()){gen(seed0)}buildAll();started=
 $('bNew').onclick=()=>{try{localStorage.removeItem('tgk-world');localStorage.removeItem('tgk-p')}catch(e){}gen((Math.random()*1e6)|0);P.x=SX/2+.5;P.z=SZ/2+.5;P.y=18;placed=0;$('cnt').textContent=0;buildAll();started=true;$('ovStart').hidden=true;msg('Thế giới mới')};
 requestAnimationFrame(frame);
 </script>
+<script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
 </body>
 </html>

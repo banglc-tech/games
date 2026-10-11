@@ -73,6 +73,7 @@ video{display:none}
 @media (min-width:1000px){#board{left:14px;transform:none}#dots{left:14px;transform:none;justify-content:flex-start;max-width:200px}}
 @media (min-width:1200px){.card{max-width:560px}.card p,.card ol{font-size:18px}.btn{font-size:19px}#status{font-size:20px;padding:14px 26px}#board b{font-size:30px}#board small{font-size:13px}#tools button{width:52px;height:52px;font-size:22px}#sens{width:220px;font-size:14px}}
 .card.help{text-align:left}.card.help ol{font-size:14px;line-height:1.55;padding-left:20px;margin:10px 0}.card.help ol li{margin:6px 0}.card.help .tips{background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.5;margin-top:12px}.card.help .tips ul{padding-left:18px;margin:6px 0 0}#bHelp{font-weight:900;font-size:20px!important}</style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -594,5 +595,6 @@ layout(); resetShot(); updHUD(); requestAnimationFrame(frame);
   ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
 })();
 </script>
+<script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
 </body>
 </html>

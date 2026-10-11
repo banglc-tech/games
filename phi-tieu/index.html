@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -178,4 +179,5 @@ function newGame(){darts=[];flying=[];score=[0,0];thrown=[0,0];turn=0;hands.clea
 function endGame(){phase='end';if(opt.mode==='pvp'){const [a,b]=score;showEnd(a>b?'Người 1 thắng!':a<b?'Người 2 thắng!':'Hoà','Mỗi người '+opt.darts+' phi tiêu.',['Người 1','Người 2'],score);(a!==b?cheer:groan)()}
   else{showEnd(score[0]+' điểm',score[0]>=opt.darts*30?'Xạ thủ!':score[0]>=opt.darts*15?'Tay ném ổn định.':'Vung tay dứt khoát hơn và dừng tay đúng hướng bia.',['Điểm'],[score[0]]);cheer()}}
 bindRow('rowMode','mode',v=>v);bindRow('rowDarts','darts',v=>+v);bindRow('rowMove','move',v=>v==='1');onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

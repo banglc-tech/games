@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -176,4 +177,5 @@ function newGame(){preW=false;overT=0;prog=0;look=false;lookT=3.5;motion=0;caugh
 function endGame(){phase='end';const p=Math.floor(prog);if(p>best){best=p;try{localStorage.setItem('tmma-best',best)}catch(e){}}
   if(won){cheer();showEnd('Thoát rồi!','Về đích trong '+timeT.toFixed(1)+' giây, qua '+rounds+' lần ma quay lại.',['Thời gian'],[timeT.toFixed(1)+' s'])}else{nz(.6,200,.5,.9);tone(80,.8,'sawtooth',.4,30);showEnd('Bị bắt!','Ma quay lại thấy bạn cử động ở mốc '+p+'. Nghe hai tiếng bíp là ma sắp quay, dừng dần; sau khi ma quay còn gần 1 giây để đứng yên hẳn.',['Tiến được','Kỷ lục'],[p,best])}}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -196,4 +197,5 @@ function newGame(){obs=[];dist=0;lives=3;nextT=1.5;base=null;state='run';pops=[]
   setStatus(input==='pose'?'Nhảy, cúi, nghiêng người theo chữ trên chướng ngại':'Vuốt lên/xuống/trái/phải');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const d=Math.floor(dist);if(d>best){best=d;try{localStorage.setItem('vr-best',best)}catch(e){}}const tot=passed+hitN,pct=tot?Math.round(passed/tot*100):0;showEnd('HẾT 10 PHÚT · '+d+' m','Vượt qua '+passed+'/'+tot+' chướng ngại ('+pct+'%). Mỗi lần va bị chậm lại một nửa. Kỷ lục quãng đường: '+best+' m.',['Quãng đường','Vượt qua','Va'],[d+' m',passed,hitN]);(pct>=70?cheer:groan)()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

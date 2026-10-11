@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -176,4 +177,5 @@ function endGame(){phase='end';const f=i=>done[i]!==null?done[i].toFixed(2)+' s'
   if(opt.mode==='pvp'){t=rank[0]===0?'Người 1 thắng!':rank[0]===1?'Người 2 thắng!':'Chưa ai về đích';x='Người 1: '+f(0)+' · Người 2: '+f(1);showEnd(t,x,['Người 1','Người 2'],[f(0),f(1)])}
   else{t=rank[0]===0?'Bạn thắng!':rank[0]==='bot'?'Máy thắng':'Hết giờ';x='Bạn: '+f(0)+' · Máy: '+(bot.t?bot.t.toFixed(2)+' s':'chưa về')+'. Nhấc gối cao hơn hông thì mới tính một bước.';showEnd(t,x,['Bạn','Máy'],[f(0),bot.t?bot.t.toFixed(2)+' s':'—'])}}
 bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

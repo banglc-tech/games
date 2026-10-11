@@ -36,6 +36,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 #tools{position:absolute;right:8px;top:56px;display:flex;flex-direction:column;gap:8px;z-index:6}#tools button{width:38px;height:38px;border-radius:50%;border:none;background:var(--panel);color:var(--paper);font-size:16px;font-weight:900}
 #endText{font-size:14px;line-height:1.5;opacity:.9}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -182,4 +183,5 @@ function draw(now){ctx.fillStyle='#8fd3ff';ctx.fillRect(0,0,W,H);ctx.fillStyle='
   if(phase==='play'&&timeL>142&&lvl===0){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(0,0,W*0.25,H);ctx.fillRect(W*0.25,0,W*0.25,H);ctx.fillRect(W*0.5,0,W*0.5,H);txt('◀ LÙI',W*0.125,H/2,8);txt('TIẾN ▶',W*0.375,H/2,8);txt('CHẠM ĐỂ NHẢY',W*0.75,H/2,8);txt('giữ lâu = nhảy cao',W*0.75,H/2+18,6,'#F5C542')}}
 load();layout();requestAnimationFrame(loop);
 
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

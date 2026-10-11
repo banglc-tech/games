@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -173,4 +174,5 @@ let lastAir=0;
 function newGame(){ang=0;speed=2.2;jumps=0;trip=false;base=null;airborne=false;lastPass=-1;lives=3;lastAir=0;$('n1').textContent='Số lần';$('n2').textContent='Kỷ lục';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Bật nhảy khi dây vàng xuống sát chân, màn hình sáng vàng':'Chạm để nhảy khi màn hình sáng vàng');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';if(jumps>best){best=jumps;try{localStorage.setItem('nd-best',best)}catch(e){}}showEnd(jumps+' cái','Dây quay nhanh dần tới '+speed.toFixed(1)+'x. Nhảy ngay khi màn hình nháy vàng, chân rời đất rõ ràng mới tính.',['Số lần','Kỷ lục'],[jumps,best]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

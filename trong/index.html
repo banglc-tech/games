@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -171,4 +172,5 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){notes=[];t=0;bpm=100;next=4;score=0;combo=0;hit=0;total=0;hands.clear();$('n1').textContent='Điểm';$('n2').textContent='Combo';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Vỗ tay xuống mặt trống đúng lúc nốt chạm');for(let i=0;i<4;i++)setTimeout(()=>nz(.05,7000,1,.3),i*600)}
 function endGame(){phase='end';const acc=total?Math.round(hit/total*100):0;showEnd(score+' điểm','Chính xác '+acc+'%. '+(acc>=85?'Tay trống thứ thiệt!':acc>=60?'Ổn, nhìn nốt rơi để đánh sớm hơn một nhịp.':'Đánh dứt khoát từ trên xuống, tay đi qua mặt trống.'),['Điểm','Chính xác'],[score,acc+'%']);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

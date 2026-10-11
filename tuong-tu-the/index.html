@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -181,4 +182,5 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){walls=[];lives=3;passed=0;nextT=1.2;$('n1').textContent='Lọt qua';$('box2').style.display='none';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';$('status').style.bottom=input==='touch'?'122px':'18px';setStatus(input==='pose'?'Tạo đúng dáng trước khi tường tới!':'Chạm chọn dáng ở dưới');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';showEnd(passed+' bức tường',passed>=20?'Dẻo như kẹo kéo!':passed>=10?'Tốt lắm, tường càng về sau tới càng nhanh.':'Giữ dáng cho tới khi tường chạm, đừng bỏ sớm.',['Lọt qua'],[passed]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

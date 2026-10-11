@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -180,4 +181,5 @@ function checkEnd(){const [a,b]=score;if((a>=11||b>=11)&&Math.abs(a-b)>=2)endGam
 function newGame(){ball=null;score=[0,0];rally=0;serveT=1.5;hands.clear();$('n1').textContent='Bạn';$('n2').textContent='Máy · '+['Dễ','Vừa','Khó','Huyền thoại'][opt.lvl];$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Đưa tay vào vòng vàng khi bóng tới. Vẩy tay ngang để đánh chéo.');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const w=score[0]>score[1];showEnd(w?'Bạn thắng!':'Máy thắng',w?'Set '+score[0]+'–'+score[1]+'. Thử mức khó hơn?':'Set '+score[0]+'–'+score[1]+'. Vẩy tay mạnh sang ngang để máy khó đỡ hơn.',['Bạn','Máy'],score);(w?cheer:groan)()}
 bindRow('rowLvl','lvl',v=>+v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

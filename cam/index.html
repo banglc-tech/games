@@ -6,7 +6,8 @@
 #ui{position:fixed;left:0;right:0;bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(11,13,18,.9) 40%)}
 #st{font-weight:700;font-size:15px;margin-bottom:10px}#st b{color:#06D6A0}#st i{color:#F5C542;font-style:normal}
 .row{display:flex;gap:8px}button{flex:1;padding:14px;border-radius:10px;border:none;font:inherit;font-weight:700;font-size:15px;background:#F5C542;color:#0B0D12}button.g{background:rgba(243,241,236,.15);color:#F3F1EC}
-#code{font-size:12px;opacity:.7;margin-top:8px}#tip{position:fixed;top:12px;left:12px;right:12px;background:rgba(11,13,18,.75);padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}</style></head>
+#code{font-size:12px;opacity:.7;margin-top:8px}#tip{position:fixed;top:12px;left:12px;right:12px;background:rgba(11,13,18,.75);padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5}</style><link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
+</head>
 <body><video id="v" playsinline muted autoplay></video>
 <div id="tip">Đặt điện thoại dựng đứng, camera hướng về người chơi, cách 1,5–2 m. Giữ màn hình này mở trong lúc chơi.</div>
 <div id="ui"><div id="st">Đang chuẩn bị…</div><div class="row"><button id="bStart">Bật camera và kết nối</button><button class="g" id="bFlip">⟲ Đổi camera</button></div><div id="code"></div></div>
@@ -21,4 +22,5 @@ function connect(){if(!id)return;st('Đang kết nối tới màn hình lớn…
 $('bStart').onclick=async()=>{try{await cam();$('bStart').textContent='Kết nối lại';connect()}catch(e){st('<i>Không mở được camera:</i> '+e.name)}};
 $('bFlip').onclick=async()=>{facing=facing==='user'?'environment':'user';try{await cam();if(call&&call.peerConnection){const s=call.peerConnection.getSenders().find(x=>x.track&&x.track.kind==='video');if(s)s.replaceTrack(stream.getVideoTracks()[0])}}catch(e){st('<i>Không đổi được camera</i>')}};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&stream&&call&&!call.open)connect()});
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

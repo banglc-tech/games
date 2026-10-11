@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -185,4 +186,5 @@ function newGame(){seq=[];let l=-1;for(let i=0;i<TOTAL;i++){let r;do{r=Math.rand
   $('box2').style.display=opt.mode==='pvp'?'':'none';$('n1').textContent=opt.mode==='pvp'?'Người 1 (trái)':'Điểm';$('n2').textContent='Người 2 (phải)';$('status').style.bottom=input==='touch'?'122px':'18px';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus('Tạo dáng vàng đúng lúc nó chạm vạch!')}
 function endGame(){phase='end';if(opt.mode==='pvp'){const [a,b]=score;showEnd(a>b?'Người 1 thắng!':a<b?'Người 2 thắng!':'Hoà','',['Người 1','Người 2'],score)}else showEnd(score[0]+' điểm','Đúng '+perfect+'/'+TOTAL+' nhịp. '+(perfect>=28?'Vũ công chính hiệu!':perfect>=18?'Nhịp tốt, giữ dáng tới đúng lúc vạch.':'Nhìn dáng kế tiếp bên phải để chuẩn bị trước.'),['Điểm'],[score[0]]);cheer()}
 bindRow('rowMode','mode',v=>v);onOpt();layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

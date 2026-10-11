@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -181,4 +182,5 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){zs=[];lives=3;kills=0;nextT=1.5;aimT=[0,0,0];aimLane=-1;shootCd=0;duck=false;base=null;pops=[];wave=1;$('n1').textContent='Hạ gục';$('n2').textContent='Đợt';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Giơ tay chỉ về làn có zombie để bắn, cúi khi nó tới sát':'Chạm làn để bắn, chạm sát đáy để cúi');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';showEnd(kills+' zombie','Trụ tới đợt '+wave+'. Giơ tay chỉ về làn giữ 0,25 giây mỗi phát; zombie ×2 cần 2 phát. Thấy chữ CÚI! thì khom người ngay.',['Hạ gục','Đợt'],[kills,wave]);groan()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>

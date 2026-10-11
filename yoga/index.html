@@ -33,6 +33,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 @media (min-width:1000px){.card{max-width:520px}.card p{font-size:17px}.btn{font-size:19px}#status{font-size:20px}.score b{font-size:34px}#timer{font-size:30px}#tools button{width:52px;height:52px;font-size:22px}}
 @media (prefers-reduced-motion: reduce){#big{transition:none}}
 </style>
+<link rel="manifest" href="/games/manifest.json"><meta name="theme-color" content="#0C0E13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="/games/icon-192.png">
 </head>
 <body>
 <div id="stage">
@@ -176,4 +177,5 @@ function wrap(t,x,y,mw,lh){const w=t.split(' ');let line='';for(const k of w){co
 function newGame(){idx=0;holdT=0;scores=[];prev=null;phaseIn='rest';restT=4;$('n1').textContent='Độ tĩnh';$('n2').textContent='Tư thế';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';setStatus(input==='pose'?'Vào đúng tư thế rồi giữ yên 10 giây':'Giữ ngón tay trên màn hình 10 giây')}
 function endGame(){phase='end';const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);showEnd(avg+' điểm tĩnh','Hoàn thành '+POSES.length+' tư thế. '+(avg>=90?'Thăng bằng tuyệt vời.':avg>=75?'Khá ổn, thở chậm sẽ bớt rung.':'Nhìn một điểm cố định phía trước để giữ thăng bằng.'),['Độ tĩnh trung bình'],[avg]);cheer()}
 layout();requestAnimationFrame(frame);
-</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
+</body></html>
