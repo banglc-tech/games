@@ -179,5 +179,12 @@ let dp=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault()
 document.getElementById('bInstall').onclick=async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;document.getElementById('bInstall').hidden=true};
 window.addEventListener('appinstalled',()=>{document.getElementById('bInstall').hidden=true});
 </script>
+<script>
+(()=>{let prev={};function poll(){const gps=navigator.getGamepads?navigator.getGamepads():[];for(const gp of gps){if(!gp)continue;const b=i=>gp.buttons[i]&&gp.buttons[i].pressed;const st={up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,a:b(0),back:b(1)};
+  const cards=[...document.querySelectorAll('a.card')];let i=cards.indexOf(document.activeElement);const cols=Math.max(1,Math.round(cards[0]?cards[0].parentElement.clientWidth/cards[0].offsetWidth:1));
+  const go=j=>{j=Math.max(0,Math.min(cards.length-1,j));cards[j].focus();cards[j].scrollIntoView({block:'center',behavior:'smooth'})};
+  if(st.right&&!prev.right)go(i+1);if(st.left&&!prev.left)go(i-1);if(st.down&&!prev.down)go(i<0?0:i+cols);if(st.up&&!prev.up)go(i-cols);
+  if(st.a&&!prev.a&&i>=0)cards[i].click();if(st.back&&!prev.back){const p=document.getElementById('pback');if(p)p.click()}prev=st;break}requestAnimationFrame(poll)}poll()})();
+</script>
 </body>
 </html>
