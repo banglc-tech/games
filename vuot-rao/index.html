@@ -39,7 +39,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
 <div id="stage">
   <canvas id="c"></canvas><video id="v" playsinline muted autoplay></video>
   <div id="hud"><div class="score p1"><small id="n1">Bạn</small><b id="s1">0</b></div><div id="timer">60</div><div class="score p2" id="box2"><small id="n2">Máy</small><b id="s2">0</b></div></div>
-  <div id="tools"><button id="bFlip" aria-label="Đổi camera">⟲</button><button id="bMute" aria-label="Âm thanh">🔊</button><button id="bFull" aria-label="Toàn màn hình">⛶</button><button id="bHelp" aria-label="Hướng dẫn">?</button></div>
+  <div id="tools"><button id="bFlip" aria-label="Đổi camera">⟲</button><button id="bMute" aria-label="Âm thanh">🔊</button><button id="bFull" aria-label="Toàn màn hình">⛶</button><button id="bFlipLR" aria-label="Đảo trái phải" title="Đảo trái / phải" style="font-size:14px;font-weight:900">⇄</button><button id="bHelp" aria-label="Hướng dẫn">?</button></div>
   <div id="status">Đang chuẩn bị…</div><div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Vượt chướng ngại<span>Nhảy, cúi, né bằng cả người</span></h1>
@@ -197,6 +197,9 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('ovHel
 function newGame(){obs=[];dist=0;lives=3;nextT=1.5;base=null;state='run';pops=[];hist=[];timeL=600;passed=0;hitN=0;speed=0;$('n1').textContent='Quãng đường';$('n2').textContent='Qua / Va';$('box2').style.display='';$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';
   setStatus(input==='pose'?'Nhảy, cúi, nghiêng người theo chữ trên chướng ngại':'Vuốt lên/xuống/trái/phải');tone(880,.1,'sine',.1)}
 function endGame(){phase='end';const d=Math.floor(dist);if(d>best){best=d;try{localStorage.setItem('vr-best',best)}catch(e){}}const tot=passed+hitN,pct=tot?Math.round(passed/tot*100):0;showEnd('HẾT 10 PHÚT · '+d+' m','Vượt qua '+passed+'/'+tot+' chướng ngại ('+pct+'%). Mỗi lần va bị chậm lại một nửa. Kỷ lục quãng đường: '+best+' m.',['Quãng đường','Vượt qua','Va'],[d+' m',passed,hitN]);(pct>=70?cheer:groan)()}
-bindRow('rowFlip','flip',v=>v==='1');onOpt();layout();requestAnimationFrame(frame);
+bindRow('rowFlip','flip',v=>v==='1');onOpt();
+function updFlipBtn(){$('bFlipLR').style.background=opt.flip?'#F5C542':'';$('bFlipLR').style.color=opt.flip?'#0B0D12':'';}
+$('bFlipLR').onclick=()=>{opt.flip=!opt.flip;try{localStorage.setItem('vr-opt',JSON.stringify(opt))}catch(e){}document.querySelectorAll('#rowFlip .opt').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===opt.flip));updFlipBtn();flash(opt.flip?'TRÁI PHẢI: ĐẢO':'TRÁI PHẢI: NHƯ GƯƠNG','#F5C542');base=null};updFlipBtn();
+layout();requestAnimationFrame(frame);
 </script><script>if('serviceWorker' in navigator&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('/games/sw.js',{scope:'/games/'}).catch(()=>{})</script>
 </body></html>
