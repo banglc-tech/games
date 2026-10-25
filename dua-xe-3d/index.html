@@ -40,7 +40,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}#end
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe 3D<span>Phố đêm Tokyo · Đèo núi</span></h1>
-    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm (hoặc W A S D + Shift).</li><li>Nút 📷 đổi góc nhìn: sau xe, trên cao, trong xe. Bản đồ góc phải có vị trí các xe.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
+    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li>Nút 📷 đổi góc nhìn: sau xe, trên cao, trong xe. Bản đồ góc phải có vị trí các xe.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
     <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt on" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div>
     <div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt on" data-v="1">🌃 Phố đêm Tokyo</button><button class="opt" data-v="0">⛰️ Đèo núi</button></div>
     <div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div>
@@ -51,6 +51,22 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}#end
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Đua lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>// ===== Điện thoại làm tay cầm qua QR (PeerJS) =====
+(()=>{
+const $=id=>document.getElementById(id);const host=$('bStart');if(!host)return;
+const btn=document.createElement('button');btn.className='btn ghost';btn.id='bCtrl';btn.textContent='📱 Điện thoại làm tay cầm (quét QR)';host.insertAdjacentElement('afterend',btn);
+const box=document.createElement('div');box.id='ctrlBox';box.hidden=true;box.style.cssText='margin-top:12px;background:#fff;border-radius:12px;padding:12px;color:#111;text-align:center';box.innerHTML='<div id="ctrlQr" style="display:flex;justify-content:center"></div><div style="font-weight:700;margin-top:8px;font-size:14px">Mỗi điện thoại quét mã này là một tay cầm</div><div id="ctrlSt" style="font-size:13px;margin-top:6px;color:#1a6">Chưa có điện thoại nào kết nối</div>';btn.insertAdjacentElement('afterend',box);
+function load(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=j;document.head.appendChild(s)})}
+window.phoneHeld=[{},{}];let peer=null,n=0;
+btn.onclick=async()=>{if(peer){box.hidden=!box.hidden;return}btn.disabled=true;btn.textContent='Đang tạo mã…';try{await Promise.all([load('https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'),load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js')])}catch(e){btn.textContent='Không tải được thư viện';return}
+  const id='ihz-'+Math.random().toString(36).slice(2,8);const url=location.origin+location.pathname.replace(/[^/]*$/,'').replace(/\/[^/]+\/$/,'/')+'ctrl/?id='+id;
+  peer=new Peer(id,{debug:0});peer.on('open',()=>{const q=qrcode(0,'M');q.addData(url);q.make();$('ctrlQr').innerHTML=q.createSvgTag({cellSize:5,margin:2});box.hidden=false;btn.disabled=false;btn.textContent='📱 Ẩn / hiện mã QR tay cầm'});
+  peer.on('error',e=>{$('ctrlSt').textContent='Lỗi: '+e.type;btn.disabled=false});
+  peer.on('connection',c=>{const who=Math.min(n,1);n++;c.on('open',()=>{c.send({who:'Người '+(who+1)});$('ctrlSt').textContent=n+' điện thoại đã kết nối (điện thoại 1 = Người 1, điện thoại 2 = Người 2)';if(window.flash)flash('ĐIỆN THOẠI '+(who+1)+' OK','#06D6A0')});
+    c.on('data',d=>{if(!d||d.ping)return;window.phoneHeld[who][d.k]=!!d.d;if(d.d&&window.__phonePress)window.__phonePress(who,d.k)});c.on('close',()=>{window.phoneHeld[who]={}})});
+};
+})();
+</script>
 <script>
 const $=id=>document.getElementById(id);let opt={mode:'race',track:1,lvl:1,gas:true};try{const o=JSON.parse(localStorage.getItem('dx3-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
 function bindRow(id,key,parse){const row=$(id);row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem('dx3-opt',JSON.stringify(opt))}catch(e){}}})}
@@ -106,6 +122,7 @@ window.addEventListener('keyup',e=>{const k=KM[e.key];if(k)held[k]=false;const j
 for(const [id,k] of [['bL','left'],['bR','right'],['bB','down']]){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();held[k]=true});for(const ev of ['pointerup','pointercancel','pointerleave'])b.addEventListener(ev,()=>held[k]=false)}
 $('bN').addEventListener('pointerdown',e=>{e.preventDefault();press(0,'a')});
 let gprev=[{},{}];function pads(){const gps=navigator.getGamepads?[...navigator.getGamepads()].filter(g=>g):[];const out=[{},{}];gps.slice(0,2).forEach((gp,i)=>{const b=j=>gp.buttons[j]&&gp.buttons[j].pressed;const st={left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,a:b(0)};const who=(opt.mode==='pvp'&&gps.length===1)?1:i;out[who]=st;if(st.a&&!gprev[who].a)press(who,'a');gprev[who]=st});return out}
+window.__phonePress=(who,k)=>press(who,k);
 function press(who,k){if(phase==='menu'||!$('ovStart').hidden){if(k==='a')$('bStart').click();return}if(!$('ovEnd').hidden){if(k==='a')$('bAgain').click();return}if(k==='a'&&P[who])nitroOn(P[who])}
 function nitroOn(p){if(!go||p.done||p.nitroLeft<=0||p.nitro>0)return;p.nitro=2;p.nitroLeft--;tone(200,.6,'sawtooth',.15,900);flash('NITRO!','#F5C542')}
 $('bCam').onclick=()=>{camMode=(camMode+1)%3;flash(['SAU XE','TRÊN CAO','TRONG XE'][camMode],'#00e5ff')};
@@ -123,7 +140,7 @@ function stepP(p,inp,dt){if(p.done){p.speed*=0.98;p.dist+=p.speed*dt;return}cons
   for(const c of aiCars){const dz=((c.dist-p.dist)%totalLen+totalLen)%totalLen;if(dz<5&&Math.abs(c.lat-p.lat)<2.4&&p.speed>c.speed*0.9){p.speed=c.speed*0.7;tone(120,.2,'sawtooth',.2)}}
   for(const q of P){if(q===p)continue;if(Math.abs(q.dist-p.dist)<5&&Math.abs(q.lat-p.lat)<2.4&&p.speed>q.speed)p.speed=q.speed*0.8}
   place(p,p.dist,p.lat)}
-function update(dt){const pd=pads();if(!go){P.forEach(p=>place(p,p.dist,p.lat));aiCars.forEach(c=>place(c,c.dist,c.lat));return}raceT+=dt;
+function update(dt){const pd=pads();const ph=window.phoneHeld||[{},{}];pd[0]=Object.assign({},ph[0],pd[0]);pd[1]=Object.assign({},ph[1],pd[1]);if(!go){P.forEach(p=>place(p,p.dist,p.lat));aiCars.forEach(c=>place(c,c.dist,c.lat));return}raceT+=dt;
   stepP(P[0],Object.assign({},held,pd[0]),dt);if(P[1])stepP(P[1],Object.assign({},k2,pd[1]),dt);
   for(const c of aiCars){c.speed+=(c.max-c.speed)*dt*0.8;const t=((c.dist%totalLen)+totalLen)%totalLen/totalLen;const tan=curve.getTangentAt(t),tan2=curve.getTangentAt((t+0.01)%1);const cv=Math.atan2(tan.x,tan.z)-Math.atan2(tan2.x,tan2.z);c.lat+=((Math.sign(cv)*3)-c.lat)*dt*0.3;c.dist+=c.speed*dt;place(c,c.dist,c.lat)}
   const all=[...P.map(p=>({d:p.dist,p})),...aiCars.map(c=>({d:c.dist}))].sort((a,b)=>b.d-a.d);P.forEach(p=>p.rank=1+all.findIndex(e=>e.p===p));

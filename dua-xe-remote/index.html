@@ -50,7 +50,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe remote<span>Lái bằng mũi tên trên remote TV</span></h1>
-    <ol><li><b>Người 1 (remote TV / bàn phím):</b> ◀ ▶ lái, ▲ ga, ▼ phanh, OK hoặc phím cách = nitro.</li><li><b>Người 2:</b> tay cầm game (cần trái lái, A nitro) hoặc phím W A S D + Shift. Hai remote TV giống nhau thì trình duyệt không phân biệt được, nên người 2 dùng tay cầm hoặc bàn phím.</li><li>Chọn đường đua: Đèo núi hoặc Phố đêm Tokyo. Bản đồ nhỏ góc phải cho thấy vị trí các xe.</li><li>Ra lề bị chậm, biển vàng báo cua, phanh trước cua gắt rồi bật nitro khi ra cua. 3 vòng.</li></ol>
+    <ol><li><b>Người 1 (remote TV / bàn phím):</b> ◀ ▶ lái, ▲ ga, ▼ phanh, OK hoặc phím cách = nitro.</li><li><b>Người 2:</b> tay cầm game, phím W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b> (bấm 📱 rồi quét QR; hai điện thoại = hai người). Hai remote TV giống nhau thì trình duyệt không phân biệt được.</li><li>Chọn đường đua: Đèo núi hoặc Phố đêm Tokyo. Bản đồ nhỏ góc phải cho thấy vị trí các xe.</li><li>Ra lề bị chậm, biển vàng báo cua, phanh trước cua gắt rồi bật nitro khi ra cua. 3 vòng.</li></ol>
     <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div><div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt" data-v="0">⛰️ Đèo núi</button><button class="opt" data-v="1">🌃 Phố đêm Tokyo</button></div><div id="botLvl"><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div></div><div class="lbl">Ga</div><div class="row" id="rowGas"><button class="opt" data-v="1">Tự động</button><button class="opt" data-v="0">Giữ ▲ để ga</button></div>
     <button class="btn primary" id="bStart">Chơi</button>
     <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
@@ -65,6 +65,22 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
   function startCd(){stop();n=3;el.textContent='Tự chơi tiếp sau 3 giây…';t=setInterval(()=>{n--;if(n<=0){back()}else el.textContent='Tự chơi tiếp sau '+n+' giây…'},1000)}
   new MutationObserver(()=>{if(!ov.hidden)startCd();else stop()}).observe(ov,{attributes:true,attributeFilter:['hidden']});
   ov.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')stop()});
+})();
+</script>
+<script>// ===== Điện thoại làm tay cầm qua QR (PeerJS) =====
+(()=>{
+const $=id=>document.getElementById(id);const host=$('bStart');if(!host)return;
+const btn=document.createElement('button');btn.className='btn ghost';btn.id='bCtrl';btn.textContent='📱 Điện thoại làm tay cầm (quét QR)';host.insertAdjacentElement('afterend',btn);
+const box=document.createElement('div');box.id='ctrlBox';box.hidden=true;box.style.cssText='margin-top:12px;background:#fff;border-radius:12px;padding:12px;color:#111;text-align:center';box.innerHTML='<div id="ctrlQr" style="display:flex;justify-content:center"></div><div style="font-weight:700;margin-top:8px;font-size:14px">Mỗi điện thoại quét mã này là một tay cầm</div><div id="ctrlSt" style="font-size:13px;margin-top:6px;color:#1a6">Chưa có điện thoại nào kết nối</div>';btn.insertAdjacentElement('afterend',box);
+function load(src){return new Promise((r,j)=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=j;document.head.appendChild(s)})}
+window.phoneHeld=[{},{}];let peer=null,n=0;
+btn.onclick=async()=>{if(peer){box.hidden=!box.hidden;return}btn.disabled=true;btn.textContent='Đang tạo mã…';try{await Promise.all([load('https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js'),load('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js')])}catch(e){btn.textContent='Không tải được thư viện';return}
+  const id='ihz-'+Math.random().toString(36).slice(2,8);const url=location.origin+location.pathname.replace(/[^/]*$/,'').replace(/\/[^/]+\/$/,'/')+'ctrl/?id='+id;
+  peer=new Peer(id,{debug:0});peer.on('open',()=>{const q=qrcode(0,'M');q.addData(url);q.make();$('ctrlQr').innerHTML=q.createSvgTag({cellSize:5,margin:2});box.hidden=false;btn.disabled=false;btn.textContent='📱 Ẩn / hiện mã QR tay cầm'});
+  peer.on('error',e=>{$('ctrlSt').textContent='Lỗi: '+e.type;btn.disabled=false});
+  peer.on('connection',c=>{const who=Math.min(n,1);n++;c.on('open',()=>{c.send({who:'Người '+(who+1)});$('ctrlSt').textContent=n+' điện thoại đã kết nối (điện thoại 1 = Người 1, điện thoại 2 = Người 2)';if(window.flash)flash('ĐIỆN THOẠI '+(who+1)+' OK','#06D6A0')});
+    c.on('data',d=>{if(!d||d.ping)return;window.phoneHeld[who][d.k]=!!d.d;if(d.d&&window.__phonePress)window.__phonePress(who,d.k)});c.on('close',()=>{window.phoneHeld[who]={}})});
+};
 })();
 </script>
 <script>
@@ -140,6 +156,7 @@ let P=[];
 const k2={};window.addEventListener('keydown',e=>{const m={a:'left',d:'right',w:'up',s:'down',Shift:'a'}[e.key.length===1?e.key.toLowerCase():e.key];if(m){k2[m]=true;if(m==='a'&&P[1])nitroOn(P[1])}});window.addEventListener('keyup',e=>{const m={a:'left',d:'right',w:'up',s:'down',Shift:'a'}[e.key.length===1?e.key.toLowerCase():e.key];if(m)k2[m]=false});
 let g2prevA=false;function pad2(){const gps=navigator.getGamepads?navigator.getGamepads():[];const list=[...gps].filter(g=>g);const gp=list[1]||(opt.mode==='pvp'?list[0]:null);if(!gp)return{};const b=i=>gp.buttons[i]&&gp.buttons[i].pressed;const st={left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,a:b(0)};if(st.a&&!g2prevA&&P[1])nitroOn(P[1]);g2prevA=st.a;return st}
 function press(k){if(phase!=='play')return;if(k==='a'&&P[0])nitroOn(P[0])}
+window.__phonePress=(who,k)=>{const ovs=document.getElementById('ovStart'),ove=document.getElementById('ovEnd');if(ovs&&!ovs.hidden){if(k==='a')document.getElementById('bStart').click();return}if(ove&&!ove.hidden){if(k==='a')document.getElementById('bAgain').click();return}if(k==='a'&&P[who])nitroOn(P[who])};
 function nitroOn(p){if(!go||p.done||p.nitroLeft<=0||p.nitro>0)return;p.nitro=2;p.nitroLeft--;nz(.3,900,.6,.5);tone(200,.6,'sawtooth',.15,900);flash('NITRO!','#F5C542')}
 function newGame(){build();raceT=0;cars=[];P=[mkP('#4CC9F0')];if(opt.mode==='pvp'){P.push(mkP('#F25C54'));P[1].z=SEG*0;P[1].x=0.5;P[0].x=-0.5}
   if(opt.mode==='race'){const b=BOTS[opt.lvl];[['#F25C54',-0.5],['#F5C542',0.4],['#06D6A0',0],['#B388FF',-0.2]].forEach(([c,o],i)=>cars.push({z:SEG*(4+i*3),off:o,sp:9000*b*(0.9+i*0.05),color:c}))}
@@ -151,7 +168,7 @@ function stepPlayer(p,inp,dt){if(p.done){p.speed*=0.97;p.z+=p.speed*dt;return}co
   for(const c of cars){const dz=((c.z-p.z)%trackLen+trackLen)%trackLen;if(dz<SEG*1.2&&Math.abs(c.off*1.3-p.x)<0.4&&p.speed>c.sp*0.9){p.speed=c.sp*0.7;p.shake=1;nz(.2,300,1,.6)}}
   for(const q of P){if(q===p)continue;const dz=q.z-p.z;if(Math.abs(dz)<SEG*1.2&&Math.abs(q.x-p.x)<0.5&&p.speed>q.speed){p.speed=q.speed*0.8;p.shake=0.6}}
   p.shake=Math.max(0,p.shake-dt*3)}
-function update(dt){if(!go)return;raceT+=dt;stepPlayer(P[0],held,dt);if(P[1])stepPlayer(P[1],Object.assign({},k2,pad2()),dt);
+function update(dt){if(!go)return;raceT+=dt;const ph=window.phoneHeld||[{},{}];stepPlayer(P[0],Object.assign({},ph[0],held),dt);if(P[1])stepPlayer(P[1],Object.assign({},ph[1],k2,pad2()),dt);
   for(const c of cars){const cs=segAt(c.z);c.z+=c.sp*dt;c.off+=(-cs.curve*0.15-c.off)*dt*0.5;c.off=Math.max(-0.75,Math.min(0.75,c.off))}
   const all=[...P.map(p=>({z:p.z,p})),...cars.map(c=>({z:c.z}))].sort((a,b)=>b.z-a.z);P.forEach(p=>p.rank=1+all.findIndex(e=>e.p===p));
   $('score').textContent=P.map((p,i)=>(P.length>1?'P'+(i+1)+':':'')+'#'+p.rank).join(' ');$('mid').textContent=P.map(p=>Math.min(p.lap,laps)).join(' · ')+'/'+laps;
