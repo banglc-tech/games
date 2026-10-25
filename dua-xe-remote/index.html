@@ -50,8 +50,8 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe remote<span>Lái bằng mũi tên trên remote TV</span></h1>
-    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ đánh lái, ▲ ga, ▼ phanh, OK hoặc phím cách = nitro (3 lần). Tay cầm: cần trái lái, A nitro.</li><li><b>Điện thoại:</b> D-pad bên dưới, nút NITRO.</li><li>Vượt xe khác, tránh ra lề cỏ (bị chậm). Biển vàng báo cua trước, phanh nhẹ trước cua gắt.</li><li>Đua 3 vòng với 4 xe máy, về đích xếp hạng. Chế độ Thời gian: một mình, lưu vòng nhanh nhất.</li></ol>
-    <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button></div><div id="botLvl"><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div></div><div class="lbl">Ga</div><div class="row" id="rowGas"><button class="opt" data-v="1">Tự động</button><button class="opt" data-v="0">Giữ ▲ để ga</button></div>
+    <ol><li><b>Người 1 (remote TV / bàn phím):</b> ◀ ▶ lái, ▲ ga, ▼ phanh, OK hoặc phím cách = nitro.</li><li><b>Người 2:</b> tay cầm game (cần trái lái, A nitro) hoặc phím W A S D + Shift. Hai remote TV giống nhau thì trình duyệt không phân biệt được, nên người 2 dùng tay cầm hoặc bàn phím.</li><li>Chọn đường đua: Đèo núi hoặc Phố đêm Tokyo. Bản đồ nhỏ góc phải cho thấy vị trí các xe.</li><li>Ra lề bị chậm, biển vàng báo cua, phanh trước cua gắt rồi bật nitro khi ra cua. 3 vòng.</li></ol>
+    <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div><div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt" data-v="0">⛰️ Đèo núi</button><button class="opt" data-v="1">🌃 Phố đêm Tokyo</button></div><div id="botLvl"><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div></div><div class="lbl">Ga</div><div class="row" id="rowGas"><button class="opt" data-v="1">Tự động</button><button class="opt" data-v="0">Giữ ▲ để ga</button></div>
     <button class="btn primary" id="bStart">Chơi</button>
     <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
   </div></div>
@@ -69,7 +69,7 @@ a.hub{color:var(--acc);font-size:13px;display:inline-block;margin-top:14px}
 </script>
 <script>
 const $=id=>document.getElementById(id);const cv=$('c'),ctx=cv.getContext('2d');const KEY='dxr';
-let opt={mode:'race',lvl:1,gas:true};try{const o=JSON.parse(localStorage.getItem(KEY+'-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
+let opt={mode:'race',lvl:1,gas:true,track:1};try{const o=JSON.parse(localStorage.getItem(KEY+'-opt')||'null');if(o)opt={...opt,...o}}catch(e){}
 function bindRow(id,key,parse){const row=$(id);if(!row)return;row.querySelectorAll('.opt').forEach(b=>{b.classList.toggle('on',String(b.dataset.v)===String(opt[key]));b.onclick=()=>{opt[key]=parse(b.dataset.v);row.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===b));try{localStorage.setItem(KEY+'-opt',JSON.stringify(opt))}catch(e){}}})}
 let best=0;try{best=+localStorage.getItem(KEY+'-best')||0}catch(e){}$('best').textContent=best;
 function saveBest(v){if(v>best){best=v;try{localStorage.setItem(KEY+'-best',v)}catch(e){}$('best').textContent=best;return true}return false}
@@ -120,41 +120,89 @@ function start(){$('ovStart').hidden=true;$('ovEnd').hidden=true;phase='play';pa
 window.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const ovs=document.getElementById('ovStart'),ove=document.getElementById('ovEnd');if(ovs&&!ovs.hidden){e.preventDefault();document.getElementById('bStart').click()}else if(ove&&!ove.hidden){e.preventDefault();document.getElementById('bAgain').click()}});
 let last=performance.now();
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='play'&&!paused)update(dt);draw(now);requestAnimationFrame(loop)}
-// ===== Đua xe remote =====
-const SEG=200,RW=2000,DRAW=110;let W=320,H=260,segs=[],trackLen=0,pos=0,px=0,speed=0,steer=0,nitro=0,nitroLeft=3,lap=1,lapT=0,lapTimes=[],cars=[],rank=1,raceT=0,shake=0,laps=3;
+// ===== Đua xe remote v2: 2 người, 2 đường đua, bản đồ =====
+const SEG=200,RW=2000,DRAW=120;let W=320,H=260,segs=[],trackLen=0,laps=3,cars=[],raceT=0,go=false,trackPts=[];
 const BOTS=[0.7,0.85,0.98];
+const TRACKS=[
+ {name:'Đèo núi',sky:['#1a2a55','#f0a060'],grass:['#2e8b3a','#2a7d33'],road:['#6b6b73','#64646c'],rumble:['#F3F1EC','#E3312D'],side:'tree',layout:[[50,0,0],[60,2,20],[40,0,0],[70,-3,-10],[30,0,30],[50,4,0],[60,-2,40],[40,0,-30],[80,-4,0],[50,3,0],[50,0,0]]},
+ {name:'Phố đêm Tokyo',sky:['#05020f','#2a0a4a'],grass:['#15131c','#111016'],road:['#2b2b36','#262630'],rumble:['#ff2d95','#00e5ff'],side:'city',layout:[[60,0,0],[40,3,0],[30,0,0],[40,-3,0],[60,0,10],[30,4,0],[30,-4,0],[50,0,0],[70,2,0],[40,0,0],[60,-2,0],[40,0,0]]},
+];
+let T=TRACKS[1];
 function layout(){fit(W,H)}window.addEventListener('resize',layout);
-function build(){segs=[];const add=(n,c,h)=>{for(let i=0;i<n;i++){const k=i/n;segs.push({curve:c*Math.sin(k*Math.PI),y:h*Math.sin(k*Math.PI)})}};add(50,0,0);add(60,2,20);add(40,0,0);add(70,-3,-10);add(30,0,30);add(50,4,0);add(60,-2,40);add(40,0,-30);add(80,-4,0);add(50,3,0);add(50,0,0);
-  trackLen=segs.length*SEG;segs.forEach((s,i)=>{s.i=i;s.z=i*SEG;s.light=Math.floor(i/3)%2===0;if(i%40===0)s.sign=s.curve>0.5?'R':s.curve<-0.5?'L':null})}
+function build(){T=TRACKS[opt.track];segs=[];for(const [n,c,h] of T.layout)for(let i=0;i<n;i++){const k=i/n;segs.push({curve:c*Math.sin(k*Math.PI),y:h*Math.sin(k*Math.PI)})}
+  trackLen=segs.length*SEG;let seed=7;segs.forEach((s,i)=>{s.i=i;s.z=i*SEG;s.light=Math.floor(i/3)%2===0;if(i%40===0)s.sign=s.curve>0.5?'R':s.curve<-0.5?'L':null;seed=(seed*9301+49297)%233280;s.r=seed/233280;if(i%4===0)s.side=T.side});
+  // bản đồ: tích phân hướng đi
+  trackPts=[];let x=0,y=0,a=0;for(const s of segs){a+=s.curve*0.018;x+=Math.sin(a);y-=Math.cos(a);trackPts.push([x,y])}}
 function segAt(z){return segs[Math.floor(((z%trackLen)+trackLen)%trackLen/SEG)]}
-function press(k){if(phase!=='play')return;if(k==='a'&&nitroLeft>0&&nitro<=0){nitro=2;nitroLeft--;nz(.3,900,.6,.5);tone(200,.6,'sawtooth',.15,900);flash('NITRO!','#F5C542')}}
-function newGame(){build();pos=0;px=0;speed=0;steer=0;nitro=0;nitroLeft=3;lap=1;lapT=0;lapTimes=[];raceT=0;cars=[];
+function mkP(color){return{z:0,x:0,speed:0,steer:0,nitro:0,nitroLeft:3,lap:1,lapT:0,lapTimes:[],done:null,rank:1,shake:0,color,human:true}}
+let P=[];
+// Người 2: WASD + Shift, hoặc tay cầm thứ 2 (hoặc tay cầm 1 nếu người 1 dùng remote)
+const k2={};window.addEventListener('keydown',e=>{const m={a:'left',d:'right',w:'up',s:'down',Shift:'a'}[e.key.length===1?e.key.toLowerCase():e.key];if(m){k2[m]=true;if(m==='a'&&P[1])nitroOn(P[1])}});window.addEventListener('keyup',e=>{const m={a:'left',d:'right',w:'up',s:'down',Shift:'a'}[e.key.length===1?e.key.toLowerCase():e.key];if(m)k2[m]=false});
+let g2prevA=false;function pad2(){const gps=navigator.getGamepads?navigator.getGamepads():[];const list=[...gps].filter(g=>g);const gp=list[1]||(opt.mode==='pvp'?list[0]:null);if(!gp)return{};const b=i=>gp.buttons[i]&&gp.buttons[i].pressed;const st={left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,a:b(0)};if(st.a&&!g2prevA&&P[1])nitroOn(P[1]);g2prevA=st.a;return st}
+function press(k){if(phase!=='play')return;if(k==='a'&&P[0])nitroOn(P[0])}
+function nitroOn(p){if(!go||p.done||p.nitroLeft<=0||p.nitro>0)return;p.nitro=2;p.nitroLeft--;nz(.3,900,.6,.5);tone(200,.6,'sawtooth',.15,900);flash('NITRO!','#F5C542')}
+function newGame(){build();raceT=0;cars=[];P=[mkP('#4CC9F0')];if(opt.mode==='pvp'){P.push(mkP('#F25C54'));P[1].z=SEG*0;P[1].x=0.5;P[0].x=-0.5}
   if(opt.mode==='race'){const b=BOTS[opt.lvl];[['#F25C54',-0.5],['#F5C542',0.4],['#06D6A0',0],['#B388FF',-0.2]].forEach(([c,o],i)=>cars.push({z:SEG*(4+i*3),off:o,sp:9000*b*(0.9+i*0.05),color:c}))}
-  $('score').textContent='P1';$('mid').textContent='1/'+laps;start();let c=3;const cd=setInterval(()=>{if(phase!=='play'){clearInterval(cd);return}flash(c>0?String(c):'ĐUA!',c>0?'#F5C542':'#06D6A0');tone(c>0?600:1200,.2);if(c===0){clearInterval(cd);window.__go=true}c--},800);window.__go=false}
-function update(dt){if(!window.__go)return;raceT+=dt;lapT+=dt;const maxSp=9000*(nitro>0?1.35:1);nitro=Math.max(0,nitro-dt);
-  const tgt=held.left?-1:held.right?1:0;steer+=(tgt-steer)*Math.min(1,dt*8);
-  const gas=opt.gas||held.up,brake=held.down;const seg=segAt(pos),off=Math.abs(px)>1;
-  speed+=((brake?-9000:!gas?-2500:off?3500:maxSp)-speed)*dt*(brake?2:0.6);speed=Math.max(0,Math.min(maxSp,speed));
-  const sf=speed/9000;px+=steer*dt*(1.3+1.6*sf)-seg.curve*dt*sf*sf*(off?0.3:0.9);if(off){px-=Math.sign(px)*dt*0.35;if(speed>4500)speed=Math.max(4500,speed-dt*6000)}px=Math.max(-1.4,Math.min(1.4,px));
-  pos+=speed*dt;if(pos>=trackLen){pos-=trackLen;lapTimes.push(lapT);lapT=0;lap++;if(lap>laps){finish();return}flash('VÒNG '+lap,'#F5C542');tone(900,.15);$('mid').textContent=lap+'/'+laps}
-  for(const c of cars){const cs=segAt(c.z);c.z+=c.sp*dt;c.off+=(-cs.curve*0.15-c.off)*dt*0.5;c.off=Math.max(-0.75,Math.min(0.75,c.off));const dz=((c.z-pos)%trackLen+trackLen)%trackLen;if(dz<SEG*1.2&&Math.abs(c.off*1.3-px)<0.4&&speed>c.sp*0.9){speed=c.sp*0.7;shake=1;nz(.2,300,1,.6)}}
-  const my=(lap-1)*trackLen+pos;rank=1+cars.filter(c=>c.z>my).length;$('score').textContent='P'+rank+(cars.length?'/'+(cars.length+1):'');shake=Math.max(0,shake-dt*3)}
-function finish(){const tot=raceT,bl=Math.min(...lapTimes);let t,x;if(opt.mode==='race'){t=rank===1?'VỀ NHẤT!':'VỀ THỨ '+rank;x='Tổng '+tot.toFixed(1)+'s, vòng nhanh nhất '+bl.toFixed(1)+'s.';if(rank===1)saveBest(Math.round(10000/tot))}else{t=tot.toFixed(1)+'s';const nb=saveBest(Math.round(10000/tot));x=(nb?'KỶ LỤC MỚI! ':'')+'Vòng nhanh nhất '+bl.toFixed(1)+'s.'}showEnd(t,x+' Phanh (▼) trước biển báo cua, ra khỏi cua mới bật nitro.');(rank===1?()=>{tone(800,.1);tone(1200,.3)}:()=>tone(200,.5,'sawtooth',.1))()}
-function project(p,camX,camY,camZ,camD,roadW){const dz=p.z-camZ;const sc=camD/Math.max(1,dz);return{x:W/2+sc*(p.x-camX)*W/2,y:H/2-sc*(p.y-camY)*H/2,w:sc*roadW*W/2,sc}}
+  $('score').textContent='P1';$('mid').textContent='1/'+laps;start();go=false;let c=3;const cd=setInterval(()=>{if(phase!=='play'){clearInterval(cd);return}flash(c>0?String(c):'ĐUA!',c>0?'#F5C542':'#06D6A0');tone(c>0?600:1200,.2);if(c===0){clearInterval(cd);go=true}c--},800)}
+function stepPlayer(p,inp,dt){if(p.done){p.speed*=0.97;p.z+=p.speed*dt;return}const maxSp=9000*(p.nitro>0?1.35:1);p.nitro=Math.max(0,p.nitro-dt);const tgt=inp.left?-1:inp.right?1:0;p.steer+=(tgt-p.steer)*Math.min(1,dt*8);
+  const gas=opt.gas||inp.up,brake=inp.down,seg=segAt(p.z),off=Math.abs(p.x)>1;p.speed+=((brake?-9000:!gas?-2500:off?3500:maxSp)-p.speed)*dt*(brake?2:0.6);p.speed=Math.max(0,Math.min(maxSp,p.speed));
+  const sf=p.speed/9000;p.x+=p.steer*dt*(1.3+1.6*sf)-seg.curve*dt*sf*sf*(off?0.3:0.9);if(off){p.x-=Math.sign(p.x)*dt*0.35;if(p.speed>4500)p.speed=Math.max(4500,p.speed-dt*6000)}p.x=Math.max(-1.4,Math.min(1.4,p.x));
+  p.z+=p.speed*dt;p.lapT+=dt;if(p.z>=trackLen*p.lap){p.lapTimes.push(p.lapT);p.lapT=0;p.lap++;if(p.lap>laps){p.done=raceT;tone(800,.1);tone(1200,.3);flash((P.length>1?(p===P[0]?'NGƯỜI 1':'NGƯỜI 2')+' ':'')+'VỀ ĐÍCH!',p.color)}else{flash('VÒNG '+p.lap,'#F5C542');tone(900,.15)}}
+  for(const c of cars){const dz=((c.z-p.z)%trackLen+trackLen)%trackLen;if(dz<SEG*1.2&&Math.abs(c.off*1.3-p.x)<0.4&&p.speed>c.sp*0.9){p.speed=c.sp*0.7;p.shake=1;nz(.2,300,1,.6)}}
+  for(const q of P){if(q===p)continue;const dz=q.z-p.z;if(Math.abs(dz)<SEG*1.2&&Math.abs(q.x-p.x)<0.5&&p.speed>q.speed){p.speed=q.speed*0.8;p.shake=0.6}}
+  p.shake=Math.max(0,p.shake-dt*3)}
+function update(dt){if(!go)return;raceT+=dt;stepPlayer(P[0],held,dt);if(P[1])stepPlayer(P[1],Object.assign({},k2,pad2()),dt);
+  for(const c of cars){const cs=segAt(c.z);c.z+=c.sp*dt;c.off+=(-cs.curve*0.15-c.off)*dt*0.5;c.off=Math.max(-0.75,Math.min(0.75,c.off))}
+  const all=[...P.map(p=>({z:p.z,p})),...cars.map(c=>({z:c.z}))].sort((a,b)=>b.z-a.z);P.forEach(p=>p.rank=1+all.findIndex(e=>e.p===p));
+  $('score').textContent=P.map((p,i)=>(P.length>1?'P'+(i+1)+':':'')+'#'+p.rank).join(' ');$('mid').textContent=P.map(p=>Math.min(p.lap,laps)).join(' · ')+'/'+laps;
+  if(P.every(p=>p.done))finish()}
+function finish(){const tot=raceT;let t,x;const fl=p=>p.lapTimes.length?Math.min(...p.lapTimes).toFixed(1)+'s':'—';
+  if(opt.mode==='pvp'){const w=P[0].done<=P[1].done?1:2;t='NGƯỜI '+w+' THẮNG!';x='Người 1: '+P[0].done.toFixed(1)+'s (vòng nhanh nhất '+fl(P[0])+') · Người 2: '+P[1].done.toFixed(1)+'s ('+fl(P[1])+').'}
+  else if(opt.mode==='race'){t=P[0].rank===1?'VỀ NHẤT!':'VỀ THỨ '+P[0].rank;x='Tổng '+tot.toFixed(1)+'s, vòng nhanh nhất '+fl(P[0])+'.';if(P[0].rank===1)saveBest(Math.round(10000/tot))}
+  else{t=tot.toFixed(1)+'s';const nb=saveBest(Math.round(10000/tot));x=(nb?'KỶ LỤC MỚI! ':'')+'Vòng nhanh nhất '+fl(P[0])+'.'}
+  showEnd(t,x+' Phanh trước biển báo cua, ra khỏi cua mới bật nitro.')}
+function project(p,camX,camY,camZ,camD,vw,vh){const dz=p.z-camZ;const sc=camD/Math.max(1,dz);return{x:vw/2+sc*(p.x-camX)*vw/2,y:vh/2-sc*(p.y-camY)*vh/2,w:sc*RW*vw/2,sc}}
 function poly(a,b,c,d,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.fill()}
-function car(x,y,s,col,st){ctx.save();ctx.translate(x,y);const w=s,h=s*0.42;ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(-w*0.5,-h*0.1,w,h*0.25);ctx.fillStyle='#111';ctx.fillRect(-w*0.48,-h*0.3,w*0.14,h*0.45);ctx.fillRect(w*0.34,-h*0.3,w*0.14,h*0.45);ctx.fillStyle=col;ctx.fillRect(-w*0.42,-h*0.95,w*0.84,h*0.9);ctx.fillStyle='#1a2a3a';ctx.fillRect(-w*0.3,-h*0.9,w*0.6,h*0.3);ctx.fillStyle='#F25C54';ctx.fillRect(-w*0.4,-h*0.25,w*0.12,h*0.1);ctx.fillRect(w*0.28,-h*0.25,w*0.12,h*0.1);ctx.restore()}
-function draw(now){if(!segs.length)build();const camH=1000,camD=1/Math.tan(50*Math.PI/360),base=segAt(pos),bp=(pos%SEG)/SEG;let x=0,dx=-base.curve*bp;const hz=H*0.42;
-  ctx.save();if(shake>0)ctx.translate((Math.random()-.5)*8*shake,(Math.random()-.5)*8*shake);
-  const sky=ctx.createLinearGradient(0,0,0,hz);sky.addColorStop(0,'#1a2a55');sky.addColorStop(1,'#f0a060');ctx.fillStyle=sky;ctx.fillRect(0,0,W,hz+2);ctx.fillStyle='#2e8b3a';ctx.fillRect(0,hz,W,H-hz);
-  ctx.fillStyle='#223a5a';for(let i=0;i<7;i++){const mx=((i*W/3)-(px*30)+W*3)%(W*1.3)-W*0.15,mh=H*0.1+(i%3)*H*0.04;ctx.beginPath();ctx.moveTo(mx-W*0.2,hz);ctx.lineTo(mx,hz-mh);ctx.lineTo(mx+W*0.2,hz);ctx.fill()}
-  let maxY=H;const items=[];
-  for(let n=0;n<DRAW;n++){const i=(base.i+n)%segs.length,s=segs[i],looped=i<base.i,z=s.z+(looped?trackLen:0);const p1=project({x,y:s.y,z},px*RW,camH+base.y,pos,camD,RW);x+=dx;dx+=s.curve;const nx=segs[(i+1)%segs.length];const p2=project({x,y:nx.y,z:z+SEG},px*RW,camH+base.y,pos,camD,RW);
-    if(p1.y>p2.y&&p2.y<maxY){ctx.fillStyle=s.light?'#2e8b3a':'#2a7d33';ctx.fillRect(0,p2.y,W,p1.y-p2.y);poly([p1.x-p1.w*1.15,p1.y],[p1.x+p1.w*1.15,p1.y],[p2.x+p2.w*1.15,p2.y],[p2.x-p2.w*1.15,p2.y],s.light?'#F3F1EC':'#E3312D');poly([p1.x-p1.w,p1.y],[p1.x+p1.w,p1.y],[p2.x+p2.w,p2.y],[p2.x-p2.w,p2.y],s.light?'#6b6b73':'#64646c');if(s.light)poly([p1.x-p1.w*0.02,p1.y],[p1.x+p1.w*0.02,p1.y],[p2.x+p2.w*0.02,p2.y],[p2.x-p2.w*0.02,p2.y],'#F3F1EC');maxY=p2.y}
-    if(s.sign)items.push({t:'sign',d:s.sign,p:p1,clip:maxY});for(const c of cars){const cz=((c.z%trackLen)+trackLen)%trackLen;if(Math.floor(cz/SEG)===i)items.push({t:'car',c,p:p1,clip:maxY})}}
-  for(const it of items.reverse()){ctx.save();ctx.beginPath();ctx.rect(0,0,W,it.clip+2);ctx.clip();if(it.t==='sign'){const s=it.p.sc*W*0.9;if(s>=4){const sx=it.p.x+it.p.w*1.5*(it.d==='R'?-1:1);ctx.fillStyle='#F5C542';ctx.fillRect(sx-s*0.5,it.p.y-s*1.6,s,s*0.7);ctx.fillStyle='#000';ctx.fillRect(sx-s*0.05,it.p.y-s*0.9,s*0.1,s*0.9);txt(it.d==='R'?'>':'<',sx,it.p.y-s*1.25,s*0.45,'#000')}}else{const s=it.p.sc*W*1.4;if(s>=3)car(it.p.x+it.p.w*it.c.off,it.p.y,s,it.c.color,0)}ctx.restore()}
-  car(W/2,H*0.9,W*0.32,'#4CC9F0',steer);ctx.restore();
-  if(nitro>0){ctx.fillStyle='rgba(245,197,66,'+(0.08+0.08*Math.sin(now/40))+')';ctx.fillRect(0,0,W,H)}
-  txt(Math.round(speed/9000*320)+' km/h',W-8,H-12,8,'#F3F1EC','right');txt('NITRO '+'⚡'.repeat(nitroLeft),8,H-12,8,'#F5C542','left');if(phase==='play'&&lapT<3&&lap===1)txt('◀ ▶ LÁI · ▲ GA · ▼ PHANH · OK NITRO',W/2,20,7)}
-bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);bindRow('rowGas','gas',v=>v==='1');document.getElementById('botLvl').style.display=opt.mode==='race'?'':'none';document.getElementById('rowMode').addEventListener('click',()=>{document.getElementById('botLvl').style.display=opt.mode==='race'?'':'none'});
-layout();requestAnimationFrame(loop);
+function car(x,y,s,col,st,night){ctx.save();ctx.translate(x,y);const w=s,h=s*0.42;ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(0,0,w*0.55,h*0.18,0,0,7);ctx.fill();
+  ctx.fillStyle='#111';ctx.fillRect(-w*0.48,-h*0.32,w*0.15,h*0.45);ctx.fillRect(w*0.33,-h*0.32,w*0.15,h*0.45);
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(-w*0.44,-h*0.05);ctx.lineTo(-w*0.4,-h*0.55);ctx.lineTo(-w*0.28,-h*0.95);ctx.lineTo(w*0.28,-h*0.95);ctx.lineTo(w*0.4,-h*0.55);ctx.lineTo(w*0.44,-h*0.05);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(-w*0.4,-h*0.5,w*0.8,h*0.06);ctx.fillStyle='#152030';ctx.beginPath();ctx.moveTo(-w*0.24,-h*0.9);ctx.lineTo(w*0.24,-h*0.9);ctx.lineTo(w*0.32,-h*0.58);ctx.lineTo(-w*0.32,-h*0.58);ctx.fill();
+  ctx.fillStyle=night?'#ff3b3b':'#c0392b';ctx.fillRect(-w*0.4,-h*0.28,w*0.14,h*0.1);ctx.fillRect(w*0.26,-h*0.28,w*0.14,h*0.1);if(night){ctx.fillStyle='rgba(255,60,60,.25)';ctx.fillRect(-w*0.46,-h*0.34,w*0.26,h*0.22);ctx.fillRect(w*0.2,-h*0.34,w*0.26,h*0.22)}
+  ctx.fillStyle=col;ctx.fillRect(-w*0.42,-h*1.05,w*0.84,h*0.07);ctx.restore()}
+function sideObj(kind,x,y,s,r,flip){if(s<2)return;ctx.save();ctx.translate(x,y);if(kind==='tree'){ctx.fillStyle='#3a2a16';ctx.fillRect(-s*0.06,-s*0.5,s*0.12,s*0.5);ctx.fillStyle=r<0.5?'#2f7a2f':'#3c8f3c';ctx.beginPath();ctx.moveTo(0,-s*1.4);ctx.lineTo(-s*0.45,-s*0.4);ctx.lineTo(s*0.45,-s*0.4);ctx.fill();ctx.beginPath();ctx.moveTo(0,-s*1.1);ctx.lineTo(-s*0.35,-s*0.2);ctx.lineTo(s*0.35,-s*0.2);ctx.fill()}
+  else{const h=s*(1.2+r*2.2),w=s*(0.6+r*0.6);ctx.fillStyle=['#1b1733','#241a3d','#141226'][Math.floor(r*3)%3];ctx.fillRect(-w/2,-h,w,h);ctx.fillStyle=r<0.5?'#ffd166':'#7ae7ff';for(let yy=-h+s*0.2;yy<-s*0.1;yy+=s*0.32)for(let xx=-w/2+s*0.08;xx<w/2-s*0.1;xx+=s*0.22)if(((xx*13+yy*7+r*100)|0)%3!==0)ctx.fillRect(xx,yy,s*0.12,s*0.18);
+    const neon=['#ff2d95','#00e5ff','#ffe600','#7cff5b'][Math.floor(r*4)%4];ctx.fillStyle=neon;ctx.fillRect(-w/2-s*0.05,-h*0.5,w+s*0.1,s*0.12);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(-w/2,-h,w,s*0.05)}ctx.restore()}
+function renderView(p,vx,vy,vw,vh,now){ctx.save();ctx.beginPath();ctx.rect(vx,vy,vw,vh);ctx.clip();ctx.translate(vx,vy);if(p.shake>0)ctx.translate((Math.random()-.5)*8*p.shake,(Math.random()-.5)*8*p.shake);
+  const night=T.side==='city',camH=1000,camD=1/Math.tan(50*Math.PI/360),base=segAt(p.z),bp=(p.z%SEG)/SEG;let x=0,dx=-base.curve*bp;const hz=vh*0.42;
+  const sky=ctx.createLinearGradient(0,0,0,hz);sky.addColorStop(0,T.sky[0]);sky.addColorStop(1,T.sky[1]);ctx.fillStyle=sky;ctx.fillRect(0,0,vw,hz+2);
+  if(night){ctx.fillStyle='#fff';for(let i=0;i<40;i++)ctx.fillRect(((i*97-p.x*20)%vw+vw)%vw,(i*53)%(hz*0.7),1,1);ctx.fillStyle='#f4e7b2';ctx.beginPath();ctx.arc(vw*0.8,hz*0.3,hz*0.12,0,7);ctx.fill();
+    for(let i=0;i<14;i++){const bx=((i*vw/6)-(p.x*40)+vw*3)%(vw*1.4)-vw*0.2,bh=hz*(0.3+((i*7)%5)*0.12),bw=vw*0.07+((i*3)%3)*vw*0.02;ctx.fillStyle='#0d0a1c';ctx.fillRect(bx,hz-bh,bw,bh);ctx.fillStyle='rgba(255,230,120,.5)';for(let yy=hz-bh+4;yy<hz-4;yy+=7)for(let xx=bx+3;xx<bx+bw-3;xx+=6)if(((xx*31+yy*17+i)|0)%4===0)ctx.fillRect(xx,yy,3,4)}
+    ctx.fillStyle='rgba(255,45,149,.35)';ctx.fillRect(0,hz-2,vw,2)}
+  else{ctx.fillStyle='#223a5a';for(let i=0;i<7;i++){const mx=((i*vw/3)-(p.x*30)+vw*3)%(vw*1.3)-vw*0.15,mh=vh*0.1+(i%3)*vh*0.04;ctx.beginPath();ctx.moveTo(mx-vw*0.2,hz);ctx.lineTo(mx,hz-mh);ctx.lineTo(mx+vw*0.2,hz);ctx.fill()}}
+  ctx.fillStyle=T.grass[0];ctx.fillRect(0,hz,vw,vh-hz);let maxY=vh;const items=[];
+  for(let n=0;n<DRAW;n++){const i=(base.i+n)%segs.length,s=segs[i],looped=i<base.i,z=s.z+(looped?trackLen:0);const p1=project({x,y:s.y,z},p.x*RW,camH+base.y,p.z,camD,vw,vh);x+=dx;dx+=s.curve;const nx=segs[(i+1)%segs.length];const p2=project({x,y:nx.y,z:z+SEG},p.x*RW,camH+base.y,p.z,camD,vw,vh);
+    if(p1.y>p2.y&&p2.y<maxY){ctx.fillStyle=s.light?T.grass[0]:T.grass[1];ctx.fillRect(0,p2.y,vw,p1.y-p2.y);poly([p1.x-p1.w*1.15,p1.y],[p1.x+p1.w*1.15,p1.y],[p2.x+p2.w*1.15,p2.y],[p2.x-p2.w*1.15,p2.y],s.light?T.rumble[0]:T.rumble[1]);poly([p1.x-p1.w,p1.y],[p1.x+p1.w,p1.y],[p2.x+p2.w,p2.y],[p2.x-p2.w,p2.y],s.light?T.road[0]:T.road[1]);
+      if(s.light){poly([p1.x-p1.w*0.02,p1.y],[p1.x+p1.w*0.02,p1.y],[p2.x+p2.w*0.02,p2.y],[p2.x-p2.w*0.02,p2.y],night?'#9ad0ff':'#F3F1EC');for(const l of [-0.5,0.5])poly([p1.x+p1.w*l-p1.w*0.012,p1.y],[p1.x+p1.w*l+p1.w*0.012,p1.y],[p2.x+p2.w*l+p2.w*0.012,p2.y],[p2.x+p2.w*l-p2.w*0.012,p2.y],'rgba(243,241,236,.5)')}maxY=p2.y}
+    if(s.side)items.push({t:'side',k:s.side,p:p1,clip:maxY,r:s.r,sd:(i%8<4?-1:1)});if(s.sign)items.push({t:'sign',d:s.sign,p:p1,clip:maxY});
+    for(const c of cars){const cz=((c.z%trackLen)+trackLen)%trackLen;if(Math.floor(cz/SEG)===i)items.push({t:'car',c,p:p1,clip:maxY})}
+    for(const q of P){if(q===p)continue;const qz=((q.z%trackLen)+trackLen)%trackLen;if(Math.floor(qz/SEG)===i)items.push({t:'car',c:{off:q.x/1.3,color:q.color},p:p1,clip:maxY})}}
+  for(const it of items.reverse()){ctx.save();ctx.beginPath();ctx.rect(0,0,vw,it.clip+2);ctx.clip();if(it.t==='side'){sideObj(it.k,it.p.x+it.p.w*1.6*it.sd,it.p.y,it.p.sc*vw*(it.k==='city'?1.3:0.8),it.r)}
+    else if(it.t==='sign'){const s=it.p.sc*vw*0.9;if(s>=4){const sx=it.p.x+it.p.w*1.5*(it.d==='R'?-1:1);ctx.fillStyle='#F5C542';ctx.fillRect(sx-s*0.5,it.p.y-s*1.6,s,s*0.7);ctx.fillStyle='#000';ctx.fillRect(sx-s*0.05,it.p.y-s*0.9,s*0.1,s*0.9);txt(it.d==='R'?'>':'<',sx,it.p.y-s*1.25,s*0.45,'#000')}}
+    else{const s=it.p.sc*vw*1.4;if(s>=3)car(it.p.x+it.p.w*it.c.off,it.p.y,s,it.c.color,0,night)}ctx.restore()}
+  car(vw/2,vh*0.9,vw*0.3,p.color,p.steer,night);
+  if(night){const g=ctx.createRadialGradient(vw/2,vh*0.55,10,vw/2,vh*0.55,vw*0.7);g.addColorStop(0,'rgba(255,240,200,.14)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,vw,vh)}
+  if(p.nitro>0){ctx.fillStyle='rgba(245,197,66,'+(0.08+0.08*Math.sin(now/40))+')';ctx.fillRect(0,0,vw,vh)}
+  txt(Math.round(p.speed/9000*320)+' km/h',vw-8,vh-12,8,'#F3F1EC','right');txt('⚡'.repeat(p.nitroLeft),8,vh-12,8,'#F5C542','left');if(p.done)txt('VỀ ĐÍCH '+p.done.toFixed(1)+'s',vw/2,vh/2,9,p.color);ctx.restore()}
+function minimap(x0,y0,s){if(!trackPts.length)return;const xs=trackPts.map(p=>p[0]),ys=trackPts.map(p=>p[1]);const mnx=Math.min(...xs),mxx=Math.max(...xs),mny=Math.min(...ys),mxy=Math.max(...ys);const sc=s/Math.max(mxx-mnx,mxy-mny,1);const m=p=>[x0+(p[0]-mnx)*sc+(s-(mxx-mnx)*sc)/2,y0+(p[1]-mny)*sc+(s-(mxy-mny)*sc)/2];
+  ctx.save();ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(x0-4,y0-4,s+8,s+8);ctx.strokeStyle='rgba(243,241,236,.7)';ctx.lineWidth=2.5;ctx.beginPath();trackPts.forEach((p,i)=>{const [a,b]=m(p);i?ctx.lineTo(a,b):ctx.moveTo(a,b)});ctx.closePath();ctx.stroke();
+  const dot=(z,col,r)=>{const i=Math.floor(((z%trackLen)+trackLen)%trackLen/SEG)%trackPts.length;const [a,b]=m(trackPts[i]);ctx.fillStyle=col;ctx.beginPath();ctx.arc(a,b,r,0,7);ctx.fill()};
+  cars.forEach(c=>dot(c.z,c.color,2));P.forEach(p=>dot(p.z,p.color,3.2));ctx.restore()}
+function draw(now){if(!segs.length)build();ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  if(P.length===2){renderView(P[0],0,0,W,H/2-1,now);renderView(P[1],0,H/2+1,W,H/2-1,now);ctx.fillStyle='#F3F1EC';ctx.fillRect(0,H/2-1,W,2);txt('P1',10,10,7,'#4CC9F0','left');txt('P2',10,H/2+10,7,'#F25C54','left')}
+  else renderView(P[0]||mkP('#4CC9F0'),0,0,W,H,now);
+  minimap(W-58,8,48);
+  if(phase==='play'&&raceT<3)txt(P.length>1?'P1: ◀▶▲▼ OK · P2: W A S D Shift / tay cầm':'◀ ▶ LÁI · ▲ GA · ▼ PHANH · OK NITRO',W/2,H*0.08,6.5)}
+bindRow('rowMode','mode',v=>v);bindRow('rowLvl','lvl',v=>+v);bindRow('rowGas','gas',v=>v==='1');bindRow('rowTrack','track',v=>+v);
+const upd=()=>{document.getElementById('botLvl').style.display=opt.mode==='race'?'':'none'};upd();document.getElementById('rowMode').addEventListener('click',upd);
+P=[mkP('#4CC9F0')];layout();requestAnimationFrame(loop);
 </script></body></html>
