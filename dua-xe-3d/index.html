@@ -41,7 +41,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe 3D<span>Phố đêm Tokyo · Đèo núi</span></h1>
-    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li><b>Tạm dừng:</b> nút ⏸, phím P / Esc hoặc Start trên tay cầm; trong màn tạm dừng có nút vào Gara đổi xe.</li><li><b>Gara</b> (nút 🚗 trong lúc chơi hoặc ở màn hình đầu): 12 mẫu xe lấy cảm hứng từ siêu xe Ý, hypercar Pháp và Thụy Điển, coupe Đức, JDM Nhật, cơ bắp Mỹ, bán tải, SUV, xe đua đơn, có xem trước 3D xoay 360°, sơn thân và nóc 14 màu, 4 kiểu dáng (sedan, coupe, bán tải, xe đua), 4 kiểu đuôi, 3 cỡ bánh và màu mâm, sọc, đèn gầm neon 4 màu. Tất cả mở sẵn, đổi là thấy ngay trên xe, lưu trên máy.</li><li><b>Radar</b> tròn ở giữa dưới hiện xe xung quanh trong 90 m; xe nào sát bạn thì viền màn hình đỏ lên kèm tiếng bíp. Nút 📷 đổi góc nhìn; bản đồ góc phải.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
+    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li><b>Tạm dừng:</b> nút ⏸, phím P / Esc hoặc Start trên tay cầm; trong màn tạm dừng có nút vào Gara đổi xe.</li><li><b>Gara</b> (nút 🚗 trong lúc chơi hoặc ở màn hình đầu): 15 mẫu xe 3D (mô hình Kenney, giấy phép CC0, dùng thương mại được) lấy cảm hứng từ siêu xe Ý, hypercar Pháp và Thụy Điển, coupe Đức, JDM Nhật, cơ bắp Mỹ, bán tải, SUV, xe đua đơn, có xem trước 3D xoay 360°, sơn thân và nóc 14 màu, 4 kiểu dáng (sedan, coupe, bán tải, xe đua), 4 kiểu đuôi, 3 cỡ bánh và màu mâm, sọc, đèn gầm neon 4 màu. Tất cả mở sẵn, đổi là thấy ngay trên xe, lưu trên máy.</li><li><b>Radar</b> tròn ở giữa dưới hiện xe xung quanh trong 90 m; xe nào sát bạn thì viền màn hình đỏ lên kèm tiếng bíp. Nút 📷 đổi góc nhìn; bản đồ góc phải.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
     <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt on" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div>
     <div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt on" data-v="1">🌃 Phố đêm Tokyo</button><button class="opt" data-v="0">⛰️ Đèo núi</button></div>
     <button class="btn ghost" id="bGara" style="margin-top:12px">🏠 Gara: chọn xe, sơn màu, bánh, đuôi xe</button><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div>
@@ -54,6 +54,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Đua lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>// ===== Điện thoại làm tay cầm qua QR (PeerJS) =====
 (()=>{
 const $=id=>document.getElementById(id);const host=$('bStart');if(!host)return;
@@ -112,6 +113,26 @@ function buildScene(){clearScene();buildTrack();const night=T.side==='city';scen
     else{const h=6+rnd()*6;const tr=new THREE.Mesh(new THREE.ConeGeometry(2.5+rnd()*2,h,7),new THREE.MeshLambertMaterial({color:rnd()<0.5?0x2f7a2f:0x3c8f3c}));tr.position.set(q.x,h/2+1,q.z);scene.add(tr);const tk=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.5,2,6),new THREE.MeshLambertMaterial({color:0x5a3a1a}));tk.position.set(q.x,1,q.z);scene.add(tk)}}
   if(!night){for(let i=0;i<10;i++){const m=new THREE.Mesh(new THREE.ConeGeometry(60+rnd()*40,80+rnd()*60,5),new THREE.MeshLambertMaterial({color:0x4a6a8a}));const a=i/10*6.28;m.position.set(Math.cos(a)*480+100,40,Math.sin(a)*480+100);scene.add(m)}}
   else{const stars=new THREE.BufferGeometry();const sp=[];for(let i=0;i<400;i++){const a=rnd()*6.28,b=rnd()*1.2;sp.push(Math.cos(a)*Math.cos(b)*800,Math.sin(b)*800+20,Math.sin(a)*Math.cos(b)*800)}stars.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xffffff,size:2})))}}
+const MODEL_FILES=['sedan','sedan-sports','hatchback-sports','race','race-future','suv-luxury','truck','taxi','police','delivery','suv','van'];
+const PAINT={'delivery':[3,1],'hatchback-sports':[3,1],'police':[6,2],'race-future':[7,1],'race':[6,1],'sedan-sports':[6,1],'sedan':[6,1],'suv-luxury':[4,1],'suv':[3,1],'taxi':[4,1],'truck':[3,1],'van':[7,1]};
+const MODELS={};let modelsLoaded=0;
+function loadModels(cb){if(!THREE.GLTFLoader){cb&&cb();return}const L=new THREE.GLTFLoader();const base=location.protocol.startsWith('http')?location.pathname.replace(/[^/]*$/,'')+'models/':'https://banglc-tech.github.io/games/dua-xe-3d/models/';MODEL_FILES.forEach(n=>L.load(base+n+'.glb',g=>{const sc=g.scene;const box=new THREE.Box3().setFromObject(sc);const sz=box.getSize(new THREE.Vector3());MODELS[n]={scene:sc,len:sz.z,wid:sz.x,hei:sz.y,minY:box.min.y};modelsLoaded++;if(modelsLoaded===MODEL_FILES.length&&cb)cb()},undefined,()=>{modelsLoaded++;if(modelsLoaded===MODEL_FILES.length&&cb)cb()}))}
+const texCache={};
+function paintedTex(srcTex,n,col){const key=n+':'+col;if(texCache[key])return texCache[key];const img=srcTex.image;const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);const cell=PAINT[n]||[6,1],cw=img.width/8,ch=img.height/4;const hex='#'+col.toString(16).padStart(6,'0');x.fillStyle=hex;x.fillRect(cell[0]*cw,cell[1]*ch,cw/2,ch);const cc=new THREE.Color(col).multiplyScalar(0.78);x.fillStyle='#'+cc.getHexString();x.fillRect(cell[0]*cw+cw/2,cell[1]*ch,cw/2,ch);
+  const t=new THREE.CanvasTexture(c);t.flipY=srcTex.flipY;t.encoding=srcTex.encoding;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;texCache[key]=t;return t}
+function mkModelCar(col,d,spec){const M=MODELS[spec.model];const g=new THREE.Group();const sc=M.scene.clone(true);const s=4.4/M.len;sc.scale.set(s,s,s);sc.position.y=-M.minY*s;g.add(sc);g.userData.wheels=[];
+  sc.traverse(o=>{if(!o.isMesh)return;if(o.name==='body'||o.parent&&o.parent.name==='body'){const src=o.material;o.material=new THREE.MeshStandardMaterial({map:paintedTex(src.map,spec.model,col),metalness:0.1,roughness:0.55});}else if(/wheel/.test(o.name)||(o.parent&&/wheel/.test(o.parent.name))){g.userData.wheels.push(o.parent&&/wheel/.test(o.parent.name)?o.parent:o);if(d.rim){o.material=o.material.clone();o.material.color=new THREE.Color(d.rim)}}});
+  g.userData.wheels=[...new Set(g.userData.wheels)];
+  const Mt=c=>new THREE.MeshPhongMaterial({color:c,shininess:80});const W=M.wid*s,Lz=4.4,top=M.hei*s,rearX=-Lz/2;
+  if(d.stripe===1){const st=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.03,Lz*0.95),Mt(d.stripeCol||0xffffff));st.position.set(0,top+0.015,0);g.add(st)}
+  if(d.stripe===2){for(const x of [-0.3,0.3]){const st=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.03,Lz*0.95),Mt(d.stripeCol||0xffffff));st.position.set(x,top+0.015,0);g.add(st)}}
+  if(d.stripe===3){for(const x of [-1,1]){const st=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.16,Lz*0.75),Mt(d.stripeCol||0xffffff));st.position.set(x*(W/2+0.02),top*0.45,0);g.add(st)}}
+  if(d.tail===1){const sp=new THREE.Mesh(new THREE.BoxGeometry(W*0.95,0.08,0.35),Mt(0x111111));sp.position.set(0,top*0.72+0.3,rearX+0.35);g.add(sp);for(const x of [-W*0.35,W*0.35]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.3,0.2),Mt(0x111111));l.position.set(x,top*0.72+0.15,rearX+0.35);g.add(l)}}
+  if(d.tail===2){const sp=new THREE.Mesh(new THREE.BoxGeometry(W+0.4,0.1,0.55),Mt(col));sp.position.set(0,top+0.55,rearX+0.3);g.add(sp);for(const x of [-W*0.4,W*0.4]){const l=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.7,0.35),Mt(0x111111));l.position.set(x,top+0.2,rearX+0.3);g.add(l)}}
+  if(d.tail===3){for(const x of [-W*0.38,W*0.38]){const f=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.5,1.0),Mt(col));f.position.set(x,top*0.7+0.25,rearX+0.6);g.add(f)}}
+  if(d.neon){const nc=NEONC[d.neon]||0x00e5ff;const ne=new THREE.Mesh(new THREE.BoxGeometry(W+0.3,0.04,Lz),new THREE.MeshBasicMaterial({color:nc}));ne.position.y=0.18;g.add(ne);const pl=new THREE.PointLight(nc,0.8,8);pl.position.y=0.4;g.add(pl)}
+  const night=T&&T.side==='city';const spot=new THREE.SpotLight(0xffffff,night?1.2:0,70,0.5,0.5);spot.position.set(0,0.8,Lz/2);spot.target.position.set(0,0,30);g.add(spot);g.add(spot.target);
+  const hl=new THREE.PointLight(0xfff6c0,night?0.5:0,6);hl.position.set(0,0.6,Lz/2+0.3);g.add(hl);return g}
 const PROFILES={
  sedan:[[-2.2,0.35],[-2.2,0.75],[-1.6,0.78],[-1.3,1.25],[-0.2,1.3],[0.9,1.28],[1.5,0.85],[2.2,0.75],[2.25,0.4]],
  sedan2:[[-2.25,0.35],[-2.25,0.78],[-1.55,0.82],[-1.2,1.28],[0,1.33],[1.0,1.3],[1.6,0.9],[2.3,0.8],[2.35,0.4]],
@@ -127,7 +148,7 @@ const PROFILES={
  f1:[[-2.4,0.25],[-2.4,0.5],[-1.5,0.55],[-0.8,0.95],[0.2,1.0],[0.6,0.6],[2.6,0.4],[2.6,0.28]],
 };
 function profileMesh(pts,width,mat,yOff=0){const sh=new THREE.Shape();pts.forEach((p,i)=>i?sh.lineTo(p[0],p[1]+yOff):sh.moveTo(p[0],p[1]+yOff));sh.closePath();const g=new THREE.ExtrudeGeometry(sh,{depth:width,bevelEnabled:true,bevelThickness:0.06,bevelSize:0.06,bevelSegments:2});g.rotateY(-Math.PI/2);g.translate(width/2,0,0);const m=new THREE.Mesh(g,mat);return m}
-function mkCar(col,d,spec){d=d||{};spec=spec||CARS[0];const g=new THREE.Group();const M=c=>new THREE.MeshPhongMaterial({color:c,shininess:80,specular:0x555555});const night=T&&T.side==='city';
+function mkCar(col,d,spec){d=d||{};spec=spec||CARS[0];if(spec.model&&MODELS[spec.model]&&!(d.shape>0))return mkModelCar(col,d,spec);const g=new THREE.Group();const M=c=>new THREE.MeshPhongMaterial({color:c,shininess:80,specular:0x555555});const night=T&&T.side==='city';
   let style=spec.style;if(d.shape===1&&!['super','hyper','hyper2','gt','f1'].includes(style))style='gt';if(d.shape===2)style='pickup';if(d.shape===3)style='super';
   const prof=PROFILES[style]||PROFILES.sedan;const width=style==='f1'?1.4:2.0;
   g.add(profileMesh(prof,width,M(col)));
@@ -153,7 +174,7 @@ function mkCar(col,d,spec){d=d||{};spec=spec||CARS[0];const g=new THREE.Group();
   if(d.neon){const nc=NEONC[d.neon]||0x00e5ff;const ne=new THREE.Mesh(new THREE.BoxGeometry(width+0.3,0.04,4.4),new THREE.MeshBasicMaterial({color:nc}));ne.position.y=0.22;g.add(ne);const pl=new THREE.PointLight(nc,0.8,8);pl.position.y=0.4;g.add(pl)}
   const spot=new THREE.SpotLight(0xffffff,night?1.2:0,70,0.5,0.5);spot.position.set(0,0.8,2.2);spot.target.position.set(0,0,30);g.add(spot);g.add(spot.target);return g}
 function mkP(col,spec,idx){spec=spec||CARS[0];const d=design(idx||0);col=d.col;const m=mkCar(col,d,spec);scene.add(m);return{dist:0,lat:0,speed:0,steer:0,nitro:0,nitroLeft:spec.nitro,lap:1,lapT:0,lapTimes:[],done:null,rank:1,col,spec,mesh:m,heading:0}}
-function place(o,dist,lat){const t=((dist%totalLen)+totalLen)%totalLen/totalLen;const p=curve.getPointAt(t),tan=curve.getTangentAt(t),n=new THREE.Vector3(-tan.z,0,tan.x);o.mesh.position.copy(p).addScaledVector(n,lat);o.mesh.position.y=0;o.heading=Math.atan2(tan.x,tan.z);o.mesh.rotation.y=o.heading+(o.steer||0)*-0.15}
+function place(o,dist,lat){if(o.mesh.userData.wheels&&o.speed!==undefined){const r=o.speed*0.02;o.mesh.userData.wheels.forEach(w=>{w.rotation.x+=r})}const t=((dist%totalLen)+totalLen)%totalLen/totalLen;const p=curve.getPointAt(t),tan=curve.getTangentAt(t),n=new THREE.Vector3(-tan.z,0,tan.x);o.mesh.position.copy(p).addScaledVector(n,lat);o.mesh.position.y=0;o.heading=Math.atan2(tan.x,tan.z);o.mesh.rotation.y=o.heading+(o.steer||0)*-0.15}
 // ---------- input ----------
 const KM={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',' ':'a',Enter:'a'};const KM2={a:'left',d:'right',w:'up',s:'down',Shift:'a'};
 window.addEventListener('keydown',e=>{const k=KM[e.key];if(k){e.preventDefault();if(!held[k])press(0,k);held[k]=true}const j=KM2[e.key.length===1?e.key.toLowerCase():e.key];if(j){if(!k2[j])press(1,j);k2[j]=true}});
@@ -168,18 +189,21 @@ $('bCam').onclick=()=>{camMode=(camMode+1)%3;flash(['SAU XE','TRÊN CAO','TRONG 
 // ---------- game ----------
 const BOTS=[0.7,0.85,0.98],LAPS=3;
 const CARS=[
- {n:'Sakura',cls:'Sedan Nhật',col:0x00e5ff,max:1.0,acc:1.0,grip:1.0,nitro:3,style:'sedan',d:'Cân bằng, dễ lái'},
- {n:'Kaze R',cls:'JDM thể thao',col:0xff2d95,max:1.1,acc:1.05,grip:1.0,nitro:3,style:'jdm',d:'Xe thể thao Nhật, mạnh và linh hoạt'},
- {n:'Toro',cls:'Siêu xe Ý',col:0xffe600,max:1.22,acc:1.15,grip:0.95,nitro:3,style:'super',d:'Dáng nêm, động cơ giữa, rất nhanh'},
- {n:'Éclair',cls:'Hypercar Pháp',col:0x1e6bff,max:1.35,acc:1.1,grip:0.9,nitro:4,style:'hyper',d:'Tốc độ tối đa cao nhất, khó vào cua'},
- {n:'Nordic',cls:'Hypercar Thụy Điển',col:0xf3f1ec,max:1.3,acc:1.2,grip:1.0,nitro:4,style:'hyper2',d:'Bốc và nhanh, thân thấp'},
- {n:'Stuttgart',cls:'Coupe thể thao Đức',col:0x3a3a4a,max:1.12,acc:1.0,grip:1.2,nitro:3,style:'gt',d:'Bám cua rất tốt, đuôi tròn'},
- {n:'Bavaria M',cls:'Sedan hiệu suất Đức',col:0x8a2be2,max:1.08,acc:1.0,grip:1.1,nitro:3,style:'sedan2',d:'Sedan mạnh, ổn định'},
- {n:'Nightline Z',cls:'Coupe Nhật huyền thoại',col:0x8ad0ff,max:1.1,acc:1.1,grip:1.05,nitro:3,style:'jdm2',d:'4 bánh toàn thời gian, bốc tốt'},
- {n:'Thunder V8',cls:'Xe cơ bắp Mỹ',col:0xff4d4d,max:1.15,acc:1.2,grip:0.85,nitro:3,style:'muscle',d:'Đường thẳng rất mạnh, dễ văng'},
- {n:'Terra X',cls:'Bán tải',col:0xb5533c,max:0.92,acc:0.9,grip:0.95,nitro:2,style:'pickup',d:'Gầm cao, đi lề không chậm'},
- {n:'Urban SUV',cls:'SUV',col:0x00c48c,max:0.95,acc:0.95,grip:1.0,nitro:3,style:'suv',d:'Thân cao, chắc chắn'},
+ {n:'Sakura',cls:'Sedan Nhật',model:'sedan',col:0x00e5ff,max:1.0,acc:1.0,grip:1.0,nitro:3,style:'sedan',d:'Cân bằng, dễ lái'},
+ {n:'Kaze R',cls:'JDM thể thao',model:'hatchback-sports',col:0xff2d95,max:1.1,acc:1.05,grip:1.0,nitro:3,style:'jdm',d:'Xe thể thao Nhật, mạnh và linh hoạt'},
+ {n:'Toro',cls:'Siêu xe Ý',model:'race',col:0xffe600,max:1.22,acc:1.15,grip:0.95,nitro:3,style:'super',d:'Dáng nêm, động cơ giữa, rất nhanh'},
+ {n:'Éclair',cls:'Hypercar Pháp',model:'race-future',col:0x1e6bff,max:1.35,acc:1.1,grip:0.9,nitro:4,style:'hyper',d:'Tốc độ tối đa cao nhất, khó vào cua'},
+ {n:'Nordic',cls:'Hypercar Thụy Điển',model:'race',col:0xf3f1ec,max:1.3,acc:1.2,grip:1.0,nitro:4,style:'hyper2',d:'Bốc và nhanh, thân thấp'},
+ {n:'Stuttgart',cls:'Coupe thể thao Đức',model:'sedan-sports',col:0x3a3a4a,max:1.12,acc:1.0,grip:1.2,nitro:3,style:'gt',d:'Bám cua rất tốt, đuôi tròn'},
+ {n:'Bavaria M',cls:'Sedan hiệu suất Đức',model:'sedan',col:0x8a2be2,max:1.08,acc:1.0,grip:1.1,nitro:3,style:'sedan2',d:'Sedan mạnh, ổn định'},
+ {n:'Nightline Z',cls:'Coupe Nhật huyền thoại',model:'sedan-sports',col:0x8ad0ff,max:1.1,acc:1.1,grip:1.05,nitro:3,style:'jdm2',d:'4 bánh toàn thời gian, bốc tốt'},
+ {n:'Thunder V8',cls:'Xe cơ bắp Mỹ',model:'sedan-sports',col:0xff4d4d,max:1.15,acc:1.2,grip:0.85,nitro:3,style:'muscle',d:'Đường thẳng rất mạnh, dễ văng'},
+ {n:'Terra X',cls:'Bán tải',model:'truck',col:0xb5533c,max:0.92,acc:0.9,grip:0.95,nitro:2,style:'pickup',d:'Gầm cao, đi lề không chậm'},
+ {n:'Urban SUV',cls:'SUV',model:'suv-luxury',col:0x00c48c,max:0.95,acc:0.95,grip:1.0,nitro:3,style:'suv',d:'Thân cao, chắc chắn'},
  {n:'Formula',cls:'Xe đua đơn',col:0xff6a00,max:1.28,acc:1.3,grip:1.3,nitro:5,style:'f1',d:'Nhanh nhất ở cua, 5 nitro'},
+ {n:'Taxi Tokyo',cls:'Taxi',model:'taxi',col:0xffe600,max:0.98,acc:1.0,grip:1.0,nitro:3,style:'sedan',d:'Taxi vàng, cân bằng'},
+ {n:'Cảnh sát',cls:'Xe cảnh sát',model:'police',col:0xffffff,max:1.1,acc:1.05,grip:1.05,nitro:4,style:'sedan',d:'Xe tuần tra, có đèn nóc'},
+ {n:'Giao hàng',cls:'Xe tải nhỏ',model:'delivery',col:0x7cff5b,max:0.85,acc:0.85,grip:0.9,nitro:2,style:'pickup',d:'Chậm nhưng chắc, đi lề thoải mái'},
 ];
 opt.car=Math.min(opt.car||0,CARS.length-1);opt.car2=Math.min(opt.car2||1,CARS.length-1);
 let wallet={design:{}};try{const w=JSON.parse(localStorage.getItem('dx3-wallet')||'null');if(w)wallet={design:w.design||{}}}catch(e){}
@@ -203,7 +227,7 @@ function garaUI(){const i=garaWho===0?opt.car:opt.car2,d=design(i),root=$('garaB
     b.onclick=()=>{if(garaWho===0)opt.car=k;else opt.car2=k;try{localStorage.setItem('dx3-opt',JSON.stringify(opt))}catch(e){};tone(700,.05);rebuildCar(garaWho);previewCar();garaUI()};r.appendChild(b)});root.appendChild(r);
   const desc=document.createElement('p');desc.style.cssText='font-size:12px;opacity:.8;margin:6px 0 0;text-align:left';desc.textContent=CARS[i].n+': '+CARS[i].d;root.appendChild(desc);
   H2('🎨 Sơn thân xe');pal(d.col,v=>set('col',v));H2('Nóc / kính');pal(d.roof,v=>set('roof',v));
-  H2('Kiểu dáng');rowBtns(OPTS.shape,d.shape,k=>set('shape',k));H2('Đuôi xe');rowBtns(OPTS.tail,d.tail,k=>set('tail',k));
+  H2('Kiểu dáng (chọn khác "Sedan" sẽ dùng xe vẽ đơn giản)');rowBtns(OPTS.shape,d.shape,k=>set('shape',k));H2('Đuôi xe');rowBtns(OPTS.tail,d.tail,k=>set('tail',k));
   H2('Bánh xe');rowBtns(OPTS.wheel,d.wheel,k=>set('wheel',k));H2('Màu mâm');pal(d.rim,v=>set('rim',v));
   H2('Sọc');rowBtns(OPTS.stripe,d.stripe,k=>set('stripe',k));if(d.stripe){H2('Màu sọc');pal(d.stripeCol,v=>set('stripeCol',v))}
   H2('Đèn gầm neon');rowBtns(OPTS.neon,d.neon,k=>set('neon',k))}
@@ -258,7 +282,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='
 $('bStart').onclick=newGame;$('bAgain').onclick=newGame;$('bMenu').onclick=()=>{phase='menu';engine(false,0);$('ovEnd').hidden=true;$('ovStart').hidden=false};
 $('bGara').onclick=()=>{garaWho=0;openGara()};$('bGara2').onclick=()=>{if($('ovGara').hidden)openGara();else closeGara()};$('bGaraOk').onclick=closeGara;$('bPause').onclick=()=>setPause(!paused);$('bResume').onclick=()=>setPause(false);$('bPauseGara').onclick=()=>{garaWho=0;openGara()};$('bPauseMenu').onclick=()=>{paused=false;$('ovPause').hidden=true;$('bMenu').click()};
 window.addEventListener('keydown',e=>{if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('ovGara').hidden)closeGara();else setPause(!paused)}});
-init();buildScene();requestAnimationFrame(frame);
+init();buildScene();loadModels(()=>{if(P.length)P.forEach((p,i)=>rebuildCar(i));if(!$('ovGara').hidden)previewCar()});requestAnimationFrame(frame);
 </script>
 <script>
 (()=>{const ov=document.getElementById('ovEnd');let t=null,n=3;const el=document.createElement('p');el.style.cssText='margin:10px 0 0;font-size:13px;opacity:.75;text-align:center';ov.querySelector('.card').appendChild(el);
