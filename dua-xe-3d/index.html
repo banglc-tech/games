@@ -35,12 +35,12 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}#end
   <div class="hud"><div><small>VỊ TRÍ</small><b id="pos">—</b></div><div><small>VÒNG</small><b id="lap">1/3</b></div><div><small>THỜI GIAN</small><b id="time">0.0</b></div></div>
   <canvas id="map" width="240" height="240"></canvas>
   <div id="speed">0 <small>km/h</small></div><canvas id="radar" width="180" height="180" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:90px;height:90px;border-radius:50%;background:rgba(0,0,0,.45);pointer-events:none"></canvas><div id="warn" style="position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(255,45,45,0);transition:box-shadow .15s"></div><div id="nitro">⚡⚡⚡</div>
-  <div id="tools"><button id="bMute">🔊</button><button id="bCam">📷</button><button id="bGara2" title="Gara">🚗</button></div>
+  <div id="tools"><button id="bMute">🔊</button><button id="bCam">📷</button><button id="bGara2" title="Gara">🚗</button><button id="bPause" title="Tạm dừng">⏸</button></div>
   <div id="pad"><div class="l"><button id="bL">◀</button><button id="bR">▶</button></div><div class="r"><button id="bB">▼</button><button id="bN">NITRO</button></div></div>
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe 3D<span>Phố đêm Tokyo · Đèo núi</span></h1>
-    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li><b>Gara</b> (nút 🚗 trong lúc chơi hoặc ở màn hình đầu): 6 mẫu xe khác chỉ số, sơn thân và nóc 14 màu, 4 kiểu dáng (sedan, coupe, bán tải, xe đua), 4 kiểu đuôi, 3 cỡ bánh và màu mâm, sọc, đèn gầm neon 4 màu. Tất cả mở sẵn, đổi là thấy ngay trên xe, lưu trên máy.</li><li><b>Radar</b> tròn ở giữa dưới hiện xe xung quanh trong 90 m; xe nào sát bạn thì viền màn hình đỏ lên kèm tiếng bíp. Nút 📷 đổi góc nhìn; bản đồ góc phải.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
+    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li><b>Tạm dừng:</b> nút ⏸, phím P / Esc hoặc Start trên tay cầm; trong màn tạm dừng có nút vào Gara đổi xe.</li><li><b>Gara</b> (nút 🚗 trong lúc chơi hoặc ở màn hình đầu): 6 mẫu xe khác chỉ số, sơn thân và nóc 14 màu, 4 kiểu dáng (sedan, coupe, bán tải, xe đua), 4 kiểu đuôi, 3 cỡ bánh và màu mâm, sọc, đèn gầm neon 4 màu. Tất cả mở sẵn, đổi là thấy ngay trên xe, lưu trên máy.</li><li><b>Radar</b> tròn ở giữa dưới hiện xe xung quanh trong 90 m; xe nào sát bạn thì viền màn hình đỏ lên kèm tiếng bíp. Nút 📷 đổi góc nhìn; bản đồ góc phải.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
     <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt on" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div>
     <div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt on" data-v="1">🌃 Phố đêm Tokyo</button><button class="opt" data-v="0">⛰️ Đèo núi</button></div>
     <button class="btn ghost" id="bGara" style="margin-top:12px">🏠 Gara: chọn xe, sơn màu, bánh, đuôi xe</button><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div>
@@ -48,6 +48,7 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}#end
     <button class="btn primary" id="bStart">Đua</button>
     <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
   </div></div>
+  <div class="ov" id="ovPause" hidden><div class="card"><h1 style="font-size:34px;font-style:normal">⏸ Tạm dừng</h1><button class="btn primary" id="bResume">▶ Tiếp tục đua</button><button class="btn ghost" id="bPauseGara">🚗 Gara: đổi xe, sơn màu</button><button class="btn ghost" id="bPauseMenu">Về màn hình đầu</button><p style="font-size:12px;opacity:.7;margin-top:12px">Phím P hoặc Esc, nút Start trên tay cầm cũng tạm dừng.</p></div></div>
   <div class="ov" id="ovGara" hidden><div class="card" style="text-align:left;max-width:520px"><h1 style="font-size:28px;font-style:normal">🏠 Gara</h1><div id="garaBody"></div><button class="btn primary" id="bGaraOk" style="margin-top:16px">Xong</button></div></div>
   <div class="ov" id="ovEnd" hidden><div class="card"><h1 id="endTitle"></h1><p id="endText"></p><button class="btn primary" id="bAgain">Đua lại</button><button class="btn ghost" id="bMenu">Về màn hình đầu</button></div></div>
 </div>
@@ -136,9 +137,9 @@ window.addEventListener('keydown',e=>{const k=KM[e.key];if(k){e.preventDefault()
 window.addEventListener('keyup',e=>{const k=KM[e.key];if(k)held[k]=false;const j=KM2[e.key.length===1?e.key.toLowerCase():e.key];if(j)k2[j]=false});
 for(const [id,k] of [['bL','left'],['bR','right'],['bB','down']]){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();held[k]=true});for(const ev of ['pointerup','pointercancel','pointerleave'])b.addEventListener(ev,()=>held[k]=false)}
 $('bN').addEventListener('pointerdown',e=>{e.preventDefault();press(0,'a')});
-let gprev=[{},{}];function pads(){const gps=navigator.getGamepads?[...navigator.getGamepads()].filter(g=>g):[];const out=[{},{}];gps.slice(0,2).forEach((gp,i)=>{const b=j=>gp.buttons[j]&&gp.buttons[j].pressed;const st={left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,a:b(0)};const who=(opt.mode==='pvp'&&gps.length===1)?1:i;out[who]=st;if(st.a&&!gprev[who].a)press(who,'a');gprev[who]=st});return out}
+let gprev=[{},{}];function pads(){const gps=navigator.getGamepads?[...navigator.getGamepads()].filter(g=>g):[];const out=[{},{}];gps.slice(0,2).forEach((gp,i)=>{const b=j=>gp.buttons[j]&&gp.buttons[j].pressed;const st={left:b(14)||gp.axes[0]<-0.5,right:b(15)||gp.axes[0]>0.5,up:b(12)||gp.axes[1]<-0.5,down:b(13)||gp.axes[1]>0.5,a:b(0),bb:b(1),start:b(9)};const who=(opt.mode==='pvp'&&gps.length===1)?1:i;out[who]=st;if(st.a&&!gprev[who].a)press(who,'a');if(st.bb&&!gprev[who].bb)press(who,'b');if(st.start&&!gprev[who].start)press(who,'start');gprev[who]=st});return out}
 window.__phonePress=(who,k)=>press(who,k);
-function press(who,k){if(phase==='menu'||!$('ovStart').hidden){if(k==='a')$('bStart').click();return}if(!$('ovEnd').hidden){if(k==='a')$('bAgain').click();return}if(k==='a'&&P[who])nitroOn(P[who])}
+function press(who,k){if(k==='start'){if(!$('ovGara').hidden)closeGara();else setPause(!paused);return}if(!$('ovPause').hidden){if(k==='a')setPause(false);return}if(!$('ovGara').hidden){if(k==='b')closeGara();return}if(phase==='menu'||!$('ovStart').hidden){if(k==='a')$('bStart').click();return}if(!$('ovEnd').hidden){if(k==='a')$('bAgain').click();return}if(k==='a'&&P[who])nitroOn(P[who])}
 function nitroOn(p){if(!go||p.done||p.nitroLeft<=0||p.nitro>0)return;p.nitro=2;p.nitroLeft--;tone(200,.6,'sawtooth',.15,900);flash('NITRO!','#F5C542')}
 $('bCam').onclick=()=>{camMode=(camMode+1)%3;flash(['SAU XE','TRÊN CAO','TRONG XE'][camMode],'#00e5ff')};
 // ---------- game ----------
@@ -175,12 +176,13 @@ function garaUI(){const i=garaWho===0?opt.car:opt.car2,d=design(i),root=$('garaB
   H2('Sọc');rowBtns(OPTS.stripe,d.stripe,k=>set('stripe',k));if(d.stripe){H2('Màu sọc');pal(d.stripeCol,v=>set('stripeCol',v))}
   H2('Đèn gầm neon');rowBtns(OPTS.neon,d.neon,k=>set('neon',k))}
 function rebuildCar(who){const p=P[who];if(!p)return;const i=who===0?opt.car:opt.car2;const d=design(i);scene.remove(p.mesh);p.spec=CARS[i];p.col=d.col;p.mesh=mkCar(d.col,d);p.nitroLeft=Math.min(p.nitroLeft,p.spec.nitro);place(p,p.dist,p.lat)}
-function openGara(){garaUI();$('ovGara').hidden=false;garaPaused=true}
-function closeGara(){$('ovGara').hidden=true;garaPaused=false}
-let garaPaused=false;
+function openGara(){garaUI();$('ovGara').hidden=false;garaPaused=true;$('ovPause').hidden=true}
+function closeGara(){$('ovGara').hidden=true;garaPaused=false;if(paused)$('ovPause').hidden=false}
+let garaPaused=false,paused=false;
+function setPause(v){if(phase!=='play')return;paused=v;$('ovPause').hidden=!v;engine(!v,P[0]?P[0].speed/60:0)}
 function newGame(){initAudio();buildScene();P=[mkP(0,CARS[opt.car],opt.car)];if(opt.mode==='pvp'){P.push(mkP(0,CARS[opt.car2],opt.car2));P[0].lat=4;P[1].lat=-4}aiCars=[];
   if(opt.mode==='race'){[0xff2d95,0xffe600,0x7cff5b,0xb388ff].forEach((c,i)=>{aiCars.push({dist:20+i*10,lat:(i%2?4:-4),speed:0,max:60*BOTS[opt.lvl]*(0.9+i*0.05),mesh:mkCar(c),col:c})})}
-  raceT=0;go=false;phase='play';$('ovStart').hidden=true;$('ovEnd').hidden=true;$('hud2')&&$('hud2').remove();
+  raceT=0;go=false;phase='play';paused=false;$('ovPause').hidden=true;$('ovStart').hidden=true;$('ovEnd').hidden=true;$('hud2')&&$('hud2').remove();
   let c=3;const cd=setInterval(()=>{if(phase!=='play'){clearInterval(cd);return}flash(c>0?String(c):'ĐUA!',c>0?'#F5C542':'#00e5ff');tone(c>0?600:1200,.2);if(c===0){clearInterval(cd);go=true}c--},800)}
 function stepP(p,inp,dt){if(p.done){p.speed*=0.98;p.dist+=p.speed*dt;return}const S=p.spec;const max=60*S.max*(p.nitro>0?1.4:1);p.nitro=Math.max(0,p.nitro-dt);const tgt=inp.left?-1:inp.right?1:0;p.steer+=(tgt-p.steer)*Math.min(1,dt*7);
   const gas=opt.gas||inp.up,off=Math.abs(p.lat)>roadW-1;p.speed+=((inp.down?-60:!gas?-15:off?(S.n==='Midori'?35:20):max)-p.speed)*dt*(inp.down?2:0.7*S.acc);p.speed=Math.max(0,Math.min(max,p.speed));
@@ -217,12 +219,13 @@ function drawMap(){const c=mapCtx,S=240;c.clearRect(0,0,S,S);const pts=[];for(le
   c.strokeStyle='rgba(243,241,236,.8)';c.lineWidth=6;c.lineJoin='round';c.beginPath();pts.forEach((p,i)=>{const [a,b]=m(p);i?c.lineTo(a,b):c.moveTo(a,b)});c.closePath();c.stroke();
   const dot=(o,r)=>{const [a,b]=m(o.mesh.position);c.fillStyle='#'+o.col.toString(16).padStart(6,'0');c.beginPath();c.arc(a,b,r,0,7);c.fill()};aiCars.forEach(c2=>dot(c2,5));P.forEach(p=>dot(p,7))}
 let last=performance.now();
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='play'&&!garaPaused)update(dt);
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='play'&&!garaPaused&&!paused)update(dt);
   const W=innerWidth,H=innerHeight;if(P.length===2){cam1.aspect=W/(H/2);cam1.updateProjectionMatrix();cam2.aspect=W/(H/2);cam2.updateProjectionMatrix();setCam(cam1,P[0]);setCam(cam2,P[1]);renderer.setViewport(0,H/2,W,H/2);renderer.setScissor(0,H/2,W,H/2);renderer.render(scene,cam1);renderer.setViewport(0,0,W,H/2);renderer.setScissor(0,0,W,H/2);renderer.render(scene,cam2)}
   else if(P.length){cam1.aspect=W/H;cam1.updateProjectionMatrix();setCam(cam1,P[0]);renderer.setViewport(0,0,W,H);renderer.setScissor(0,0,W,H);renderer.render(scene,cam1)}
   if(P.length){drawMap();drawRadar(P[0])}requestAnimationFrame(frame)}
 $('bStart').onclick=newGame;$('bAgain').onclick=newGame;$('bMenu').onclick=()=>{phase='menu';engine(false,0);$('ovEnd').hidden=true;$('ovStart').hidden=false};
-$('bGara').onclick=()=>{garaWho=0;openGara()};$('bGara2').onclick=()=>{if($('ovGara').hidden)openGara();else closeGara()};$('bGaraOk').onclick=closeGara;
+$('bGara').onclick=()=>{garaWho=0;openGara()};$('bGara2').onclick=()=>{if($('ovGara').hidden)openGara();else closeGara()};$('bGaraOk').onclick=closeGara;$('bPause').onclick=()=>setPause(!paused);$('bResume').onclick=()=>setPause(false);$('bPauseGara').onclick=()=>{garaWho=0;openGara()};$('bPauseMenu').onclick=()=>{paused=false;$('ovPause').hidden=true;$('bMenu').click()};
+window.addEventListener('keydown',e=>{if(e.key==='p'||e.key==='P'||e.key==='Escape'){if(!$('ovGara').hidden)closeGara();else setPause(!paused)}});
 init();buildScene();requestAnimationFrame(frame);
 </script>
 <script>
