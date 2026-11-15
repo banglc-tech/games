@@ -34,16 +34,16 @@ a.hub{color:var(--gold);font-size:13px;display:inline-block;margin-top:14px}#end
   <canvas id="c"></canvas>
   <div class="hud"><div><small>VỊ TRÍ</small><b id="pos">—</b></div><div><small>VÒNG</small><b id="lap">1/3</b></div><div><small>THỜI GIAN</small><b id="time">0.0</b></div></div>
   <canvas id="map" width="240" height="240"></canvas>
-  <div id="speed">0 <small>km/h</small></div><div id="nitro">⚡⚡⚡</div>
+  <div id="speed">0 <small>km/h</small></div><canvas id="radar" width="180" height="180" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:90px;height:90px;border-radius:50%;background:rgba(0,0,0,.45);pointer-events:none"></canvas><div id="warn" style="position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(255,45,45,0);transition:box-shadow .15s"></div><div id="nitro">⚡⚡⚡</div>
   <div id="tools"><button id="bMute">🔊</button><button id="bCam">📷</button></div>
   <div id="pad"><div class="l"><button id="bL">◀</button><button id="bR">▶</button></div><div class="r"><button id="bB">▼</button><button id="bN">NITRO</button></div></div>
   <div id="big"></div>
   <div class="ov" id="ovStart"><div class="card">
     <h1>Đua xe 3D<span>Phố đêm Tokyo · Đèo núi</span></h1>
-    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li>Nút 📷 đổi góc nhìn: sau xe, trên cao, trong xe. Bản đồ góc phải có vị trí các xe.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
+    <ol><li><b>Remote TV / bàn phím:</b> ◀ ▶ lái, ▲ ga (hoặc ga tự động), ▼ phanh, OK / phím cách = nitro. Tay cầm: cần trái, A nitro. Điện thoại: nút dưới màn hình.</li><li><b>2 người:</b> chia đôi màn hình. Người 2 dùng tay cầm, W A S D + Shift, hoặc <b>điện thoại làm tay cầm</b>: bấm nút 📱 rồi quét QR; hai điện thoại = hai người.</li><li><b>Gara:</b> 6 xe khác nhau về tốc độ tối đa, độ bốc, độ bám cua và số nitro; chọn ở màn hình đầu.</li><li><b>Radar</b> tròn ở giữa dưới hiện xe xung quanh trong 90 m; xe nào sát bạn thì viền màn hình đỏ lên kèm tiếng bíp. Nút 📷 đổi góc nhìn; bản đồ góc phải.</li><li>Ra lề bị chậm, đâm xe khác mất tốc. 3 vòng, về đích xếp hạng.</li></ol>
     <div class="lbl">Thể thức</div><div class="row" id="rowMode"><button class="opt on" data-v="race">Đua với máy</button><button class="opt" data-v="time">Thời gian</button><button class="opt" data-v="pvp">2 người</button></div>
     <div class="lbl">Đường đua</div><div class="row" id="rowTrack"><button class="opt on" data-v="1">🌃 Phố đêm Tokyo</button><button class="opt" data-v="0">⛰️ Đèo núi</button></div>
-    <div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div>
+    <div class="lbl">🏠 Gara · Người 1 (vàng: tốc độ · xanh lá: bốc · xanh dương: bám cua)</div><div class="row" id="rowCar" style="flex-wrap:wrap"></div><div class="lbl" id="lblCar2">🏠 Gara · Người 2</div><div class="row" id="rowCar2" style="flex-wrap:wrap"></div><p id="garaDesc" style="font-size:12px;opacity:.8;margin:6px 0 0;text-align:left"></p><div class="lbl">Máy</div><div class="row" id="rowLvl"><button class="opt" data-v="0">Dễ</button><button class="opt on" data-v="1">Vừa</button><button class="opt" data-v="2">Khó</button></div>
     <div class="lbl">Ga</div><div class="row" id="rowGas"><button class="opt on" data-v="1">Tự động</button><button class="opt" data-v="0">Giữ ▲</button></div>
     <button class="btn primary" id="bStart">Đua</button>
     <a class="hub" href="https://banglc-tech.github.io/games/">← Tất cả game</a>
@@ -113,7 +113,7 @@ function mkCar(col){const g=new THREE.Group();const body=new THREE.Mesh(new THRE
   for(const [x,z] of [[-1.1,1.4],[1.1,1.4],[-1.1,-1.4],[1.1,-1.4]]){const w=new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.45,0.4,10),new THREE.MeshLambertMaterial({color:0x111111}));w.rotation.z=Math.PI/2;w.position.set(x,0.45,z);g.add(w)}
   const hl=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.25,0.1),new THREE.MeshBasicMaterial({color:0xfff6c0}));hl.position.set(0,0.7,2.2);g.add(hl);const tl=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.25,0.1),new THREE.MeshBasicMaterial({color:0xff3030}));tl.position.set(0,0.7,-2.2);g.add(tl);
   const sp=new THREE.SpotLight(0xffffff,T.side==='city'?1.2:0,70,0.5,0.5);sp.position.set(0,1,2);sp.target.position.set(0,0,30);g.add(sp);g.add(sp.target);scene.add(g);return g}
-function mkP(col){return{dist:0,lat:0,speed:0,steer:0,nitro:0,nitroLeft:3,lap:1,lapT:0,lapTimes:[],done:null,rank:1,col,mesh:mkCar(col),heading:0}}
+function mkP(col,spec){spec=spec||CARS[0];col=spec.col;return{dist:0,lat:0,speed:0,steer:0,nitro:0,nitroLeft:spec.nitro,lap:1,lapT:0,lapTimes:[],done:null,rank:1,col,spec,mesh:mkCar(col),heading:0}}
 function place(o,dist,lat){const t=((dist%totalLen)+totalLen)%totalLen/totalLen;const p=curve.getPointAt(t),tan=curve.getTangentAt(t),n=new THREE.Vector3(-tan.z,0,tan.x);o.mesh.position.copy(p).addScaledVector(n,lat);o.mesh.position.y=0;o.heading=Math.atan2(tan.x,tan.z);o.mesh.rotation.y=o.heading+(o.steer||0)*-0.15}
 // ---------- input ----------
 const KM={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',' ':'a',Enter:'a'};const KM2={a:'left',d:'right',w:'up',s:'down',Shift:'a'};
@@ -128,14 +128,27 @@ function nitroOn(p){if(!go||p.done||p.nitroLeft<=0||p.nitro>0)return;p.nitro=2;p
 $('bCam').onclick=()=>{camMode=(camMode+1)%3;flash(['SAU XE','TRÊN CAO','TRONG XE'][camMode],'#00e5ff')};
 // ---------- game ----------
 const BOTS=[0.7,0.85,0.98],LAPS=3;
-function newGame(){initAudio();buildScene();P=[mkP(0x00e5ff)];if(opt.mode==='pvp'){P.push(mkP(0xff2d95));P[0].lat=4;P[1].lat=-4}aiCars=[];
+const CARS=[
+ {n:'Sakura',col:0x00e5ff,max:1.0,acc:1.0,grip:1.0,nitro:3,d:'Cân bằng, dễ lái'},
+ {n:'Kaze',col:0xff2d95,max:1.12,acc:0.85,grip:0.9,nitro:3,d:'Tốc độ cao, vào cua kém'},
+ {n:'Tora',col:0xffe600,max:0.95,acc:1.25,grip:1.05,nitro:3,d:'Bốc nhanh, hợp đường nhiều cua'},
+ {n:'Yuki',col:0xf3f1ec,max:1.0,acc:0.95,grip:1.25,nitro:2,d:'Bám cua tốt nhất, ít nitro'},
+ {n:'Kuro',col:0x3a3a4a,max:1.08,acc:0.9,grip:0.95,nitro:5,d:'Nhiều nitro, dành cho đường thẳng'},
+ {n:'Midori',col:0x7cff5b,max:0.9,acc:1.1,grip:1.1,nitro:4,d:'Xe tập, đi lề không bị chậm nhiều'},
+];
+opt.car=opt.car||0;opt.car2=opt.car2||1;
+function garaUI(id,key){const row=$(id);row.innerHTML='';CARS.forEach((c,i)=>{const b=document.createElement('button');b.className='opt'+(opt[key]===i?' on':'');b.style.cssText='padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px';
+  const bar=(v,col)=>'<span style="display:block;height:3px;width:100%;background:rgba(255,255,255,.15);border-radius:2px"><i style="display:block;height:3px;width:'+Math.round(v/1.3*100)+'%;background:'+col+';border-radius:2px"></i></span>';
+  b.innerHTML='<span style="width:38px;height:18px;border-radius:5px 5px 3px 3px;background:#'+c.col.toString(16).padStart(6,'0')+';border:2px solid rgba(0,0,0,.4)"></span><b>'+c.n+'</b>'+bar(c.max,'#F5C542')+bar(c.acc,'#06D6A0')+bar(c.grip,'#00e5ff')+'<span style="opacity:.7">⚡'+c.nitro+'</span>';
+  b.title=c.d;b.onclick=()=>{opt[key]=i;row.querySelectorAll('.opt').forEach((x,j)=>x.classList.toggle('on',j===i));$('garaDesc').textContent=c.n+': '+c.d;try{localStorage.setItem('dx3-opt',JSON.stringify(opt))}catch(e){}};row.appendChild(b)})}
+function newGame(){initAudio();buildScene();P=[mkP(0,CARS[opt.car])];if(opt.mode==='pvp'){P.push(mkP(0,CARS[opt.car2]));P[0].lat=4;P[1].lat=-4}aiCars=[];
   if(opt.mode==='race'){[0xff2d95,0xffe600,0x7cff5b,0xb388ff].forEach((c,i)=>{aiCars.push({dist:20+i*10,lat:(i%2?4:-4),speed:0,max:60*BOTS[opt.lvl]*(0.9+i*0.05),mesh:mkCar(c),col:c})})}
   raceT=0;go=false;phase='play';$('ovStart').hidden=true;$('ovEnd').hidden=true;$('hud2')&&$('hud2').remove();
   let c=3;const cd=setInterval(()=>{if(phase!=='play'){clearInterval(cd);return}flash(c>0?String(c):'ĐUA!',c>0?'#F5C542':'#00e5ff');tone(c>0?600:1200,.2);if(c===0){clearInterval(cd);go=true}c--},800)}
-function stepP(p,inp,dt){if(p.done){p.speed*=0.98;p.dist+=p.speed*dt;return}const max=60*(p.nitro>0?1.4:1);p.nitro=Math.max(0,p.nitro-dt);const tgt=inp.left?-1:inp.right?1:0;p.steer+=(tgt-p.steer)*Math.min(1,dt*7);
-  const gas=opt.gas||inp.up,off=Math.abs(p.lat)>roadW-1;p.speed+=((inp.down?-60:!gas?-15:off?20:max)-p.speed)*dt*(inp.down?2:0.7);p.speed=Math.max(0,Math.min(max,p.speed));
+function stepP(p,inp,dt){if(p.done){p.speed*=0.98;p.dist+=p.speed*dt;return}const S=p.spec;const max=60*S.max*(p.nitro>0?1.4:1);p.nitro=Math.max(0,p.nitro-dt);const tgt=inp.left?-1:inp.right?1:0;p.steer+=(tgt-p.steer)*Math.min(1,dt*7);
+  const gas=opt.gas||inp.up,off=Math.abs(p.lat)>roadW-1;p.speed+=((inp.down?-60:!gas?-15:off?(S.n==='Midori'?35:20):max)-p.speed)*dt*(inp.down?2:0.7*S.acc);p.speed=Math.max(0,Math.min(max,p.speed));
   const t=((p.dist%totalLen)+totalLen)%totalLen/totalLen;const tan=curve.getTangentAt(t),tan2=curve.getTangentAt((t+0.004)%1);const curv=(Math.atan2(tan2.x,tan2.z)-Math.atan2(tan.x,tan.z));const cv=Math.atan2(Math.sin(curv),Math.cos(curv));
-  p.lat+=p.steer*dt*(8+p.speed*0.25)+cv*p.speed*dt*2.2;if(off){p.lat-=Math.sign(p.lat)*dt*3;if(p.speed>25)p.speed-=dt*40}p.lat=Math.max(-roadW-5,Math.min(roadW+5,p.lat));
+  p.lat+=p.steer*dt*(8+p.speed*0.25)*S.grip+cv*p.speed*dt*2.2/S.grip;if(off){p.lat-=Math.sign(p.lat)*dt*3;if(p.speed>25)p.speed-=dt*40}p.lat=Math.max(-roadW-5,Math.min(roadW+5,p.lat));
   p.dist+=p.speed*dt;p.lapT+=dt;if(p.dist>=totalLen*p.lap){p.lapTimes.push(p.lapT);p.lapT=0;p.lap++;if(p.lap>LAPS){p.done=raceT;tone(800,.1);tone(1200,.3);flash((P.length>1?(p===P[0]?'P1 ':'P2 '):'')+'VỀ ĐÍCH!','#'+p.col.toString(16).padStart(6,'0'))}else{flash('VÒNG '+p.lap,'#F5C542')}}
   for(const c of aiCars){const dz=((c.dist-p.dist)%totalLen+totalLen)%totalLen;if(dz<5&&Math.abs(c.lat-p.lat)<2.4&&p.speed>c.speed*0.9){p.speed=c.speed*0.7;tone(120,.2,'sawtooth',.2)}}
   for(const q of P){if(q===p)continue;if(Math.abs(q.dist-p.dist)<5&&Math.abs(q.lat-p.lat)<2.4&&p.speed>q.speed)p.speed=q.speed*0.8}
@@ -145,7 +158,7 @@ function update(dt){const pd=pads();const ph=window.phoneHeld||[{},{}];pd[0]=Obj
   for(const c of aiCars){c.speed+=(c.max-c.speed)*dt*0.8;const t=((c.dist%totalLen)+totalLen)%totalLen/totalLen;const tan=curve.getTangentAt(t),tan2=curve.getTangentAt((t+0.01)%1);const cv=Math.atan2(tan.x,tan.z)-Math.atan2(tan2.x,tan2.z);c.lat+=((Math.sign(cv)*3)-c.lat)*dt*0.3;c.dist+=c.speed*dt;place(c,c.dist,c.lat)}
   const all=[...P.map(p=>({d:p.dist,p})),...aiCars.map(c=>({d:c.dist}))].sort((a,b)=>b.d-a.d);P.forEach(p=>p.rank=1+all.findIndex(e=>e.p===p));
   $('pos').textContent=P.map((p,i)=>(P.length>1?'P'+(i+1)+' ':'')+'#'+p.rank).join('  ');$('lap').textContent=P.map(p=>Math.min(p.lap,LAPS)).join('·')+'/'+LAPS;$('time').textContent=raceT.toFixed(1);
-  $('speed').innerHTML=Math.round(P[0].speed*4.5)+' <small>km/h</small>';$('nitro').textContent='⚡'.repeat(P[0].nitroLeft)+(P[1]?'   P2 '+'⚡'.repeat(P[1].nitroLeft):'');engine(true,P[0].speed/60);
+  $('speed').innerHTML=Math.round(P[0].speed*4.5)+' <small>km/h</small>';$('nitro').textContent=P[0].spec.n+' '+'⚡'.repeat(P[0].nitroLeft)+(P[1]?'   P2 '+P[1].spec.n+' '+'⚡'.repeat(P[1].nitroLeft):'');engine(true,P[0].speed/60);
   if(P.every(p=>p.done))finish()}
 function finish(){phase='end';engine(false,0);const fl=p=>p.lapTimes.length?Math.min(...p.lapTimes).toFixed(1)+'s':'—';let t,x;
   if(opt.mode==='pvp'){const w=P[0].done<=P[1].done?1:2;t='NGƯỜI '+w+' THẮNG!';x='P1: '+P[0].done.toFixed(1)+'s (vòng nhanh nhất '+fl(P[0])+') · P2: '+P[1].done.toFixed(1)+'s ('+fl(P[1])+')'}
@@ -156,6 +169,13 @@ function setCam(cam,p){const t=((p.dist%totalLen)+totalLen)%totalLen/totalLen;co
   if(camMode===0){const tgt=pos.clone().addScaledVector(back,11).add(new THREE.Vector3(0,5,0));cam.position.lerp(tgt,0.15);cam.lookAt(pos.clone().addScaledVector(tan,8).add(new THREE.Vector3(0,1,0)))}
   else if(camMode===1){const tgt=pos.clone().addScaledVector(back,18).add(new THREE.Vector3(0,22,0));cam.position.lerp(tgt,0.12);cam.lookAt(pos.clone().addScaledVector(tan,10))}
   else{cam.position.copy(pos).addScaledVector(tan,0.5).add(new THREE.Vector3(0,1.6,0));cam.lookAt(pos.clone().addScaledVector(tan,30).add(new THREE.Vector3(0,1.4,0)))}}
+function drawRadar(p){const c=$('radar').getContext('2d'),S=180,R=S/2,range=90;c.clearRect(0,0,S,S);c.strokeStyle='rgba(0,229,255,.35)';c.lineWidth=2;c.beginPath();c.arc(R,R,R-3,0,7);c.stroke();c.beginPath();c.arc(R,R,R*0.5,0,7);c.stroke();c.beginPath();c.moveTo(R,4);c.lineTo(R,S-4);c.moveTo(4,R);c.lineTo(S-4,R);c.stroke();
+  const sweep=(performance.now()/1200)%(2*Math.PI);const g=c.createConicalGradient?null:null;c.fillStyle='rgba(0,229,255,.12)';c.beginPath();c.moveTo(R,R);c.arc(R,R,R-3,sweep-0.9,sweep);c.fill();
+  let danger=0;const others=[...aiCars.map(o=>({dist:o.dist,lat:o.lat,col:o.col})),...P.filter(q=>q!==p).map(q=>({dist:q.dist,lat:q.lat,col:q.col}))];
+  for(const o of others){let dz=o.dist-p.dist;dz=((dz+totalLen/2)%totalLen+totalLen)%totalLen-totalLen/2;const dx=o.lat-p.lat;if(Math.abs(dz)>range)continue;const x=R+dx/roadW*R*0.9,y=R-dz/range*(R-6);c.fillStyle='#'+o.col.toString(16).padStart(6,'0');c.beginPath();c.arc(x,y,5,0,7);c.fill();
+    if(Math.abs(dz)<12&&Math.abs(dx)<3.5)danger=Math.max(danger,1-Math.abs(dz)/12)}
+  c.fillStyle='#fff';c.beginPath();c.moveTo(R,R-7);c.lineTo(R-5,R+5);c.lineTo(R+5,R+5);c.fill();
+  $('warn').style.boxShadow='inset 0 0 0 '+Math.round(danger*22)+'px rgba(255,45,45,'+(danger*0.45).toFixed(2)+')';if(danger>0.5&&!p.done&&go&&Math.random()<0.08)tone(1400,.05,'square',.04)}
 function drawMap(){const c=mapCtx,S=240;c.clearRect(0,0,S,S);const pts=[];for(let i=0;i<=120;i++)pts.push(curve.getPointAt(i/120));const xs=pts.map(p=>p.x),zs=pts.map(p=>p.z),mnx=Math.min(...xs),mxx=Math.max(...xs),mnz=Math.min(...zs),mxz=Math.max(...zs),sc=(S-30)/Math.max(mxx-mnx,mxz-mnz);const m=p=>[15+(p.x-mnx)*sc+((S-30)-(mxx-mnx)*sc)/2,15+(p.z-mnz)*sc+((S-30)-(mxz-mnz)*sc)/2];
   c.strokeStyle='rgba(243,241,236,.8)';c.lineWidth=6;c.lineJoin='round';c.beginPath();pts.forEach((p,i)=>{const [a,b]=m(p);i?c.lineTo(a,b):c.moveTo(a,b)});c.closePath();c.stroke();
   const dot=(o,r)=>{const [a,b]=m(o.mesh.position);c.fillStyle='#'+o.col.toString(16).padStart(6,'0');c.beginPath();c.arc(a,b,r,0,7);c.fill()};aiCars.forEach(c2=>dot(c2,5));P.forEach(p=>dot(p,7))}
@@ -163,8 +183,9 @@ let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(phase==='play')update(dt);
   const W=innerWidth,H=innerHeight;if(P.length===2){cam1.aspect=W/(H/2);cam1.updateProjectionMatrix();cam2.aspect=W/(H/2);cam2.updateProjectionMatrix();setCam(cam1,P[0]);setCam(cam2,P[1]);renderer.setViewport(0,H/2,W,H/2);renderer.setScissor(0,H/2,W,H/2);renderer.render(scene,cam1);renderer.setViewport(0,0,W,H/2);renderer.setScissor(0,0,W,H/2);renderer.render(scene,cam2)}
   else if(P.length){cam1.aspect=W/H;cam1.updateProjectionMatrix();setCam(cam1,P[0]);renderer.setViewport(0,0,W,H);renderer.setScissor(0,0,W,H);renderer.render(scene,cam1)}
-  if(P.length)drawMap();requestAnimationFrame(frame)}
+  if(P.length){drawMap();drawRadar(P[0])}requestAnimationFrame(frame)}
 $('bStart').onclick=newGame;$('bAgain').onclick=newGame;$('bMenu').onclick=()=>{phase='menu';engine(false,0);$('ovEnd').hidden=true;$('ovStart').hidden=false};
+garaUI('rowCar','car');garaUI('rowCar2','car2');$('garaDesc').textContent=CARS[opt.car].n+': '+CARS[opt.car].d;const updG=()=>{const pv=opt.mode==='pvp';$('lblCar2').style.display=pv?'':'none';$('rowCar2').style.display=pv?'':'none'};updG();$('rowMode').addEventListener('click',updG);
 init();buildScene();requestAnimationFrame(frame);
 </script>
 <script>
