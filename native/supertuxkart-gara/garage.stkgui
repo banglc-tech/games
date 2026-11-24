@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <!-- Nen: phong trung bay toi voi den neon (anh ve san), keo gian kin man hinh -->
+    <icon-stretch id="bg" x="0" y="0" width="100%" height="100%" icon="gui/icons/garage_bg.png"/>
+
+    <!-- Xe dung tren ban xoay cua anh nen -->
+    <model id="model" x="17%" y="23%" width="40%" height="66%"/>
+
+    <!-- Bang dieu khien ben phai -->
+    <icon-stretch id="panel-bg" x="64%" y="2%" width="35%" height="96%" icon="gui/icons/garage_panel.png"/>
+
+    <icon-button id="back" x="1%" y="1%" height="10%" icon="gui/icons/back.png"/>
+
+    <div x="9%" y="2%" width="54%" height="12%" layout="vertical-row">
+        <label id="title" width="100%" height="100%" raw_text="GARA" text_align="left"/>
+    </div>
+
+    <div x="5%" y="12%" width="58%" height="10%" layout="vertical-row">
+        <label id="kart-name" width="100%" height="100%" raw_text="" text_align="center"/>
+    </div>
+
+    <div x="66%" y="4%" width="31%" height="92%" layout="vertical-row">
+        <label id="lbl-kart" width="100%" height="fit" text_align="left" raw_text="Kart"/>
+        <div layout="horizontal-row" width="100%" height="8%">
+            <icon-button id="kart-prev" width="16%" height="100%" icon="gui/icons/garage/prev.png"/>
+            <label id="kart-label" proportion="1" height="100%" text_align="center" raw_text=""/>
+            <icon-button id="kart-next" width="16%" height="100%" icon="gui/icons/garage/next.png"/>
+        </div>
+
+        <spacer height="1%" width="25"/>
+        <label id="lbl-color" width="100%" height="fit" text_align="left" raw_text="Color"/>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <icon-button id="c0" proportion="1" height="100%" icon="gui/icons/garage/sw_0.png"/>
+            <icon-button id="c1" proportion="1" height="100%" icon="gui/icons/garage/sw_1.png"/>
+            <icon-button id="c2" proportion="1" height="100%" icon="gui/icons/garage/sw_2.png"/>
+            <icon-button id="c3" proportion="1" height="100%" icon="gui/icons/garage/sw_3.png"/>
+            <icon-button id="c4" proportion="1" height="100%" icon="gui/icons/garage/sw_4.png"/>
+            <icon-button id="c5" proportion="1" height="100%" icon="gui/icons/garage/sw_5.png"/>
+        </div>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <icon-button id="c6" proportion="1" height="100%" icon="gui/icons/garage/sw_6.png"/>
+            <icon-button id="c7" proportion="1" height="100%" icon="gui/icons/garage/sw_7.png"/>
+            <icon-button id="c8" proportion="1" height="100%" icon="gui/icons/garage/sw_8.png"/>
+            <icon-button id="c9" proportion="1" height="100%" icon="gui/icons/garage/sw_9.png"/>
+            <icon-button id="c10" proportion="1" height="100%" icon="gui/icons/garage/sw_10.png"/>
+            <icon-button id="c11" proportion="1" height="100%" icon="gui/icons/garage/sw_11.png"/>
+        </div>
+
+        <spacer height="1%" width="25"/>
+        <label id="lbl-spoiler" width="100%" height="fit" text_align="left" raw_text="Spoiler"/>
+        <div layout="horizontal-row" width="100%" height="8%">
+            <icon-button id="spoiler-prev" width="16%" height="100%" icon="gui/icons/garage/prev.png"/>
+            <label id="spoiler-label" proportion="1" height="100%" text_align="center" raw_text=""/>
+            <icon-button id="spoiler-next" width="16%" height="100%" icon="gui/icons/garage/next.png"/>
+        </div>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <label id="lbl-ssize" width="27%" height="100%" text_align="left" raw_text="Size"/>
+            <icon-button id="ssize-minus" width="13%" height="100%" icon="gui/icons/garage/minus.png"/>
+            <icon id="ssize-bar" proportion="1" height="100%" icon="gui/icons/garage/bar3_1.png"/>
+            <icon-button id="ssize-plus" width="13%" height="100%" icon="gui/icons/garage/plus.png"/>
+        </div>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <label id="lbl-sheight" width="27%" height="100%" text_align="left" raw_text="Height"/>
+            <icon-button id="sheight-minus" width="13%" height="100%" icon="gui/icons/garage/minus.png"/>
+            <icon id="sheight-bar" proportion="1" height="100%" icon="gui/icons/garage/bar3_1.png"/>
+            <icon-button id="sheight-plus" width="13%" height="100%" icon="gui/icons/garage/plus.png"/>
+        </div>
+
+        <spacer height="1%" width="25"/>
+        <label id="lbl-tune" width="100%" height="fit" text_align="left" raw_text="Tuning"/>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <label id="lbl-speed" width="27%" height="100%" text_align="left" raw_text="Speed"/>
+            <icon-button id="speed-minus" width="13%" height="100%" icon="gui/icons/garage/minus.png"/>
+            <icon id="speed-bar" proportion="1" height="100%" icon="gui/icons/garage/bar_1.png"/>
+            <icon-button id="speed-plus" width="13%" height="100%" icon="gui/icons/garage/plus.png"/>
+        </div>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <label id="lbl-power" width="27%" height="100%" text_align="left" raw_text="Engine"/>
+            <icon-button id="power-minus" width="13%" height="100%" icon="gui/icons/garage/minus.png"/>
+            <icon id="power-bar" proportion="1" height="100%" icon="gui/icons/garage/bar_1.png"/>
+            <icon-button id="power-plus" width="13%" height="100%" icon="gui/icons/garage/plus.png"/>
+        </div>
+        <div layout="horizontal-row" width="100%" height="7%">
+            <label id="lbl-turn" width="27%" height="100%" text_align="left" raw_text="Steering"/>
+            <icon-button id="turn-minus" width="13%" height="100%" icon="gui/icons/garage/minus.png"/>
+            <icon id="turn-bar" proportion="1" height="100%" icon="gui/icons/garage/bar_1.png"/>
+            <icon-button id="turn-plus" width="13%" height="100%" icon="gui/icons/garage/plus.png"/>
+        </div>
+
+        <spacer proportion="1" width="25"/>
+        <icon-button id="race" width="100%" height="11%" icon="gui/icons/garage/drive.png"/>
+    </div>
+</stkgui>

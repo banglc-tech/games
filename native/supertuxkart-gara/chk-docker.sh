@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --rm a9-rn-build bash -c 'echo "SDK=$ANDROID_HOME / $ANDROID_SDK_ROOT"; S=${ANDROID_HOME:-$ANDROID_SDK_ROOT}; ls $S; echo "platforms: $(ls $S/platforms 2>/dev/null | tr "\n" " ")"; echo "build-tools: $(ls $S/build-tools 2>/dev/null | tr "\n" " ")"; echo "ndk: $(ls $S/ndk 2>/dev/null | tr "\n" " ")"; echo "cmake: $(ls $S/cmake 2>/dev/null | tr "\n" " ")"; echo "licenses: $(ls $S/licenses 2>/dev/null | tr "\n" " ")"; ls $S/cmdline-tools 2>/dev/null; which cmake make autoconf automake python3 gradle convert pngquant oggenc | tr "\n" " "'
